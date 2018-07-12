@@ -84,15 +84,8 @@ public class CollectionDeserializer extends AbstractListDeserializer {
 
         in.addRef(list);
 
-        Deserializer deserializer = null;
-
-        SerializerFactory factory = findSerializerFactory(in);
-        if (expectType != null) {
-            deserializer = factory.getDeserializer(expectType.getName());
-        }
-
         while (!in.isEnd())
-            list.add(deserializer != null ? deserializer.readObject(in) : in.readObject());
+            list.add(in.readObject());
 
         in.readEnd();
 

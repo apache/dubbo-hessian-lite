@@ -1171,9 +1171,12 @@ public class HessianInput extends AbstractHessianInput {
                 if (List.class != reader.getType() && List.class.isAssignableFrom(reader.getType()))
                     return reader.readList(this, length, valueType ? expectedTypes.get(0) : null);
 
-                reader = _serializerFactory.getDeserializer(List.class);
-
-                Object v = reader.readList(this, length, valueType ? expectedTypes.get(0) : null);
+                Object v = null;
+                try {
+                    v = reader.readList(this, length, valueType ? expectedTypes.get(0) : Class.forName(type));
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
 
                 return v;
             }
