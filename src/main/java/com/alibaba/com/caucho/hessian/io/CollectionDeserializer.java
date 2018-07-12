@@ -75,7 +75,7 @@ public class CollectionDeserializer extends AbstractListDeserializer {
     @Override
     public Object readList(AbstractHessianInput in, int length)
             throws IOException {
-        return readList(in, length, null);
+        return readList(in, length, _type);
     }
 
     @Override
@@ -84,8 +84,15 @@ public class CollectionDeserializer extends AbstractListDeserializer {
 
         in.addRef(list);
 
+        Deserializer deserializer = null;
+
+        SerializerFactory factory = findSerializerFactory(in);
+        if (expectType != null) {
+            deserializer = factory.getDeserializer(expectType.getName());
+        }
+
         while (!in.isEnd())
-            list.add(in.readObject());
+            list.add(deserializer != null ? deserializer.readObject(in) : in.readObject());
 
         in.readEnd();
 

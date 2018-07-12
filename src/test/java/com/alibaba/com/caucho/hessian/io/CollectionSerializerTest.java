@@ -31,7 +31,7 @@ public class CollectionSerializerTest extends SerializeTestBase {
     @Test
     public void testSetSerializer() throws Exception {
 
-        Set<Integer> set = new HashSet();
+        Set set = new HashSet();
         set.add(1111);
         set.add(2222);
 
