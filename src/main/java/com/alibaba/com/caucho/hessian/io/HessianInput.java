@@ -56,7 +56,9 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Input stream for Hessian requests.
@@ -1170,8 +1172,8 @@ public class HessianInput extends AbstractHessianInput {
 
                 if (List.class != reader.getType() && List.class.isAssignableFrom(reader.getType()))
                     return reader.readList(this, length, valueType ? expectedTypes.get(0) : null);
-
-                reader = _serializerFactory.getDeserializer(List.class);
+                Class clazz = type.equals(HashSet.class.getName()) ? Set.class : List.class;
+                reader = _serializerFactory.getDeserializer(clazz);
 
                 Object v = reader.readList(this, length, valueType ? expectedTypes.get(0) : null);
 

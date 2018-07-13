@@ -83,14 +83,7 @@ public class CollectionSerializer extends AbstractSerializer {
         Collection list = (Collection) obj;
 
         Class cl = obj.getClass();
-        boolean hasEnd;
-
-        if (cl.equals(ArrayList.class)
-                || !_sendJavaType
-                || !Serializable.class.isAssignableFrom(cl))
-            hasEnd = out.writeListBegin(list.size(), null);
-        else
-            hasEnd = out.writeListBegin(list.size(), obj.getClass().getName());
+        boolean hasEnd = out.writeListBegin(list.size(), obj.getClass().getName());
 
         Iterator iter = list.iterator();
         while (iter.hasNext()) {
