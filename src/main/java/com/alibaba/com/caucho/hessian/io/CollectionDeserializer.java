@@ -91,8 +91,15 @@ public class CollectionDeserializer extends AbstractListDeserializer {
             deserializer = factory.getDeserializer(expectType.getName());
         }
 
-        while (!in.isEnd())
-            list.add(deserializer != null ? deserializer.readObject(in) : in.readObject());
+        while (!in.isEnd()) {
+            Object object = deserializer != null ? deserializer.readObject(in) : in.readObject();
+            if (Hessian2Input._isNull) {
+                list.add(null);
+            } else {
+                list.add(object);
+            }
+        }
+
 
         in.readEnd();
 
