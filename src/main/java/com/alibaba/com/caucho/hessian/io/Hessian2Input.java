@@ -482,12 +482,10 @@ public class Hessian2Input
     @Override
     public void readNull()
             throws IOException {
-        _isNull = false;
         int tag = read();
 
         switch (tag) {
             case 'N':
-                _isNull = true;
                 return;
 
             default:
@@ -506,7 +504,6 @@ public class Hessian2Input
     @Override
     public boolean readBoolean()
             throws IOException {
-        _isNull = false;
         int tag = _offset < _length ? (_buffer[_offset++] & 0xff) : read();
 
         switch (tag) {
@@ -725,7 +722,6 @@ public class Hessian2Input
                 return parseDouble() != 0.0;
 
             case 'N':
-                _isNull = true;
                 return false;
 
             default:
@@ -1448,12 +1444,10 @@ public class Hessian2Input
             _chunkLength = 0;
             return -1;
         }
-        _isNull = false;
         int tag = read();
 
         switch (tag) {
             case 'N':
-                _isNull = true;
                 return -1;
 
             case 'S':
@@ -1481,7 +1475,6 @@ public class Hessian2Input
      */
     public int readString(char[] buffer, int offset, int length)
             throws IOException {
-        _isNull = false;
         int readLength = 0;
 
         if (_chunkLength == END_OF_DATA) {
@@ -1492,7 +1485,6 @@ public class Hessian2Input
 
             switch (tag) {
                 case 'N':
-                    _isNull = true;
                     return -1;
 
                 case 'S':
@@ -1592,12 +1584,10 @@ public class Hessian2Input
     @Override
     public String readString()
             throws IOException {
-        _isNull = false;
         int tag = read();
 
         switch (tag) {
             case 'N':
-                _isNull = true;
                 return null;
             case 'T':
                 return "true";
@@ -1880,12 +1870,10 @@ public class Hessian2Input
     @Override
     public byte[] readBytes()
             throws IOException {
-        _isNull = false;
         int tag = read();
 
         switch (tag) {
             case 'N':
-                _isNull = true;
                 return null;
 
             case 'B':
@@ -1956,7 +1944,6 @@ public class Hessian2Input
      */
     public int readByte()
             throws IOException {
-        _isNull = false;
         if (_chunkLength > 0) {
             _chunkLength--;
             if (_chunkLength == 0 && _isLastChunk)
@@ -1972,7 +1959,6 @@ public class Hessian2Input
 
         switch (tag) {
             case 'N':
-                _isNull = true;
                 return -1;
 
             case 'B':
@@ -1999,7 +1985,6 @@ public class Hessian2Input
      */
     public int readBytes(byte[] buffer, int offset, int length)
             throws IOException {
-        _isNull = false;
         int readLength = 0;
 
         if (_chunkLength == END_OF_DATA) {
@@ -2010,7 +1995,6 @@ public class Hessian2Input
 
             switch (tag) {
                 case 'N':
-                    _isNull = true;
                     return -1;
 
                 case 'B':
@@ -2098,7 +2082,6 @@ public class Hessian2Input
 
     @Override
     public Object readObject(Class expectedClass, Class<?>... expectedTypes) throws IOException {
-        _isNull = false;
         if (expectedClass == null || expectedClass == Object.class)
             return readObject();
 
@@ -2106,7 +2089,6 @@ public class Hessian2Input
 
         switch (tag) {
             case 'N':
-                _isNull = true;
                 return null;
 
             case 'H': {
@@ -2304,12 +2286,10 @@ public class Hessian2Input
 
     @Override
     public Object readObject(List<Class<?>> expectedTypes) throws IOException {
-        _isNull = false;
         int tag = _offset < _length ? (_buffer[_offset++] & 0xff) : read();
 
         switch (tag) {
             case 'N':
-                _isNull = true;
                 return null;
 
             case 'T':
@@ -3374,12 +3354,10 @@ public class Hessian2Input
     @Override
     public InputStream readInputStream()
             throws IOException {
-        _isNull = false;
         int tag = read();
 
         switch (tag) {
             case 'N':
-                _isNull = true;
                 return null;
 
             case 'B':

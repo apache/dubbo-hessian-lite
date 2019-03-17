@@ -80,7 +80,6 @@ public class HessianInput extends AbstractHessianInput {
     private static int END_OF_DATA = -2;
 
     private static Field _detailMessageField;
-    public static boolean _isNull = false;
 
     static {
         try {
@@ -439,12 +438,10 @@ public class HessianInput extends AbstractHessianInput {
     @Override
     public void readNull()
             throws IOException {
-        _isNull = false;
         int tag = read();
 
         switch (tag) {
             case 'N':
-                _isNull = true;
                 return;
 
             default:
@@ -478,7 +475,6 @@ public class HessianInput extends AbstractHessianInput {
     @Override
     public boolean readBoolean()
             throws IOException {
-        _isNull = false;
         int tag = read();
 
         switch (tag) {
@@ -493,7 +489,6 @@ public class HessianInput extends AbstractHessianInput {
             case 'D':
                 return parseDouble() == 0.0;
             case 'N':
-                _isNull = true;
                 return false;
 
             default:
@@ -663,12 +658,10 @@ public class HessianInput extends AbstractHessianInput {
             return -1;
         }
 
-        _isNull = false;
         int tag = read();
 
         switch (tag) {
             case 'N':
-                _isNull = true;
                 return -1;
 
             case 'S':
@@ -698,7 +691,6 @@ public class HessianInput extends AbstractHessianInput {
      */
     public int readString(char[] buffer, int offset, int length)
             throws IOException {
-        _isNull = false;
         int readLength = 0;
 
         if (_chunkLength == END_OF_DATA) {
@@ -709,7 +701,6 @@ public class HessianInput extends AbstractHessianInput {
 
             switch (tag) {
                 case 'N':
-                    _isNull = true;
                     return -1;
 
                 case 'S':
@@ -776,12 +767,10 @@ public class HessianInput extends AbstractHessianInput {
     @Override
     public String readString()
             throws IOException {
-        _isNull = false;
         int tag = read();
 
         switch (tag) {
             case 'N':
-                _isNull = true;
                 return null;
 
             case 'I':
@@ -821,12 +810,10 @@ public class HessianInput extends AbstractHessianInput {
     @Override
     public org.w3c.dom.Node readNode()
             throws IOException {
-        _isNull = false;
         int tag = read();
 
         switch (tag) {
             case 'N':
-                _isNull = true;
                 return null;
 
             case 'S':
@@ -853,12 +840,10 @@ public class HessianInput extends AbstractHessianInput {
     @Override
     public byte[] readBytes()
             throws IOException {
-        _isNull = false;
         int tag = read();
 
         switch (tag) {
             case 'N':
-                _isNull = true;
                 return null;
 
             case 'B':
@@ -895,12 +880,10 @@ public class HessianInput extends AbstractHessianInput {
             return -1;
         }
 
-        _isNull = false;
         int tag = read();
 
         switch (tag) {
             case 'N':
-                _isNull = true;
                 return -1;
 
             case 'B':
@@ -927,7 +910,6 @@ public class HessianInput extends AbstractHessianInput {
      */
     public int readBytes(byte[] buffer, int offset, int length)
             throws IOException {
-        _isNull = false;
         int readLength = 0;
 
         if (_chunkLength == END_OF_DATA) {
@@ -938,7 +920,6 @@ public class HessianInput extends AbstractHessianInput {
 
             switch (tag) {
                 case 'N':
-                    _isNull = true;
                     return -1;
 
                 case 'B':
@@ -1029,7 +1010,6 @@ public class HessianInput extends AbstractHessianInput {
      */
     public Object readObject(Class expectedClass, Class<?>... expectedTypes)
             throws IOException {
-        _isNull = false;
         if (expectedClass == null || expectedClass == Object.class)
             return readObject();
 
@@ -1037,7 +1017,6 @@ public class HessianInput extends AbstractHessianInput {
 
         switch (tag) {
             case 'N':
-                _isNull = true;
                 return null;
 
             case 'M': {
@@ -1122,12 +1101,10 @@ public class HessianInput extends AbstractHessianInput {
      */
     public Object readObject(List<Class<?>> expectedTypes)
             throws IOException {
-        _isNull = false;
         int tag = read();
 
         switch (tag) {
             case 'N':
-                _isNull = true;
                 return null;
 
             case 'T':
@@ -1592,12 +1569,10 @@ public class HessianInput extends AbstractHessianInput {
     @Override
     public InputStream readInputStream()
             throws IOException {
-        _isNull = false;
         int tag = read();
 
         switch (tag) {
             case 'N':
-                _isNull = true;
                 return null;
 
             case 'B':

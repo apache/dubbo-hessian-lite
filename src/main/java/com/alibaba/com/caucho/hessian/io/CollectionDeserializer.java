@@ -92,8 +92,9 @@ public class CollectionDeserializer extends AbstractListDeserializer {
         }
 
         while (!in.isEnd()) {
+            Hessian2Input._isNull = false;
             Object object = deserializer != null ? deserializer.readObject(in) : in.readObject();
-            if (HessianInput._isNull || Hessian2Input._isNull) {
+            if (Hessian2Input._isNull) {
                 list.add(null);
             } else {
                 list.add(object);
