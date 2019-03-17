@@ -92,13 +92,7 @@ public class CollectionDeserializer extends AbstractListDeserializer {
         }
 
         while (!in.isEnd()) {
-            Hessian2Input._isNull = false;
-            Object object = deserializer != null ? deserializer.readObject(in) : in.readObject();
-            if (Hessian2Input._isNull) {
-                list.add(null);
-            } else {
-                list.add(object);
-            }
+            deserializerList(in, deserializer, list);
         }
 
 
@@ -126,10 +120,22 @@ public class CollectionDeserializer extends AbstractListDeserializer {
             deserializer = factory.getDeserializer(expectType.getName());
         }
 
-        for (; length > 0; length--)
-            list.add(deserializer != null ? deserializer.readObject(in) : in.readObject());
+        for (; length > 0; length--) {
+            deserializerList(in, deserializer, list);
+        }
+
 
         return list;
+    }
+
+    private void deserializerList(AbstractHessianInput in, Deserializer deserializer, Collection list) throws IOException {
+        Hessian2Input._isNull = false;
+        Object object = deserializer != null ? deserializer.readObject(in) : in.readObject();
+        if (Hessian2Input._isNull) {
+            list.add(null);
+        } else {
+            list.add(object);
+        }
     }
 
     private Collection createList()
