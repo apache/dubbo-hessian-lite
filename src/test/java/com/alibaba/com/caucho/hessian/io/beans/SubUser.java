@@ -17,19 +17,31 @@
 package com.alibaba.com.caucho.hessian.io.beans;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
+ *
  */
 public class SubUser extends BaseUser implements Serializable {
     private static final long serialVersionUID = 4017613093053853415L;
     private String userName;
+    private List<Integer> wage;
 
     @Override
     public String getUserName() {
         return userName;
     }
+
     @Override
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public List<Integer> getWage() {
+        return wage;
+    }
+
+    public void setWage(List<Integer> wage) {
+        this.wage = wage;
     }
 }

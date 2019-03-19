@@ -24,10 +24,12 @@ import com.alibaba.com.caucho.hessian.io.beans.SubUser;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * fix hessian serialize bug:
  * the filed of parent class will cover the filed of sub class
- *
  */
 public class HessianJavaSerializeTest extends SerializeTestBase {
 
@@ -51,6 +53,23 @@ public class HessianJavaSerializeTest extends SerializeTestBase {
 
         SubUser serializedUser = baseHessianSerialize(subUser);
         Assert.assertEquals("tom", serializedUser.getUserName());
+
+    }
+
+
+    @Test
+    public void testSubUserWage() throws Exception {
+        SubUser subUser = new SubUser();
+        subUser.setUserId(1);
+        subUser.setUserName("tom");
+        List<Integer> list = new ArrayList<>();
+        list.add(null);
+        list.add(null);
+        list.add(3);
+        subUser.setWage(list);
+
+        SubUser serializedUser = baseHessian2Serialize(subUser);
+        Assert.assertEquals(subUser.getWage(), serializedUser.getWage());
 
     }
 
