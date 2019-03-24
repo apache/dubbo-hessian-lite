@@ -148,6 +148,9 @@ public class BasicDeserializer extends AbstractDeserializer {
     @Override
     public Object readObject(AbstractHessianInput in)
             throws IOException {
+        if (in.checkAndReadNull()) {
+            return null;
+        }
         switch (_code) {
             case NULL:
                 // hessian/3490

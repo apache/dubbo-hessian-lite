@@ -90,7 +90,6 @@ public class Hessian2Input
     private static final int GAP = 16;
     private static Field _detailMessageField;
     private static boolean _isCloseStreamOnClose;
-    public static boolean _isNull = false;
 
     static {
         try {
@@ -183,6 +182,19 @@ public class Hessian2Input
      */
     public Throwable getReplyFault() {
         return _replyFault;
+    }
+
+    @Override
+    public boolean checkAndReadNull() {
+        try {
+            int tag = read();
+            if ('N' == tag) {
+                return true;
+            }
+            _offset--;
+        } catch (IOException ignored) {
+        }
+        return false;
     }
 
     /**
@@ -752,12 +764,10 @@ public class Hessian2Input
     public final int readInt()
             throws IOException {
         //int tag = _offset < _length ? (_buffer[_offset++] & 0xff) : read();
-        _isNull = false;
         int tag = read();
 
         switch (tag) {
             case 'N':
-                _isNull = true;
                 return 0;
 
             case 'F':
@@ -973,12 +983,10 @@ public class Hessian2Input
     @Override
     public long readLong()
             throws IOException {
-        _isNull = false;
         int tag = read();
 
         switch (tag) {
             case 'N':
-                _isNull = true;
                 return 0;
 
             case 'F':
@@ -1203,12 +1211,10 @@ public class Hessian2Input
     @Override
     public double readDouble()
             throws IOException {
-        _isNull = false;
         int tag = read();
 
         switch (tag) {
             case 'N':
-                _isNull = true;
                 return 0;
 
             case 'F':
