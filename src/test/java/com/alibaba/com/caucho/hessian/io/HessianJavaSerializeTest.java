@@ -83,4 +83,12 @@ public class HessianJavaSerializeTest extends SerializeTestBase {
         Assert.assertEquals("tom", serializedUser.getUserName());
     }
 
+    @Test
+    public void testFloat() throws Exception {
+        Float fData = 99.8F;
+        Double dData = 99.8D;
+        Assert.assertEquals(dData, baseHessianSerialize(fData));
+        Assert.assertEquals(dData, baseHessian2Serialize(fData));
+    }
+
 }
