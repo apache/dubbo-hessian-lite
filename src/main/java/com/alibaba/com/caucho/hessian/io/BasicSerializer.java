@@ -106,7 +106,7 @@ public class BasicSerializer extends AbstractSerializer {
                 break;
 
             case FLOAT:
-                out.writeDouble(Double.parseDouble(((Number) obj).floatValue() + ""));
+                out.writeDouble(Double.parseDouble(String.valueOf(((Number) obj).floatValue())));
                 break;
             case DOUBLE:
                 out.writeDouble(((Number) obj).doubleValue());
