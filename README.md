@@ -17,7 +17,7 @@ Hessian-lite is a Alibaba dubbo embed version of [official hessian](https://gith
 <dependency>
     <groupId>com.alibaba</groupId>
     <artifactId>hessian-lite</artifactId>
-    <version>3.2.5</version>
+    <version>3.2.6</version>
 <dependency>
 ```
 
