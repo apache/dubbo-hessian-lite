@@ -99,4 +99,18 @@ public class SerializerFactoryTest {
         countDownLatch.await();
     }
 
+    @Test
+    public void getDeserializerByType() throws Exception {
+        final SerializerFactory serializerFactory = new SerializerFactory();
+
+        final String testClassName = TestClass.class.getName();
+        Deserializer d1 = serializerFactory.getDeserializer(testClassName);
+        Assert.assertTrue("TestClass Deserializer!", d1 != null);
+
+        Deserializer d2 = serializerFactory.getDeserializer("com.test.NotExistClass");
+        Assert.assertTrue("NotExistClass Deserializer!", d2 == null);
+        //again check NotExistClass, there should be no warning like Hessian/Burlap:.....
+        Deserializer d3 = serializerFactory.getDeserializer("com.test.NotExistClass");
+        Assert.assertTrue("NotExistClass Deserializer!", d3 == null);
+    }
 }

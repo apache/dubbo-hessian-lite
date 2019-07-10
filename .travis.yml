@@ -2,13 +2,14 @@ language: java
 sudo: false # faster builds
 
 jdk:
-#    - oraclejdk10
-#    - oraclejdk9
+    - oraclejdk11
+    - openjdk10
+    - oraclejdk9
     - oraclejdk8
     - openjdk7
 
 script:
-    - mvn clean cobertura:cobertura package
+    - mvn clean package
 
 after_success:
     - bash <(curl -s https://codecov.io/bash)

@@ -1,6 +1,6 @@
 ## Hessian Lite(Alibaba embed version)
 
-[![Build Status](https://travis-ci.org/dubbo/hessian-lite.svg?branch=master)](https://travis-ci.org/dubbo/hessian-lite)
+[![Build Status](https://travis-ci.org/dubbo/hessian-lite.svg?branch=master)](https://travis-ci.org/apache/dubbo-hessian-lite)
 [![codecov](https://codecov.io/gh/dubbo/hessian-lite/branch/master/graph/badge.svg)](https://codecov.io/gh/dubbo/hessian-lite)
 [![Gitter](https://badges.gitter.im/alibaba/dubbo.svg)](https://gitter.im/alibaba/dubbo?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 ![license](https://img.shields.io/github/license/alibaba/dubbo.svg)
@@ -17,7 +17,7 @@ Hessian-lite is a Alibaba dubbo embed version of [official hessian](https://gith
 <dependency>
     <groupId>com.alibaba</groupId>
     <artifactId>hessian-lite</artifactId>
-    <version>3.2.4</version>
+    <version>3.2.6</version>
 <dependency>
 ```
 
