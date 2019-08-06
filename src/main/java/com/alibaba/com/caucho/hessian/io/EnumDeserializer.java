@@ -48,8 +48,14 @@
 
 package com.alibaba.com.caucho.hessian.io;
 
+import com.alibaba.fastjson.JSONObject;
+
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Deserializing an enum valued object
@@ -57,6 +63,8 @@ import java.lang.reflect.Method;
 public class EnumDeserializer extends AbstractDeserializer {
     private Class _enumType;
     private Method _valueOf;
+
+    private HashMap<String, Method> _methodMap;
 
     public EnumDeserializer(Class cl) {
         // hessian/33b[34], hessian/3bb[78]
@@ -73,14 +81,15 @@ public class EnumDeserializer extends AbstractDeserializer {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
+        _methodMap = getMethodMap(cl);
+
     }
 
-    @Override
     public Class getType() {
         return _enumType;
     }
 
-    @Override
     public Object readMap(AbstractHessianInput in)
             throws IOException {
         String name = null;
@@ -103,23 +112,63 @@ public class EnumDeserializer extends AbstractDeserializer {
         return obj;
     }
 
-    @Override
     public Object readObject(AbstractHessianInput in, String[] fieldNames)
             throws IOException {
-        String name = null;
+        String value = null;
 
         for (int i = 0; i < fieldNames.length; i++) {
-            if ("name".equals(fieldNames[i]))
-                name = in.readString();
+            if ("enum".equals(fieldNames[i]))
+                value = in.readString();
             else
                 in.readObject();
         }
 
-        Object obj = create(name);
+        JSONObject jo = JSONObject.parseObject(value);
+        Object obj = create(jo.getString("_"));
+        wlDecode(obj, jo, _methodMap);
 
         in.addRef(obj);
 
         return obj;
+    }
+
+    private void wlDecode(Object obj, JSONObject jo, HashMap<String, Method> methodMap) {
+        for (Map.Entry<String, Method> me : methodMap.entrySet()) {
+            if (!jo.containsKey(me.getKey())) continue;
+            Class c = me.getValue().getParameterTypes()[0];
+
+            if (Enum.class.isAssignableFrom(c)) {
+                try {
+                    JSONObject _jo = jo.getJSONObject(me.getKey());
+
+                    Method method = c.getMethod("valueOf", new Class[]{Class.class, String.class});
+
+                    Object _obj = method.invoke(null, c, _jo.getString("_"));
+
+                    HashMap<String, Method> _methodMap = getMethodMap(c);
+
+                    wlDecode(_obj, _jo, _methodMap);
+
+                    me.getValue().invoke(obj, _obj);
+                } catch (NoSuchMethodException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                try {
+                    me.getValue().invoke(obj, new Object[]{jo.get(me.getKey())});
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     private Object create(String name)
@@ -132,5 +181,85 @@ public class EnumDeserializer extends AbstractDeserializer {
         } catch (Exception e) {
             throw new IOExceptionWrapper(e);
         }
+    }
+
+    /**
+     * Creates a map of the classes fields.
+     */
+    protected HashMap<String, Method> getMethodMap(Class cl) {
+        HashMap<String, Method> methodMap = new HashMap<String, Method>();
+
+        for (; cl != null; cl = cl.getSuperclass()) {
+            Method[] methods = cl.getDeclaredMethods();
+
+            for (int i = 0; i < methods.length; i++) {
+                Method method = methods[i];
+
+                if (Modifier.isStatic(method.getModifiers()))
+                    continue;
+
+                String name = method.getName();
+
+                if (!name.startsWith("set"))
+                    continue;
+
+                Class[] paramTypes = method.getParameterTypes();
+                if (paramTypes.length != 1)
+                    continue;
+
+                //if (!method.getReturnType().equals(void.class))
+                //    continue;
+
+                if (findGetter(methods, name, paramTypes[0]) == null)
+                    continue;
+
+                // XXX: could parameterize the handler to only deal with public
+                try {
+                    method.setAccessible(true);
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                }
+
+                name = name.substring(3);
+
+                int j = 0;
+                for (; j < name.length() && Character.isUpperCase(name.charAt(j)); j++) {
+                }
+
+                if (j == 1)
+                    name = name.substring(0, j).toLowerCase() + name.substring(j);
+                else if (j > 1)
+                    name = name.substring(0, j - 1).toLowerCase() + name.substring(j - 1);
+
+
+                methodMap.put(name, method);
+            }
+        }
+
+        return methodMap;
+    }
+
+    /**
+     * Finds any matching setter.
+     */
+    private Method findGetter(Method[] methods, String setterName, Class arg) {
+        String getterName = "get" + setterName.substring(3);
+
+        for (int i = 0; i < methods.length; i++) {
+            Method method = methods[i];
+
+            if (!method.getName().equals(getterName))
+                continue;
+
+            if (!method.getReturnType().equals(arg))
+                continue;
+
+            Class[] params = method.getParameterTypes();
+
+            if (params.length == 0)
+                return method;
+        }
+
+        return null;
     }
 }
