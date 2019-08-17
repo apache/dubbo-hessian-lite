@@ -11,6 +11,8 @@ Hessian-lite is a Alibaba dubbo embed version of [official hessian](https://gith
 - [2018-07-13 Delete the code of dubbo/hessian-lite module of the 2.6.x and 2.5.x branches](https://lists.apache.org/thread.html/72f7bbca340e96fb7da6a7ada014312953cfccd19271fad8e60cbf39@%3Cdev.dubbo.apache.org%3E) 
 - [2018-06-04 Moving hessian-lite from Dubbo codebase to eco-system](https://lists.apache.org/thread.html/872bbcada2db0f04145f853dd7c7f8abef589807b8089a5016478ec8@%3Cdev.dubbo.apache.org%3E) 
 
+Now we are try to build a hessian group https://github.com/hessian-group to make Hessian's maintainers work more closely together .
+
 ## Maven dependency
 
 ```xml
