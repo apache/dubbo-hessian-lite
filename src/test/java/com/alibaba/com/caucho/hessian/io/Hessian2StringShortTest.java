@@ -24,11 +24,7 @@ import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
@@ -206,5 +202,21 @@ public class Hessian2StringShortTest extends SerializeTestBase {
         assertTrue(deserialize.get(1) instanceof Short);
         assertEquals(Short.valueOf((short)0), deserialize.get(0));
         assertEquals(Short.valueOf((short)60), deserialize.get(1));
+    }
+
+    @Test
+    public void serialize_short_set_then_deserialize() throws Exception {
+
+        Hessian2StringShortType stringShort = new Hessian2StringShortType();
+        Set<Short> shortSet = new HashSet<Short>();
+        shortSet.add((short) 0);
+        shortSet.add((short) 60);
+        stringShort.shortSet = shortSet;
+
+        Hessian2StringShortType deserialize = baseHessian2Serialize(stringShort);
+        assertTrue(deserialize.shortSet != null);
+        assertTrue(deserialize.shortSet.size() == 2);
+        assertTrue(deserialize.shortSet.contains((short) 0));
+        assertTrue(deserialize.shortSet.contains((short) 60));
     }
 }
