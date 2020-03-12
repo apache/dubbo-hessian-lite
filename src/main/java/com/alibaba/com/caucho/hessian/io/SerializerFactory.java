@@ -80,6 +80,7 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -94,7 +95,7 @@ public class SerializerFactory extends AbstractSerializerFactory {
 
     private static Deserializer OBJECT_DESERIALIZER
             = new BasicDeserializer(BasicDeserializer.OBJECT);
-
+    private static ConcurrentHashMap _unrecognizedTypeCache = new ConcurrentHashMap();
     private static HashMap _staticSerializerMap;
     private static HashMap _staticDeserializerMap;
     private static HashMap _staticTypeMap;
@@ -647,7 +648,7 @@ public class SerializerFactory extends AbstractSerializerFactory {
                 deserializer = new ArrayDeserializer(subDeserializer.getType());
             else
                 deserializer = new ArrayDeserializer(Object.class);
-        } else {
+        } else if (_unrecognizedTypeCache.get(type) == null) {
             try {
                 Class cl = Class.forName(type, false, _loader);
                 deserializer = getDeserializer(cl);
@@ -655,7 +656,12 @@ public class SerializerFactory extends AbstractSerializerFactory {
                 log.warning("Hessian/Burlap: '" + type + "' is an unknown class in " + _loader + ":\n" + e);
                 _typeNotFoundDeserializerMap.put(type, PRESENT);
                 log.log(Level.FINER, e.toString(), e);
+                _unrecognizedTypeCache.put(type, new AtomicLong(1L));
             }
+        } else {
+            ((AtomicLong) _unrecognizedTypeCache.get(type)).incrementAndGet();
+            if (((AtomicLong) _unrecognizedTypeCache.get(type)).get() % 2000L == 0L)
+                ((AtomicLong) _unrecognizedTypeCache.get(type)).getAndSet(1L);
         }
 
         if (deserializer != null) {
