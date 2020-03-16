@@ -18,11 +18,14 @@ package com.alibaba.com.caucho.hessian.io.beans;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * test short serialize & deserialize model
  */
 public class Hessian2StringShortType implements Serializable {
+
+    public Set<Short> shortSet;
 
     public Map<String, Short> stringShortMap;
 

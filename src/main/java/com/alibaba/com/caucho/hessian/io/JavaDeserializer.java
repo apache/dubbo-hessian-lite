@@ -59,6 +59,7 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -374,7 +375,11 @@ public class JavaDeserializer extends AbstractMapDeserializer {
                 } else if (List.class.equals(type)
                         && field.getGenericType() != field.getType()) {
                     deser = new ObjectListFieldDeserializer(field);
-                } else {
+                } else if (Set.class.equals(type)
+                        && field.getGenericType() != field.getType()) {
+                    deser = new ObjectSetFieldDeserializer(field);
+                }
+                else {
                     deser = new ObjectFieldDeserializer(field);
                 }
 
@@ -530,6 +535,33 @@ public class JavaDeserializer extends AbstractMapDeserializer {
             }
         }
     }
+
+    static class ObjectSetFieldDeserializer extends FieldDeserializer {
+        private final Field _field;
+
+        ObjectSetFieldDeserializer(Field field) {
+            _field = field;
+        }
+
+        @Override
+        void deserialize(AbstractHessianInput in, Object obj)
+                throws IOException {
+            Object value = null;
+
+            try {
+
+                Type[] types = ((ParameterizedType) _field.getGenericType()).getActualTypeArguments();
+                value = in.readObject(_field.getType(),
+                        isPrimitive(types[0]) ? (Class<?>) types[0] : null
+                );
+
+                _field.set(obj, value);
+            } catch (Exception e) {
+                logDeserializeError(_field, obj, value, e);
+            }
+        }
+    }
+
 
     static class IntFieldDeserializer extends FieldDeserializer {
         private final Field _field;
