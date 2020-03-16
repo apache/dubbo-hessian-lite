@@ -66,10 +66,10 @@ public class HessianJavaSerializeTest extends SerializeTestBase {
         list.add(null);
         list.add(null);
         list.add(3);
-        subUser.setWage(list);
+        subUser.setAgeList(list);
 
         SubUser serializedUser = baseHessian2Serialize(subUser);
-        Assert.assertEquals(subUser.getWage(), serializedUser.getWage());
+        Assert.assertEquals(subUser.getAgeList(), serializedUser.getAgeList());
 
     }
 

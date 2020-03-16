@@ -100,6 +100,8 @@ abstract public class AbstractHessianInput {
     public void setSerializerFactory(SerializerFactory ser) {
     }
 
+    public abstract boolean checkAndReadNull();
+
     /**
      * Reads the call
      * <p>

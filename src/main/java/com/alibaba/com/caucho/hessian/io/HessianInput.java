@@ -170,6 +170,11 @@ public class HessianInput extends AbstractHessianInput {
         return _replyFault;
     }
 
+    @Override
+    public boolean checkAndReadNull() {
+        return _peek == 'N';
+    }
+
     /**
      * Starts reading the call
      * <p>

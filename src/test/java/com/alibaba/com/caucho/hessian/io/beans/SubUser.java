@@ -25,7 +25,9 @@ import java.util.List;
 public class SubUser extends BaseUser implements Serializable {
     private static final long serialVersionUID = 4017613093053853415L;
     private String userName;
-    private List<Integer> wage;
+    private List<Integer> ageList;
+    private List<Double> weightList;
+    private List<Boolean> sexyList;
 
     @Override
     public String getUserName() {
@@ -37,11 +39,27 @@ public class SubUser extends BaseUser implements Serializable {
         this.userName = userName;
     }
 
-    public List<Integer> getWage() {
-        return wage;
+    public List<Integer> getAgeList() {
+        return ageList;
     }
 
-    public void setWage(List<Integer> wage) {
-        this.wage = wage;
+    public void setAgeList(List<Integer> ageList) {
+        this.ageList = ageList;
+    }
+
+    public List<Double> getWeightList() {
+        return weightList;
+    }
+
+    public void setWeightList(List<Double> weightList) {
+        this.weightList = weightList;
+    }
+
+    public List<Boolean> getSexyList() {
+        return sexyList;
+    }
+
+    public void setSexyList(List<Boolean> sexyList) {
+        this.sexyList = sexyList;
     }
 }
