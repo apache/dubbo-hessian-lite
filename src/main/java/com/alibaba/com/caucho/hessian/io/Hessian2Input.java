@@ -114,9 +114,6 @@ public class Hessian2Input
     private boolean _isStreaming;
     // the method for a call
     private String _method;
-    private int _argLength;
-    private Reader _chunkReader;
-    private InputStream _chunkInputStream;
     private Throwable _replyFault;
     private StringBuilder _sbuf = new StringBuilder();
     // true if this is the last chunk
@@ -182,6 +179,25 @@ public class Hessian2Input
      */
     public Throwable getReplyFault() {
         return _replyFault;
+    }
+
+    @Override
+    public void init(InputStream is) {
+        _is = is;
+
+        reset();
+    }
+
+    public void reset() {
+        resetReferences();
+
+        if (_classDefs != null) {
+            _classDefs.clear();
+        }
+
+        if (_types != null) {
+            _types.clear();
+        }
     }
 
     @Override
@@ -454,12 +470,9 @@ public class Hessian2Input
             throws IOException {
         int tag = read();
 
-        if (tag == 'p')
-            _isStreaming = false;
-        else if (tag == 'P')
-            _isStreaming = true;
-        else
+        if (tag != 'p' && tag != 'P') {
             throw error("expected Hessian message ('p') at " + codeName(tag));
+        }
 
         int major = read();
         int minor = read();
@@ -3392,7 +3405,10 @@ public class Hessian2Input
                 _isLastChunk = true;
                 _chunkLength = tag - 0x20;
                 break;
-            case 0x34: case 0x35: case 0x36: case 0x37:
+            case 0x34:
+            case 0x35:
+            case 0x36:
+            case 0x37:
                 _isLastChunk = true;
                 _chunkLength = (tag - 0x34) * 256 + read();
                 break;
@@ -3450,7 +3466,10 @@ public class Hessian2Input
                         _isLastChunk = true;
                         _chunkLength = code - 0x20;
                         break;
-                    case 0x34: case 0x35: case 0x36: case 0x37:
+                    case 0x34:
+                    case 0x35:
+                    case 0x36:
+                    case 0x37:
                         _isLastChunk = true;
                         _chunkLength = (code - 0x34) * 256 + read();
                         break;
