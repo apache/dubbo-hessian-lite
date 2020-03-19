@@ -198,6 +198,9 @@ public class Hessian2Input
         if (_types != null) {
             _types.clear();
         }
+
+        _offset = 0;
+        _length = 0;
     }
 
     @Override
