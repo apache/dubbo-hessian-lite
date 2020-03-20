@@ -101,6 +101,30 @@ public class Hessian2Output
         _os = os;
     }
 
+    @Override
+    public void init(OutputStream os) {
+        reset();
+
+        _os = os;
+    }
+
+    /**
+     * Resets all counters and references
+     */
+    public void reset() {
+        resetReferences();
+
+        if (_classRefs != null) {
+            _classRefs.clear();
+        }
+
+        if (_typeRefs != null) {
+            _typeRefs.clear();
+        }
+
+        _offset = 0;
+    }
+
     public boolean isCloseStreamOnClose() {
         return _isCloseStreamOnClose;
     }
@@ -384,10 +408,7 @@ public class Hessian2Output
             return;
         }
 
-        Serializer serializer;
-
-        serializer = findSerializerFactory().getSerializer(object.getClass());
-
+        Serializer serializer = findSerializerFactory().getSerializer(object.getClass());
         serializer.writeObject(object, this);
     }
 

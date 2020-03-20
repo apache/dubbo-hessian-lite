@@ -17,6 +17,7 @@
 package com.alibaba.com.caucho.hessian.io.beans;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  */
@@ -31,5 +32,19 @@ public class GrandsonUser extends SubUser implements Serializable {
     @Override
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof GrandsonUser)) return false;
+        if (!super.equals(o)) return false;
+        GrandsonUser that = (GrandsonUser) o;
+        return Objects.equals(userName, that.userName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), userName);
     }
 }
