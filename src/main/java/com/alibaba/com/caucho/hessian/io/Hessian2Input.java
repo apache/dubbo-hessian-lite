@@ -206,12 +206,13 @@ public class Hessian2Input
     @Override
     public boolean checkAndReadNull() {
         try {
-            int tmp_offset = _offset;
             int tag = read();
             if ('N' == tag) {
                 return true;
             }
-            _offset = tmp_offset;
+            if (-1 != tag) {
+                _offset--;
+            }
         } catch (IOException ignored) {
         }
         return false;
