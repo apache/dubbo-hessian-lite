@@ -210,7 +210,9 @@ public class Hessian2Input
             if ('N' == tag) {
                 return true;
             }
-            _offset--;
+            if (-1 != tag) {
+                _offset--;
+            }
         } catch (IOException ignored) {
         }
         return false;
