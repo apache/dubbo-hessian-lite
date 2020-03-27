@@ -18,6 +18,7 @@ package com.alibaba.com.caucho.hessian.io.beans;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -61,5 +62,22 @@ public class SubUser extends BaseUser implements Serializable {
 
     public void setSexyList(List<Boolean> sexyList) {
         this.sexyList = sexyList;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SubUser)) return false;
+        if (!super.equals(o)) return false;
+        SubUser subUser = (SubUser) o;
+        return Objects.equals(userName, subUser.userName) &&
+                Objects.equals(ageList, subUser.ageList) &&
+                Objects.equals(weightList, subUser.weightList) &&
+                Objects.equals(sexyList, subUser.sexyList);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), userName, ageList, weightList, sexyList);
     }
 }

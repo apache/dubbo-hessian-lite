@@ -18,6 +18,7 @@ package com.alibaba.com.caucho.hessian.io.beans;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -35,5 +36,21 @@ public class Hessian2StringShortType implements Serializable {
 
     public Hessian2StringShortType() {
 
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Hessian2StringShortType)) return false;
+        Hessian2StringShortType that = (Hessian2StringShortType) o;
+        return Objects.equals(shortSet, that.shortSet) &&
+                Objects.equals(stringShortMap, that.stringShortMap) &&
+                Objects.equals(stringByteMap, that.stringByteMap) &&
+                Objects.equals(stringPersonTypeMap, that.stringPersonTypeMap);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(shortSet, stringShortMap, stringByteMap, stringPersonTypeMap);
     }
 }

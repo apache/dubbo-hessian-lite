@@ -17,6 +17,7 @@
 package com.alibaba.com.caucho.hessian.io.beans;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  */
@@ -39,5 +40,19 @@ public class BaseUser implements Serializable {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof BaseUser)) return false;
+        BaseUser user = (BaseUser) o;
+        return Objects.equals(userId, user.userId) &&
+                Objects.equals(userName, user.userName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userId, userName);
     }
 }
