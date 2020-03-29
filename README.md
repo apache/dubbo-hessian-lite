@@ -22,4 +22,13 @@ Now we are trying to build a hessian group https://github.com/hessian-group to m
     <version>3.2.6</version>
 <dependency>
 ```
+## Reaease
+Deploy to maven repo:
+```shell script
+mvn clean deploy -Prelease
+```
+Apache source package:
+```shell script
+mvn clean install -Papache-release
+```
 
