@@ -20,7 +20,6 @@ import com.alibaba.com.caucho.hessian.io.base.SerializeTestBase;
 import com.alibaba.com.caucho.hessian.io.beans.BaseUser;
 import com.alibaba.com.caucho.hessian.io.beans.GrandsonUser;
 import com.alibaba.com.caucho.hessian.io.beans.SubUser;
-
 import org.junit.Assert;
 import org.junit.Test;
 
