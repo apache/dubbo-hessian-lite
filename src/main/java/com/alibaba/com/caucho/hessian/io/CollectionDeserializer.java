@@ -160,6 +160,11 @@ public class CollectionDeserializer extends AbstractListDeserializer {
 
         return list;
     }
+
+    public String toString()
+    {
+        return getClass().getSimpleName() + "[" + _type + "]";
+    }
 }
 
 

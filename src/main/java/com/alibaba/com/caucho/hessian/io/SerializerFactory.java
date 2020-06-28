@@ -239,12 +239,31 @@ public class SerializerFactory extends AbstractSerializerFactory {
     private Map<String, Object> _typeNotFoundDeserializerMap = new ConcurrentHashMap<>(8);
     private static final Object PRESENT = new Object();
 
+    private ClassFactory _classFactory;
+
     public SerializerFactory() {
         this(Thread.currentThread().getContextClassLoader());
     }
 
     public SerializerFactory(ClassLoader loader) {
         _loader = loader;
+    }
+
+    public Class<?> loadSerializedClass(String className)
+            throws ClassNotFoundException
+    {
+        return getClassFactory().load(className);
+    }
+
+    public ClassFactory getClassFactory()
+    {
+        synchronized (this) {
+            if (_classFactory == null) {
+                _classFactory = new ClassFactory(getClassLoader());
+            }
+
+            return _classFactory;
+        }
     }
 
     private static void addBasic(Class cl, String typeName, int type) {
@@ -650,7 +669,8 @@ public class SerializerFactory extends AbstractSerializerFactory {
                 deserializer = new ArrayDeserializer(Object.class);
         } else if (_unrecognizedTypeCache.get(type) == null) {
             try {
-                Class cl = Class.forName(type, false, _loader);
+//                Class cl = Class.forName(type, false, _loader);
+                Class cl = loadSerializedClass(type);
                 deserializer = getDeserializer(cl);
             } catch (Exception e) {
                 log.warning("Hessian/Burlap: '" + type + "' is an unknown class in " + _loader + ":\n" + e);
