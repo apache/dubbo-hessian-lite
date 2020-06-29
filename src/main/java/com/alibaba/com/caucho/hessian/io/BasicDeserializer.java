@@ -607,4 +607,9 @@ public class BasicDeserializer extends AbstractDeserializer {
                 throw new UnsupportedOperationException(String.valueOf(this));
         }
     }
+
+    public String toString()
+    {
+        return getClass().getSimpleName() + "[" + _code + "]";
+    }
 }
