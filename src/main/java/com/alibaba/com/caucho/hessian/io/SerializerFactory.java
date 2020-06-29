@@ -70,15 +70,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
@@ -151,6 +143,10 @@ public class SerializerFactory extends AbstractSerializerFactory {
                     new BigIntegerDeserializer());
         } catch (Throwable e) {
         }
+
+
+        _staticSerializerMap.put(UUID.class, new StringValueSerializer());
+        _staticDeserializerMap.put(UUID.class, new UUIDDeserializer());
 
         _staticSerializerMap.put(File.class, new StringValueSerializer());
         try {
