@@ -50,6 +50,8 @@ package com.alibaba.com.caucho.hessian.io;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 /**
@@ -57,6 +59,8 @@ import java.util.regex.Pattern;
  */
 public class ClassFactory
 {
+    protected static final Logger log
+            = Logger.getLogger(ClassFactory.class.getName());
     private static ArrayList<Allow> _staticAllowList;
 
     private ClassLoader _loader;
@@ -76,6 +80,7 @@ public class ClassFactory
             return Class.forName(className, false, _loader);
         }
         else {
+            log.log(Level.SEVERE, className + " in blacklist or not in whitelist, deserialization  with type 'HashMap' instead.");
             return HashMap.class;
         }
     }
