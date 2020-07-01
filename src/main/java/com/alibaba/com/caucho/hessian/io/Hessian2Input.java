@@ -2822,6 +2822,12 @@ public class Hessian2Input
     private void readObjectDefinition(Class cl)
             throws IOException {
         String type = readString();
+
+        if (cl != null && !cl.getName().equals(type)) {
+            log.log(Level.SEVERE, "Hessian2Input#readObjectDefinition Dubbo Provider反序列化安全检查失败，clazz:" + cl.getName() + ", type:" + type);
+            throw new IllegalArgumentException("Hessian反序列化失败，类型不一致");
+        }
+
         int len = readInt();
 
         String[] fieldNames = new String[len];
@@ -3203,6 +3209,7 @@ public class Hessian2Input
             return false;
 
         int code = _offset < _length ? (_buffer[_offset++] & 0xff) : read();
+        break;
 
         switch (code) {
             case BC_STRING_CHUNK:
