@@ -104,7 +104,11 @@ public class ClassFactory
             }
         }
 
-        return false;
+        if (_isWhitelist) {
+            return false;
+        }
+
+        return true;
     }
 
     public void setWhitelist(boolean isWhitelist)
