@@ -20,7 +20,7 @@ Now we are trying to build a hessian group https://github.com/hessian-group to m
     <groupId>com.alibaba</groupId>
     <artifactId>hessian-lite</artifactId>
     <version>3.2.6</version>
-<dependency>
+</dependency>
 ```
 ## Release
 Deploy to maven repo:
