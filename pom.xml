@@ -31,7 +31,7 @@
     <name>Hessian Lite(Dubbo embed version)</name>
 
     <properties>
-        <junit_version>4.12</junit_version>
+        <junit_version>4.13.1</junit_version>
         <mockito_version>2.18.3</mockito_version>
         <hamcrest_version>1.3</hamcrest_version>
         <maven_jacoco_version>0.8.2</maven_jacoco_version>
