@@ -48,8 +48,17 @@
 
 package com.alibaba.com.caucho.hessian.io;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -61,16 +70,18 @@ public class ClassFactory
 {
     protected static final Logger log
             = Logger.getLogger(ClassFactory.class.getName());
-    private static ArrayList<Allow> _staticAllowList;
+    private static final ArrayList<Allow> _staticAllowList;
+    private static final Map<String, Object> _allowClassSet = new ConcurrentHashMap<>();
 
     private ClassLoader _loader;
     private boolean _isWhitelist;
 
-    private ArrayList<Allow> _allowList;
+    private LinkedList<Allow> _allowList;
 
     ClassFactory(ClassLoader loader)
     {
         _loader = loader;
+        initAllow();
     }
 
     public Class<?> load(String className)
@@ -87,9 +98,13 @@ public class ClassFactory
 
     private boolean isAllow(String className)
     {
-        ArrayList<Allow> allowList = _allowList;
+        LinkedList<Allow> allowList = _allowList;
 
         if (allowList == null) {
+            return true;
+        }
+
+        if (_allowClassSet.containsKey(className)) {
             return true;
         }
 
@@ -100,6 +115,9 @@ public class ClassFactory
             Boolean isAllow = allow.allow(className);
 
             if (isAllow != null) {
+                if (isAllow) {
+                    _allowClassSet.put(className, className);
+                }
                 return isAllow;
             }
         }
@@ -108,11 +126,13 @@ public class ClassFactory
             return false;
         }
 
+        _allowClassSet.put(className, className);
         return true;
     }
 
     public void setWhitelist(boolean isWhitelist)
     {
+        _allowClassSet.clear();
         _isWhitelist = isWhitelist;
 
         initAllow();
@@ -120,19 +140,21 @@ public class ClassFactory
 
     public void allow(String pattern)
     {
+        _allowClassSet.clear();
         initAllow();
 
         synchronized (this) {
-            _allowList.add(new Allow(toPattern(pattern), true));
+            _allowList.addFirst(new Allow(toPattern(pattern), true));
         }
     }
 
     public void deny(String pattern)
     {
+        _allowClassSet.clear();
         initAllow();
 
         synchronized (this) {
-            _allowList.add(new Allow(toPattern(pattern), false));
+            _allowList.addFirst(new Allow(toPattern(pattern), false));
         }
     }
 
@@ -148,7 +170,7 @@ public class ClassFactory
     {
         synchronized (this) {
             if (_allowList == null) {
-                _allowList = new ArrayList<Allow>();
+                _allowList = new LinkedList<Allow>();
                 _allowList.addAll(_staticAllowList);
             }
         }
@@ -157,6 +179,9 @@ public class ClassFactory
     static class Allow {
         private Boolean _isAllow;
         private Pattern _pattern;
+
+        public Allow() {
+        }
 
         private Allow(String pattern, boolean isAllow)
         {
@@ -175,9 +200,61 @@ public class ClassFactory
         }
     }
 
+    static class AllowPrefix extends Allow {
+        private Boolean _isAllow;
+        private String _prefix;
+
+        private AllowPrefix(String prefix, boolean isAllow)
+        {
+            super();
+            _isAllow = isAllow;
+            _prefix = prefix;
+        }
+
+        @Override
+        Boolean allow(String className)
+        {
+            if (className.startsWith(_prefix)) {
+                return _isAllow;
+            }
+            else {
+                return null;
+            }
+        }
+    }
+
     static {
         _staticAllowList = new ArrayList<Allow>();
 
-        _staticAllowList.add(new Allow("java\\..+", true));
+        ClassLoader classLoader = ClassFactory.class.getClassLoader();
+        try {
+            String[] denyClasses = readLines(classLoader.getResourceAsStream("DENY_CLASS"));
+            for (String denyClass : denyClasses) {
+                if (denyClass.startsWith("#")) {
+                    continue;
+                }
+                _staticAllowList.add(new AllowPrefix(denyClass, false));
+            }
+        } catch (IOException ignore) {
+
+        }
+    }
+
+    /**
+     * read lines.
+     *
+     * @param is input stream.
+     * @return lines.
+     * @throws IOException If an I/O error occurs
+     */
+    public static String[] readLines(InputStream is) throws IOException {
+        List<String> lines = new ArrayList<String>();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                lines.add(line);
+            }
+            return lines.toArray(new String[0]);
+        }
     }
 }

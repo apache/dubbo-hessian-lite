@@ -1,0 +1,124 @@
+#
+#
+#   Licensed to the Apache Software Foundation (ASF) under one or more
+#   contributor license agreements.  See the NOTICE file distributed with
+#   this work for additional information regarding copyright ownership.
+#   The ASF licenses this file to You under the Apache License, Version 2.0
+#   (the "License"); you may not use this file except in compliance with
+#   the License.  You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+#
+bsh.
+ch.qos.logback.core.db.
+clojure.
+com.alibaba.citrus.springext.support.parser.
+com.alibaba.citrus.springext.util.SpringExtUtil.
+com.alibaba.druid.pool.
+com.alibaba.hotcode.internal.org.apache.commons.collections.functors.
+com.alipay.custrelation.service.model.redress.
+com.alipay.oceanbase.obproxy.druid.pool.
+com.caucho.config.types.
+com.caucho.hessian.test.
+com.caucho.naming.
+com.ibm.jtc.jax.xml.bind.v2.runtime.unmarshaller.
+com.ibm.xltxe.rnm1.xtq.bcel.util.
+com.mchange.v2.c3p0.
+com.mysql.jdbc.util.
+com.rometools.rome.feed.
+com.sun.corba.se.impl.
+com.sun.corba.se.spi.orbutil.
+com.sun.jndi.rmi.
+com.sun.jndi.toolkit.
+com.sun.org.apache.bcel.internal.
+com.sun.org.apache.xalan.internal.
+com.sun.rowset.
+com.sun.xml.internal.bind.v2.
+com.taobao.vipserver.commons.collections.functors.
+groovy.lang.
+java.beans.
+java.lang.ProcessBuilder
+java.lang.Runtime
+java.rmi.server.
+java.security.
+java.util.ServiceLoader
+javassist.bytecode.annotation.
+javassist.tools.web.Viewer
+javassist.util.proxy.
+javax.imageio.
+javax.imageio.spi.
+javax.management.
+javax.media.jai.remote.
+javax.naming.
+javax.script.
+javax.sound.sampled.
+javax.xml.transform.
+net.bytebuddy.dynamic.loading.
+oracle.jdbc.connector.
+oracle.jdbc.pool.
+org.apache.aries.transaction.jms.
+org.apache.bcel.util.
+org.apache.carbondata.core.scan.expression.
+org.apache.commons.beanutils.
+org.apache.commons.codec.binary.
+org.apache.commons.collections.functors.
+org.apache.commons.collections4.functors.
+org.apache.commons.configuration.
+org.apache.commons.configuration2.
+org.apache.commons.dbcp.datasources.
+org.apache.commons.dbcp2.datasources.
+org.apache.commons.fileupload.disk.
+org.apache.ibatis.executor.loader.
+org.apache.ibatis.javassist.bytecode.
+org.apache.ibatis.javassist.tools.
+org.apache.ibatis.javassist.util.
+org.apache.ignite.cache.
+org.apache.log.output.db.
+org.apache.log4j.receivers.db.
+org.apache.myfaces.view.facelets.el.
+org.apache.openjpa.ee.
+org.apache.openjpa.ee.
+org.apache.shiro.
+org.apache.tomcat.dbcp.
+org.apache.velocity.runtime.
+org.apache.velocity.
+org.apache.wicket.util.
+org.apache.xalan.xsltc.trax.
+org.apache.xbean.naming.context.
+org.apache.xpath.
+org.apache.zookeeper.
+org.aspectj.apache.bcel.util.
+org.codehaus.groovy.runtime.
+org.datanucleus.store.rdbms.datasource.dbcp.datasources.
+org.eclipse.jetty.util.log.
+org.geotools.filter.
+org.h2.value.
+org.hibernate.tuple.component.
+org.hibernate.type.
+org.jboss.ejb3.
+org.jboss.proxy.ejb.
+org.jboss.resteasy.plugins.server.resourcefactory.
+org.jboss.weld.interceptor.builder.
+org.mockito.internal.creation.cglib.
+org.mortbay.log.
+org.quartz.
+org.springframework.aop.aspectj.
+org.springframework.beans.BeanWrapperImpl$BeanPropertyHandler
+org.springframework.beans.factory.
+org.springframework.expression.spel.
+org.springframework.jndi.
+org.springframework.orm.
+org.springframework.transaction.
+org.yaml.snakeyaml.tokens.
+pstore.shaded.org.apache.commons.collections.
+sun.rmi.server.
+sun.rmi.transport.
+weblogic.ejb20.internal.
+weblogic.jms.common.
