@@ -27,7 +27,7 @@
     <groupId>com.alibaba</groupId>
     <artifactId>hessian-lite</artifactId>
     <packaging>jar</packaging>
-    <version>3.2.9</version>
+    <version>3.2.10</version>
     <name>Hessian Lite(Dubbo embed version)</name>
 
     <properties>
