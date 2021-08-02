@@ -54,6 +54,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -71,6 +72,7 @@ public class ClassFactory
     protected static final Logger log
             = Logger.getLogger(ClassFactory.class.getName());
     private static final ArrayList<Allow> _staticAllowList;
+    private static final Map<String, Object> _allowSubClassSet = new ConcurrentHashMap<>();
     private static final Map<String, Object> _allowClassSet = new ConcurrentHashMap<>();
 
     private ClassLoader _loader;
@@ -88,10 +90,43 @@ public class ClassFactory
             throws ClassNotFoundException
     {
         if (isAllow(className)) {
-            return Class.forName(className, false, _loader);
+            Class<?> aClass = Class.forName(className, false, _loader);
+
+            if (_allowClassSet.containsKey(className)) {
+                return aClass;
+            }
+
+            if (aClass.getInterfaces().length > 0) {
+                for (Class<?> anInterface : aClass.getInterfaces()) {
+                    if(!isAllow(anInterface.getName())) {
+                        log.log(Level.SEVERE, className + "'s interfaces: " + anInterface.getName() + " in blacklist or not in whitelist, deserialization with type 'HashMap' instead.");
+                        return HashMap.class;
+                    }
+                }
+            }
+
+            List<Class<?>> allSuperClasses = new LinkedList<>();
+
+            Class<?> superClass = aClass.getSuperclass();
+            while (superClass != null) {
+                // add current super class
+                allSuperClasses.add(superClass);
+                superClass = superClass.getSuperclass();
+            }
+
+            for (Class<?> aSuperClass : allSuperClasses) {
+                if(!isAllow(aSuperClass.getName())) {
+                    log.log(Level.SEVERE, className + "'s superClass: " + aSuperClass.getName() + " in blacklist or not in whitelist, deserialization with type 'HashMap' instead.");
+                    return HashMap.class;
+                }
+
+            }
+
+            _allowClassSet.put(className, className);
+            return aClass;
         }
         else {
-            log.log(Level.SEVERE, className + " in blacklist or not in whitelist, deserialization  with type 'HashMap' instead.");
+            log.log(Level.SEVERE, className + " in blacklist or not in whitelist, deserialization with type 'HashMap' instead.");
             return HashMap.class;
         }
     }
@@ -104,19 +139,16 @@ public class ClassFactory
             return true;
         }
 
-        if (_allowClassSet.containsKey(className)) {
+        if (_allowSubClassSet.containsKey(className)) {
             return true;
         }
 
-        int size = allowList.size();
-        for (int i = 0; i < size; i++) {
-            Allow allow = allowList.get(i);
-
+        for (Allow allow : allowList) {
             Boolean isAllow = allow.allow(className);
 
             if (isAllow != null) {
                 if (isAllow) {
-                    _allowClassSet.put(className, className);
+                    _allowSubClassSet.put(className, className);
                 }
                 return isAllow;
             }
@@ -126,13 +158,14 @@ public class ClassFactory
             return false;
         }
 
-        _allowClassSet.put(className, className);
+        _allowSubClassSet.put(className, className);
         return true;
     }
 
     public void setWhitelist(boolean isWhitelist)
     {
         _allowClassSet.clear();
+        _allowSubClassSet.clear();
         _isWhitelist = isWhitelist;
 
         initAllow();
@@ -141,6 +174,7 @@ public class ClassFactory
     public void allow(String pattern)
     {
         _allowClassSet.clear();
+        _allowSubClassSet.clear();
         initAllow();
 
         synchronized (this) {
@@ -151,6 +185,7 @@ public class ClassFactory
     public void deny(String pattern)
     {
         _allowClassSet.clear();
+        _allowSubClassSet.clear();
         initAllow();
 
         synchronized (this) {
@@ -158,7 +193,7 @@ public class ClassFactory
         }
     }
 
-    private String toPattern(String pattern)
+    private static String toPattern(String pattern)
     {
         pattern = pattern.replace(".", "\\.");
         pattern = pattern.replace("*", ".*");
@@ -233,7 +268,11 @@ public class ClassFactory
                 if (denyClass.startsWith("#")) {
                     continue;
                 }
-                _staticAllowList.add(new AllowPrefix(denyClass, false));
+                if (denyClass.endsWith(".")) {
+                    _staticAllowList.add(new AllowPrefix(denyClass, false));
+                } else {
+                    _staticAllowList.add(new Allow(toPattern(denyClass), false));
+                }
             }
         } catch (IOException ignore) {
 
