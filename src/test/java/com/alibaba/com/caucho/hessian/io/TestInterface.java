@@ -16,11 +16,9 @@
  */
 package com.alibaba.com.caucho.hessian.io;
 
-import java.io.Serializable;
-
-public class TestClass implements Serializable {
+public interface TestInterface {
 }
 
-class TestClass1 extends TestClass {
+class TestImpl implements TestInterface {
 
 }

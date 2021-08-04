@@ -18,6 +18,7 @@ package com.alibaba.com.caucho.hessian.io;
 
 import org.junit.Assert;
 import org.junit.Test;
+import sun.rmi.transport.StreamRemoteCall;
 
 import java.lang.reflect.Array;
 import java.util.HashMap;
@@ -35,6 +36,15 @@ public class DenyListTest {
         Assert.assertEquals(HashMap.class, classFactory.load("java.beans.C"));
         Assert.assertEquals(HashMap.class, classFactory.load("java.beans.D"));
         Assert.assertEquals(HashMap.class, classFactory.load("java.beans.E"));
+        Assert.assertEquals(HashMap.class, classFactory.load("sun.rmi.transport.StreamRemoteCall"));
+
+        classFactory.deny(TestClass.class.getName());
+        Assert.assertEquals(HashMap.class, classFactory.load(TestClass.class.getName()));
+        Assert.assertEquals(HashMap.class, classFactory.load(TestClass1.class.getName()));
+
+        classFactory.deny(TestInterface.class.getName());
+        Assert.assertEquals(HashMap.class, classFactory.load(TestInterface.class.getName()));
+        Assert.assertEquals(HashMap.class, classFactory.load(TestImpl.class.getName()));
     }
 
     @Test
@@ -47,5 +57,6 @@ public class DenyListTest {
         Assert.assertEquals(List.class, classFactory.load(List.class.getName()));
         Assert.assertEquals(Array.class, classFactory.load(Array.class.getName()));
         Assert.assertEquals(LinkedList.class, classFactory.load(LinkedList.class.getName()));
+        Assert.assertEquals(RuntimeException.class, classFactory.load(RuntimeException.class.getName()));
     }
 }
