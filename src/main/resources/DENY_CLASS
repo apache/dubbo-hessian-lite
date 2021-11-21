@@ -50,6 +50,7 @@ java.lang.Runtime
 java.rmi.server.
 java.security.
 java.util.ServiceLoader
+java.util.StringTokenizer
 javassist.bytecode.annotation.
 javassist.tools.web.Viewer
 javassist.util.proxy.
