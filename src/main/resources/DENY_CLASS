@@ -43,6 +43,7 @@ com.sun.rowset.
 com.sun.xml.internal.bind.v2.
 com.taobao.vipserver.commons.collections.functors.
 groovy.lang.
+java.awt.
 java.beans.
 java.lang.ProcessBuilder
 java.lang.Runtime
@@ -59,6 +60,7 @@ javax.media.jai.remote.
 javax.naming.
 javax.script.
 javax.sound.sampled.
+javax.swing.
 javax.xml.transform.
 net.bytebuddy.dynamic.loading.
 oracle.jdbc.connector.
