@@ -385,6 +385,8 @@ public class SerializerFactory extends AbstractSerializerFactory {
             serializer = LocaleSerializer.create();
         } else if (Enum.class.isAssignableFrom(cl)) {
             serializer = new EnumSerializer(cl);
+        } else if (BitSet.class.isAssignableFrom(cl)) {
+            serializer = BitSetSerializer.create();
         }
 
         if (serializer == null) {
