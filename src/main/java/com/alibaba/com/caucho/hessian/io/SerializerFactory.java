@@ -343,11 +343,6 @@ public class SerializerFactory extends AbstractSerializerFactory {
             serializer = factory.getSerializer(cl);
         }
 
-        if (!Serializable.class.isAssignableFrom(cl)
-                && !_isAllowNonSerializable) {
-            throw new IllegalStateException("Serialized class " + cl.getName() + " must implement java.io.Serializable");
-        }
-
         if (serializer != null) {
 
         } else if (isZoneId(cl)) //must before "else if (JavaSerializer.getWriteReplace(cl) != null)"
@@ -419,6 +414,11 @@ public class SerializerFactory extends AbstractSerializerFactory {
         if (_defaultSerializer != null)
             return _defaultSerializer;
 
+        if (!Serializable.class.isAssignableFrom(cl)
+                && !_isAllowNonSerializable) {
+            throw new IllegalStateException("Serialized class " + cl.getName() + " must implement java.io.Serializable");
+        }
+
         return new JavaSerializer(cl, _loader);
     }
 
@@ -451,11 +451,6 @@ public class SerializerFactory extends AbstractSerializerFactory {
             factory = (AbstractSerializerFactory) _factories.get(i);
 
             deserializer = factory.getDeserializer(cl);
-        }
-
-        if (!Serializable.class.isAssignableFrom(cl)
-                && !_isAllowNonSerializable) {
-            throw new IllegalStateException("Serialized class " + cl.getName() + " must implement java.io.Serializable");
         }
 
         if (deserializer != null) {
@@ -500,6 +495,11 @@ public class SerializerFactory extends AbstractSerializerFactory {
      * @return a serializer object for the serialization.
      */
     protected Deserializer getDefaultDeserializer(Class cl) {
+        if (!Serializable.class.isAssignableFrom(cl)
+                && !_isAllowNonSerializable) {
+            throw new IllegalStateException("Serialized class " + cl.getName() + " must implement java.io.Serializable");
+        }
+
         return new JavaDeserializer(cl);
     }
 
