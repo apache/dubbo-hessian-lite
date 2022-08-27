@@ -74,6 +74,29 @@ public class SerializerFactoryTest {
     }
 
     @Test
+    public void testCheckSerializable() throws HessianProtocolException {
+        final SerializerFactory serializerFactory = new SerializerFactory();
+        try {
+            serializerFactory.getSerializer(TestImpl.class);
+            Assert.fail();
+        } catch (RuntimeException e) {
+            Assert.assertEquals(IllegalStateException.class, e.getClass());
+            Assert.assertTrue(e.getMessage().equals("Serialized class com.alibaba.com.caucho.hessian.io.TestImpl must implement java.io.Serializable"));
+        }
+
+        try {
+            serializerFactory.getDeserializer(TestImpl.class);
+            Assert.fail();
+        } catch (RuntimeException e) {
+            Assert.assertEquals(IllegalStateException.class, e.getClass());
+            Assert.assertTrue(e.getMessage().startsWith("Serialized class com.alibaba.com.caucho.hessian.io.TestImpl must implement java.io.Serializable"));
+        }
+
+        Assert.assertNotNull(serializerFactory.getSerializer(TestClass.class));
+        Assert.assertNotNull(serializerFactory.getDeserializer(TestClass.class));
+    }
+
+    @Test
     public void getDeserializerDuplicateThread() throws Exception {
         final SerializerFactory serializerFactory = new SerializerFactory();
         final Class<TestClass> klass = TestClass.class;

@@ -18,7 +18,6 @@ package com.alibaba.com.caucho.hessian.io;
 
 import org.junit.Assert;
 import org.junit.Test;
-import sun.rmi.transport.StreamRemoteCall;
 
 import java.lang.reflect.Array;
 import java.util.HashMap;
