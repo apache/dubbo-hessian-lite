@@ -60,6 +60,7 @@ public class Hessian2UUIDTest extends SerializeTestBase {
 
 		ByteArrayInputStream bin = new ByteArrayInputStream(bout.toByteArray());
 		Hessian2Input input = new Hessian2Input(bin);
+		input.findSerializerFactory().setAllowNonSerializable(true);
 
 		Map<UUID, Object> deserialize = (Map<UUID, Object>) input.readObject();
 		assertTrue(deserialize != null);
