@@ -73,6 +73,7 @@ org.apache.commons.beanutils.
 org.apache.commons.codec.binary.
 org.apache.commons.collections.functors.
 org.apache.commons.collections4.functors.
+org.apache.commons.codec.
 org.apache.commons.configuration.
 org.apache.commons.configuration2.
 org.apache.commons.dbcp.datasources.
@@ -97,9 +98,10 @@ org.apache.xalan.xsltc.trax.
 org.apache.xbean.naming.context.
 org.apache.xpath.
 org.apache.zookeeper.
-org.aspectj.apache.bcel.util.
+org.aspectj.
 org.codehaus.groovy.runtime.
 org.datanucleus.store.rdbms.datasource.dbcp.datasources.
+org.dom4j.
 org.eclipse.jetty.util.log.
 org.geotools.filter.
 org.h2.value.
@@ -109,8 +111,11 @@ org.jboss.ejb3.
 org.jboss.proxy.ejb.
 org.jboss.resteasy.plugins.server.resourcefactory.
 org.jboss.weld.interceptor.builder.
+org.junit.
 org.mockito.internal.creation.cglib.
 org.mortbay.log.
+org.mockito.
+org.thymeleaf.
 org.quartz.
 org.springframework.aop.aspectj.
 org.springframework.beans.BeanWrapperImpl$BeanPropertyHandler
@@ -120,7 +125,9 @@ org.springframework.jndi.
 org.springframework.orm.
 org.springframework.transaction.
 org.yaml.snakeyaml.tokens.
+ognl.
 pstore.shaded.org.apache.commons.collections.
+sun.print.
 sun.rmi.server.
 sun.rmi.transport.
 weblogic.ejb20.internal.
