@@ -48,14 +48,11 @@
 
 package com.alibaba.com.caucho.hessian.io;
 
+import com.alibaba.com.caucho.hessian.util.TypeUtil;
+
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.lang.reflect.Type;
+import java.util.*;
 
 /**
  * Deserializing a JDK 1.2 Collection.
@@ -79,7 +76,7 @@ public class CollectionDeserializer extends AbstractListDeserializer {
     }
 
     @Override
-    public Object readList(AbstractHessianInput in, int length, Class<?> expectType) throws IOException {
+    public Object readList(AbstractHessianInput in, int length, Type actualType) throws IOException {
         Collection list = createList();
 
         in.addRef(list);
@@ -87,14 +84,13 @@ public class CollectionDeserializer extends AbstractListDeserializer {
         Deserializer deserializer = null;
 
         SerializerFactory factory = findSerializerFactory(in);
-        if (expectType != null) {
-            deserializer = factory.getDeserializer(expectType.getName());
+        if (TypeUtil.isByteOrShortClass(actualType)) {
+            deserializer = factory.getDeserializer(((Class<?>) actualType).getName());
         }
 
         while (!in.isEnd()) {
-            list.add(deserializer != null ? deserializer.readObject(in) : in.readObject());
+            list.add(deserializer != null ? deserializer.readObject(in) : in.readObject(actualType));
         }
-
 
         in.readEnd();
 
@@ -108,7 +104,7 @@ public class CollectionDeserializer extends AbstractListDeserializer {
     }
 
     @Override
-    public Object readLengthList(AbstractHessianInput in, int length, Class<?> expectType) throws IOException {
+    public Object readLengthList(AbstractHessianInput in, int length, Type actualType) throws IOException {
         Collection list = createList();
 
         in.addRef(list);
@@ -116,14 +112,13 @@ public class CollectionDeserializer extends AbstractListDeserializer {
         Deserializer deserializer = null;
 
         SerializerFactory factory = findSerializerFactory(in);
-        if (expectType != null) {
-            deserializer = factory.getDeserializer(expectType.getName());
+        if (TypeUtil.isByteOrShortClass(actualType)) {
+            deserializer = factory.getDeserializer(((Class<?>) actualType).getName());
         }
 
         for (; length > 0; length--) {
-            list.add(deserializer != null ? deserializer.readObject(in) : in.readObject());
+            list.add(deserializer != null ? deserializer.readObject(in) : in.readObject(actualType));
         }
-
 
         return list;
     }

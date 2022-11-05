@@ -51,7 +51,7 @@ package com.alibaba.com.caucho.hessian.io;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.util.List;
+import java.lang.reflect.Type;
 
 /**
  * Abstract base class for Hessian requests.  Hessian users should only
@@ -341,10 +341,9 @@ abstract public class AbstractHessianInput {
      * Reads an arbitrary object from the input stream.
      *
      * @param expectedClass the expected class if the protocol doesn't supply it.
-     * @param expectedTypes the runtime type hints, eg: expectedClass equals Map, expectedTypes can
-     *                      equals String.class, Short.class
+     * @param genericParameterType the actual type parameters used in the source code.
      */
-    public Object readObject(Class expectedClass, Class<?>... expectedTypes)
+    public Object readObject(Class expectedClass, Type genericParameterType)
             throws IOException {
         throw new UnsupportedOperationException(String.valueOf(this));
     }
@@ -358,10 +357,9 @@ abstract public class AbstractHessianInput {
     /**
      * Reads an arbitrary object from the input stream.
      *
-     * @param expectedTypes the runtime type hints, eg: expectedTypes can
-     *                      equals String.class, Short.class for HashMap
+     * @param genericParameterType the actual type parameters used in the source code.
      */
-    public Object readObject(List<Class<?>> expectedTypes)
+    public Object readObject(Type genericParameterType)
             throws IOException {
         throw new UnsupportedOperationException(String.valueOf(this));
     }

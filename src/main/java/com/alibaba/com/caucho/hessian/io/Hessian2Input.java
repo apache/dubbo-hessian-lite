@@ -48,19 +48,18 @@
 
 package com.alibaba.com.caucho.hessian.io;
 
-import java.io.ByteArrayOutputStream;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
+import java.io.*;
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static com.alibaba.com.caucho.hessian.util.TypeUtil.extractActualArgumentType;
+import static com.alibaba.com.caucho.hessian.util.TypeUtil.extractActualArgumentTypes;
 
 /**
  * Input stream for Hessian requests.
@@ -2101,12 +2100,12 @@ public class Hessian2Input
     @Override
     public Object readObject(Class cl)
             throws IOException {
-        return readObject(cl, null, null);
+        return readObject(cl, null);
     }
 
     @Override
-    public Object readObject(Class expectedClass, Class<?>... expectedTypes) throws IOException {
-        if (expectedClass == null || expectedClass == Object.class)
+    public Object readObject(Class cl, Type genericParameterType) throws IOException {
+        if (cl == null || cl == Object.class)
             return readObject();
 
         int tag = _offset < _length ? (_buffer[_offset++] & 0xff) : read();
@@ -2116,13 +2115,14 @@ public class Hessian2Input
                 return null;
 
             case 'H': {
-                Deserializer reader = findSerializerFactory().getDeserializer(expectedClass);
+                Deserializer reader = findSerializerFactory().getDeserializer(cl);
 
-                boolean keyValuePair = expectedTypes != null && expectedTypes.length == 2;
-                // fix deserialize of short type
-                return reader.readMap(this
-                        , keyValuePair ? expectedTypes[0] : null
-                        , keyValuePair ? expectedTypes[1] : null);
+                Type[] actualArgumentTypes = extractActualArgumentTypes(genericParameterType);
+                if (actualArgumentTypes != null && actualArgumentTypes.length == 2) {
+                    return reader.readMap(this, actualArgumentTypes[0], actualArgumentTypes[1]);
+                } else {
+                    return reader.readMap(this, null, null);
+                }
             }
 
             case 'M': {
@@ -2131,21 +2131,21 @@ public class Hessian2Input
                 // hessian/3bb3
                 if ("".equals(type)) {
                     Deserializer reader;
-                    reader = findSerializerFactory().getDeserializer(expectedClass);
+                    reader = findSerializerFactory().getDeserializer(cl);
 
                     return reader.readMap(this);
                 } else {
                     Deserializer reader;
-                    reader = findSerializerFactory().getObjectDeserializer(type, expectedClass);
+                    reader = findSerializerFactory().getObjectDeserializer(type, cl);
 
                     return reader.readMap(this);
                 }
             }
 
             case 'C': {
-                readObjectDefinition(expectedClass);
+                readObjectDefinition(cl);
 
-                return readObject(expectedClass);
+                return readObject(cl);
             }
 
             case 0x60:
@@ -2172,7 +2172,7 @@ public class Hessian2Input
 
                 ObjectDefinition def = (ObjectDefinition) _classDefs.get(ref);
 
-                return readObjectInstance(expectedClass, def);
+                return readObjectInstance(cl, def);
             }
 
             case 'O': {
@@ -2184,18 +2184,14 @@ public class Hessian2Input
 
                 ObjectDefinition def = (ObjectDefinition) _classDefs.get(ref);
 
-                return readObjectInstance(expectedClass, def);
+                return readObjectInstance(cl, def);
             }
 
             case BC_LIST_VARIABLE: {
                 String type = readType();
 
-                Deserializer reader;
-                reader = findSerializerFactory().getListDeserializer(type, expectedClass);
-
-                Object v = reader.readList(this, -1);
-
-                return v;
+                Deserializer reader = findSerializerFactory().getListDeserializer(type, cl);
+                return reader.readList(this, -1);
             }
 
             case BC_LIST_FIXED: {
@@ -2203,13 +2199,9 @@ public class Hessian2Input
                 int length = readInt();
 
                 Deserializer reader;
-                reader = findSerializerFactory().getListDeserializer(type, expectedClass);
+                reader = findSerializerFactory().getListDeserializer(type, cl);
 
-                boolean valueType = expectedTypes != null && expectedTypes.length == 1;
-
-                Object v = reader.readLengthList(this, length, valueType ? expectedTypes[0] : null);
-
-                return v;
+                return reader.readLengthList(this, length, extractActualArgumentType(genericParameterType));
             }
 
             case 0x70:
@@ -2225,40 +2217,25 @@ public class Hessian2Input
                 String type = readType();
 
                 Deserializer reader;
-                reader = findSerializerFactory().getListDeserializer(null, expectedClass);
+                reader = findSerializerFactory().getListDeserializer(null, cl);
 
-                boolean valueType = expectedTypes != null && expectedTypes.length == 1;
-
-                // fix deserialize of short type
-                Object v = reader.readLengthList(this, length, valueType ? expectedTypes[0] : null);
-
-                return v;
+                return reader.readLengthList(this, length, extractActualArgumentType(genericParameterType));
             }
 
             case BC_LIST_VARIABLE_UNTYPED: {
                 Deserializer reader;
-                reader = findSerializerFactory().getListDeserializer(null, expectedClass);
+                reader = findSerializerFactory().getListDeserializer(null, cl);
 
-                boolean valueType = expectedTypes != null && expectedTypes.length == 1;
-
-                // fix deserialize of short type
-                Object v = reader.readList(this, -1, valueType ? expectedTypes[0] : null);
-
-                return v;
+                return reader.readList(this, -1, extractActualArgumentType(genericParameterType));
             }
 
             case BC_LIST_FIXED_UNTYPED: {
                 int length = readInt();
 
                 Deserializer reader;
-                reader = findSerializerFactory().getListDeserializer(null, expectedClass);
+                reader = findSerializerFactory().getListDeserializer(null, cl);
 
-                boolean valueType = expectedTypes != null && expectedTypes.length == 1;
-
-                // fix deserialize of short type
-                Object v = reader.readLengthList(this, length, valueType ? expectedTypes[0] : null);
-
-                return v;
+                return reader.readLengthList(this, length, extractActualArgumentType(genericParameterType));
             }
 
             case 0x78:
@@ -2272,14 +2249,9 @@ public class Hessian2Input
                 int length = tag - 0x78;
 
                 Deserializer reader;
-                reader = findSerializerFactory().getListDeserializer(null, expectedClass);
+                reader = findSerializerFactory().getListDeserializer(null, cl);
 
-                boolean valueType = expectedTypes != null && expectedTypes.length == 1;
-
-                // fix deserialize of short type
-                Object v = reader.readLengthList(this, length, valueType ? expectedTypes[0] : null);
-
-                return v;
+                return reader.readLengthList(this, length, extractActualArgumentType(genericParameterType));
             }
 
             case BC_REF: {
@@ -2294,8 +2266,8 @@ public class Hessian2Input
 
         // hessian/3b2i vs hessian/3406
         // return readObject();
-        Object value = findSerializerFactory().getDeserializer(expectedClass).readObject(this);
-        return value;
+
+        return findSerializerFactory().getDeserializer(cl).readObject(this);
     }
 
     /**
@@ -2305,11 +2277,11 @@ public class Hessian2Input
     @Override
     public Object readObject()
             throws IOException {
-        return readObject((List<Class<?>>) null);
+        return readObject((Type) null);
     }
 
     @Override
-    public Object readObject(List<Class<?>> expectedTypes) throws IOException {
+    public Object readObject(Type genericParameterType) throws IOException {
         int tag = _offset < _length ? (_buffer[_offset++] & 0xff) : read();
 
         switch (tag) {
@@ -2664,9 +2636,7 @@ public class Hessian2Input
                 Deserializer reader;
                 reader = findSerializerFactory().getListDeserializer(type, null);
 
-                boolean valueType = expectedTypes != null && expectedTypes.size() == 1;
-
-                return reader.readLengthList(this, length, valueType ? expectedTypes.get(0) : null);
+                return reader.readLengthList(this, length, extractActualArgumentType(genericParameterType));
             }
 
             case BC_LIST_FIXED_UNTYPED: {
@@ -2676,9 +2646,7 @@ public class Hessian2Input
                 Deserializer reader;
                 reader = findSerializerFactory().getListDeserializer(null, null);
 
-                boolean valueType = expectedTypes != null && expectedTypes.size() == 1;
-
-                return reader.readLengthList(this, length, valueType ? expectedTypes.get(0) : null);
+                return reader.readLengthList(this, length, extractActualArgumentType(genericParameterType));
             }
 
             // compact fixed list
@@ -2697,9 +2665,7 @@ public class Hessian2Input
                 Deserializer reader;
                 reader = findSerializerFactory().getListDeserializer(type, null);
 
-                boolean valueType = expectedTypes != null && expectedTypes.size() == 1;
-
-                return reader.readLengthList(this, length, valueType ? expectedTypes.get(0) : null);
+                return reader.readLengthList(this, length, extractActualArgumentType(genericParameterType));
             }
 
             // compact fixed untyped list
@@ -2717,22 +2683,19 @@ public class Hessian2Input
                 Deserializer reader;
                 reader = findSerializerFactory().getListDeserializer(null, null);
 
-                boolean valueType = expectedTypes != null && expectedTypes.size() == 1;
-
-                return reader.readLengthList(this, length, valueType ? expectedTypes.get(0) : null);
+                return reader.readLengthList(this, length, extractActualArgumentType(genericParameterType));
             }
 
             case 'H': {
-
-                boolean keyValuePair = expectedTypes != null && expectedTypes.size() == 2;
-
-                // fix deserialize of short type
                 Deserializer reader;
                 reader = findSerializerFactory().getDeserializer(Map.class);
 
-                return reader.readMap(this
-                        , keyValuePair ? expectedTypes.get(0) : null
-                        , keyValuePair ? expectedTypes.get(1) : null);
+                Type[] actualArgumentTypes = extractActualArgumentTypes(genericParameterType);
+                if (actualArgumentTypes != null && actualArgumentTypes.length == 2) {
+                    return reader.readMap(this, actualArgumentTypes[0], actualArgumentTypes[1]);
+                } else {
+                    return reader.readMap(this, null, null);
+                }
             }
 
             case 'M': {

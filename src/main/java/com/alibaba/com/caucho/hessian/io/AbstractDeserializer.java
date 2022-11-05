@@ -49,6 +49,7 @@
 package com.alibaba.com.caucho.hessian.io;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 
 /**
  * Deserializing an object.
@@ -79,8 +80,8 @@ abstract public class AbstractDeserializer implements Deserializer {
     }
 
     @Override
-    public Object readList(AbstractHessianInput in, int length, Class<?> expectType) throws IOException {
-        if (expectType == null) {
+    public Object readList(AbstractHessianInput in, int length, Type actualType) throws IOException {
+        if (actualType == null) {
             return readList(in, length);
         }
         throw new UnsupportedOperationException(String.valueOf(this));
@@ -93,8 +94,8 @@ abstract public class AbstractDeserializer implements Deserializer {
     }
 
     @Override
-    public Object readLengthList(AbstractHessianInput in, int length, Class<?> expectType) throws IOException {
-        if (expectType == null) {
+    public Object readLengthList(AbstractHessianInput in, int length, Type actualType) throws IOException {
+        if (actualType == null) {
             return readLengthList(in, length);
         }
         throw new UnsupportedOperationException(String.valueOf(this));
@@ -114,8 +115,8 @@ abstract public class AbstractDeserializer implements Deserializer {
     }
 
     @Override
-    public Object readMap(AbstractHessianInput in, Class<?> expectKeyType, Class<?> expectValueType) throws IOException {
-        if (expectKeyType == null && expectValueType == null) {
+    public Object readMap(AbstractHessianInput in, Type actualKeyType, Type actualValueType) throws IOException {
+        if (actualKeyType == null && actualValueType == null) {
             return readMap(in);
         }
         throw new UnsupportedOperationException(String.valueOf(this));

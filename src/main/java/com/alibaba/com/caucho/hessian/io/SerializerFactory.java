@@ -48,26 +48,14 @@
 
 package com.alibaba.com.caucho.hessian.io;
 
-import com.alibaba.com.caucho.hessian.io.java8.DurationHandle;
-import com.alibaba.com.caucho.hessian.io.java8.InstantHandle;
-import com.alibaba.com.caucho.hessian.io.java8.LocalDateHandle;
-import com.alibaba.com.caucho.hessian.io.java8.LocalDateTimeHandle;
-import com.alibaba.com.caucho.hessian.io.java8.LocalTimeHandle;
-import com.alibaba.com.caucho.hessian.io.java8.MonthDayHandle;
-import com.alibaba.com.caucho.hessian.io.java8.OffsetDateTimeHandle;
-import com.alibaba.com.caucho.hessian.io.java8.OffsetTimeHandle;
-import com.alibaba.com.caucho.hessian.io.java8.PeriodHandle;
-import com.alibaba.com.caucho.hessian.io.java8.YearHandle;
-import com.alibaba.com.caucho.hessian.io.java8.YearMonthHandle;
-import com.alibaba.com.caucho.hessian.io.java8.ZoneIdSerializer;
-import com.alibaba.com.caucho.hessian.io.java8.ZoneOffsetHandle;
-import com.alibaba.com.caucho.hessian.io.java8.ZonedDateTimeHandle;
+import com.alibaba.com.caucho.hessian.io.java8.*;
 
 import javax.management.ObjectName;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
@@ -527,18 +515,18 @@ public class SerializerFactory extends AbstractSerializerFactory {
     /**
      * Reads the object as a map.
      */
-    public Object readMap(AbstractHessianInput in, String type, Class<?> expectKeyType, Class<?> expectValueType)
+    public Object readMap(AbstractHessianInput in, String type, Type actualKeyType, Type actualValueType)
             throws HessianProtocolException, IOException {
         Deserializer deserializer = getDeserializer(type);
 
         if (deserializer != null)
             return deserializer.readMap(in);
         else if (_hashMapDeserializer != null)
-            return _hashMapDeserializer.readMap(in, expectKeyType, expectValueType);
+            return _hashMapDeserializer.readMap(in, actualKeyType, actualValueType);
         else {
             _hashMapDeserializer = new MapDeserializer(HashMap.class);
 
-            return _hashMapDeserializer.readMap(in, expectKeyType, expectValueType);
+            return _hashMapDeserializer.readMap(in, actualKeyType, actualValueType);
         }
     }
 

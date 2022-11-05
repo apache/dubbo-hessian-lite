@@ -49,33 +49,19 @@
 package com.alibaba.com.caucho.hessian.io;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 
 /**
  * Deserializing an object.
  *
  */
 public interface Deserializer {
-    public Class getType();
+    Class getType();
 
-    public Object readObject(AbstractHessianInput in)
+    Object readObject(AbstractHessianInput in)
             throws IOException;
 
-    public Object readList(AbstractHessianInput in, int length)
-            throws IOException;
-
-    /**
-     * deserialize list object from expect type.
-     *
-     * @param in
-     * @param length
-     * @param expectType
-     * @return
-     * @throws IOException
-     */
-    public Object readList(AbstractHessianInput in, int length, Class<?> expectType)
-            throws IOException;
-
-    public Object readLengthList(AbstractHessianInput in, int length)
+    Object readList(AbstractHessianInput in, int length)
             throws IOException;
 
     /**
@@ -83,27 +69,42 @@ public interface Deserializer {
      *
      * @param in
      * @param length
-     * @param expectType
+     * @param actualType
      * @return
      * @throws IOException
      */
-    public Object readLengthList(AbstractHessianInput in, int length, Class<?> expectType)
+    Object readList(AbstractHessianInput in, int length, Type actualType)
             throws IOException;
 
-    public Object readMap(AbstractHessianInput in)
+    Object readLengthList(AbstractHessianInput in, int length)
+            throws IOException;
+
+    /**
+     * deserialize list object from expect type.
+     *
+     * @param in
+     * @param length
+     * @param actualType
+     * @return
+     * @throws IOException
+     */
+    Object readLengthList(AbstractHessianInput in, int length, Type actualType)
+            throws IOException;
+
+    Object readMap(AbstractHessianInput in)
             throws IOException;
 
     /**
      *  deserialize map object from expect key and value type.
      * @param in
-     * @param expectKeyType
-     * @param expectValueType
+     * @param actualKeyType
+     * @param actualValueType
      * @return
      * @throws IOException
      */
-    public Object readMap(AbstractHessianInput in, Class<?> expectKeyType, Class<?> expectValueType)
+    Object readMap(AbstractHessianInput in, Type actualKeyType, Type actualValueType)
             throws IOException;
 
-    public Object readObject(AbstractHessianInput in, String[] fieldNames)
+    Object readObject(AbstractHessianInput in, String[] fieldNames)
             throws IOException;
 }
