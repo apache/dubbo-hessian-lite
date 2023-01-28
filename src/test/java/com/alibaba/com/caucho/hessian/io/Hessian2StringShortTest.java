@@ -19,7 +19,7 @@ package com.alibaba.com.caucho.hessian.io;
 import com.alibaba.com.caucho.hessian.io.base.SerializeTestBase;
 import com.alibaba.com.caucho.hessian.io.beans.Hessian2StringShortType;
 import com.alibaba.com.caucho.hessian.io.beans.PersonType;
-
+import com.alibaba.com.caucho.hessian.io.type.TypeReference;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -37,12 +37,12 @@ public class Hessian2StringShortTest extends SerializeTestBase {
     public void serialize_string_short_map_then_deserialize() throws Exception {
 
         Hessian2StringShortType stringShort = new Hessian2StringShortType();
-        Map<String, Short> stringShortMap = new HashMap<String, Short>();
+        Map<String, Short> stringShortMap = new HashMap<>();
         stringShortMap.put("first", (short) 0);
         stringShortMap.put("last", (short) 60);
         stringShort.stringShortMap = stringShortMap;
 
-        Hessian2StringShortType deserialize = baseHessian2Serialize(stringShort);
+        Hessian2StringShortType deserialize = baseHessian2Serialize(stringShort, true);
         assertTrue(deserialize.stringShortMap != null);
         assertTrue(deserialize.stringShortMap.size() == 2);
         assertTrue(deserialize.stringShortMap.get("last") instanceof Short);
@@ -59,7 +59,7 @@ public class Hessian2StringShortTest extends SerializeTestBase {
         stringByteMap.put("last", (byte) 60);
         stringShort.stringByteMap = stringByteMap;
 
-        Hessian2StringShortType deserialize = baseHessian2Serialize(stringShort);
+        Hessian2StringShortType deserialize = baseHessian2Serialize(stringShort, true);
         assertTrue(deserialize.stringByteMap != null);
         assertTrue(deserialize.stringByteMap.size() == 2);
         assertTrue(deserialize.stringByteMap.get("last") instanceof Byte);
@@ -82,7 +82,8 @@ public class Hessian2StringShortTest extends SerializeTestBase {
 
         ByteArrayInputStream bin = new ByteArrayInputStream(bout.toByteArray());
         Hessian2Input input = new Hessian2Input(bin);
-        Map deserialize = (Map) input.readObject(HashMap.class, String.class, Short.class);
+
+        Map deserialize = (Map) input.readObject(HashMap.class, new TypeReference<Map<String, Short>>(){}.getType());
         assertTrue(deserialize != null);
         assertTrue(deserialize.size() == 2);
         assertTrue(deserialize.get("last") instanceof Short);
@@ -105,12 +106,13 @@ public class Hessian2StringShortTest extends SerializeTestBase {
 
         ByteArrayInputStream bin = new ByteArrayInputStream(bout.toByteArray());
         Hessian2Input input = new Hessian2Input(bin);
+        input.findSerializerFactory().setAllowNonSerializable(true);
 
         List<Class<?>> keyValueType = new ArrayList<Class<?>>();
         keyValueType.add(String.class);
         keyValueType.add(short.class);
 
-        Map deserialize = (Map) input.readObject(keyValueType);
+        Map deserialize = (Map) input.readObject(new TypeReference<Map<String, Short>>(){}.getType());
         assertTrue(deserialize != null);
         assertTrue(deserialize.size() == 2);
         assertTrue(deserialize.get("last") instanceof Short);
@@ -122,7 +124,7 @@ public class Hessian2StringShortTest extends SerializeTestBase {
     public void serialize_string_person_map_then_deserialize() throws Exception {
 
         Hessian2StringShortType stringShort = new Hessian2StringShortType();
-        Map<String, PersonType> stringPersonTypeMap = new HashMap<String, PersonType>();
+        Map<String, PersonType> stringPersonTypeMap = new HashMap<>();
         stringPersonTypeMap.put("first", new PersonType(
                 "jason.shang", 26, (double) 0.1, (short) 1, (byte) 2, Arrays.asList((short) 1, (short) 1)
         ));
@@ -139,6 +141,7 @@ public class Hessian2StringShortTest extends SerializeTestBase {
 
         ByteArrayInputStream bin = new ByteArrayInputStream(bout.toByteArray());
         Hessian2Input input = new Hessian2Input(bin);
+        input.findSerializerFactory().setAllowNonSerializable(true);
 
         Hessian2StringShortType deserialize = (Hessian2StringShortType) input.readObject();
         assertTrue(deserialize.stringPersonTypeMap != null);
@@ -159,7 +162,7 @@ public class Hessian2StringShortTest extends SerializeTestBase {
     @Test
     public void serialize_list_then_deserialize() throws Exception {
 
-        List<Short> shortList = new ArrayList<Short>();
+        List<Short> shortList = new ArrayList<>();
         shortList.add((short) 0);
         shortList.add((short) 60);
 
@@ -171,7 +174,7 @@ public class Hessian2StringShortTest extends SerializeTestBase {
 
         ByteArrayInputStream bin = new ByteArrayInputStream(bout.toByteArray());
         Hessian2Input input = new Hessian2Input(bin);
-        List<Short> deserialize = (List) input.readObject(ArrayList.class, Short.class);
+        List<Short> deserialize = (List) input.readObject(ArrayList.class, new TypeReference<List<Short>>(){}.getType());
         assertTrue(deserialize != null);
         assertTrue(deserialize.size() == 2);
         assertTrue(deserialize.get(1) instanceof Short);
@@ -179,10 +182,11 @@ public class Hessian2StringShortTest extends SerializeTestBase {
         assertEquals(Short.valueOf((short) 60), deserialize.get(1));
     }
 
+
     @Test
     public void serialize_list_then_deserialize0() throws Exception {
 
-        List<Short> shortList = new ArrayList<Short>();
+        List<Short> shortList = new ArrayList<>();
         shortList.add((short) 0);
         shortList.add((short) 60);
 
@@ -195,10 +199,7 @@ public class Hessian2StringShortTest extends SerializeTestBase {
         ByteArrayInputStream bin = new ByteArrayInputStream(bout.toByteArray());
         Hessian2Input input = new Hessian2Input(bin);
 
-        List<Class<?>> valueType = new ArrayList<Class<?>>();
-        valueType.add(short.class);
-
-        List<Short> deserialize = (List) input.readObject(valueType);
+        List<Short> deserialize = (List) input.readObject(new TypeReference<List<Short>>(){}.getType());
         assertTrue(deserialize != null);
         assertTrue(deserialize.size() == 2);
         assertTrue(deserialize.get(1) instanceof Short);
@@ -215,7 +216,7 @@ public class Hessian2StringShortTest extends SerializeTestBase {
         shortSet.add((short) 60);
         stringShort.shortSet = shortSet;
 
-        Hessian2StringShortType deserialize = baseHessian2Serialize(stringShort);
+        Hessian2StringShortType deserialize = baseHessian2Serialize(stringShort, true);
         assertTrue(deserialize.shortSet != null);
         assertTrue(deserialize.shortSet.size() == 2);
         assertTrue(deserialize.shortSet.contains((short) 0));
@@ -242,7 +243,7 @@ public class Hessian2StringShortTest extends SerializeTestBase {
             PersonType abc = new PersonType("ABC", 12, 128D, (short) 1, (byte) 2, shorts);
             obj.stringPersonTypeMap.put("P_" + i, abc);
 
-            Hessian2StringShortType newObj = baseHessian2Serialize(obj);
+            Hessian2StringShortType newObj = baseHessian2Serialize(obj, true);
             Assert.assertEquals(obj, newObj);
             System.out.println("ShortTypeTest.testHessian2StringShortType(): i=" + i + " passed!");
         }

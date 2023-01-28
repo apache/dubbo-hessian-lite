@@ -49,17 +49,8 @@
 package com.alibaba.com.caucho.hessian.io;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -367,19 +358,7 @@ public class JavaDeserializer extends AbstractMapDeserializer {
                     deser = new SqlTimestampFieldDeserializer(field);
                 } else if (java.sql.Time.class.equals(type)) {
                     deser = new SqlTimeFieldDeserializer(field);
-                }
-                // support generic type of map
-                else if (Map.class.equals(type)
-                        && field.getGenericType() != field.getType()) {
-                    deser = new ObjectMapFieldDeserializer(field);
-                } else if (List.class.equals(type)
-                        && field.getGenericType() != field.getType()) {
-                    deser = new ObjectListFieldDeserializer(field);
-                } else if (Set.class.equals(type)
-                        && field.getGenericType() != field.getType()) {
-                    deser = new ObjectSetFieldDeserializer(field);
-                }
-                else {
+                } else {
                     deser = new ObjectFieldDeserializer(field);
                 }
 
@@ -408,7 +387,7 @@ public class JavaDeserializer extends AbstractMapDeserializer {
             Object value = null;
 
             try {
-                value = in.readObject(_field.getType());
+                value = in.readObject(_field.getType(), _field.getGenericType());
 
                 _field.set(obj, value);
             } catch (Exception e) {
@@ -482,86 +461,6 @@ public class JavaDeserializer extends AbstractMapDeserializer {
             }
         }
     }
-
-    static class ObjectMapFieldDeserializer extends FieldDeserializer {
-        private final Field _field;
-
-        ObjectMapFieldDeserializer(Field field) {
-            _field = field;
-        }
-
-        @Override
-        void deserialize(AbstractHessianInput in, Object obj)
-                throws IOException {
-            Object value = null;
-
-            try {
-
-                Type[] types = ((ParameterizedType) _field.getGenericType()).getActualTypeArguments();
-                value = in.readObject(_field.getType(),
-                        isPrimitive(types[0]) ? (Class<?>) types[0] : null,
-                        isPrimitive(types[1]) ? (Class<?>) types[1] : null
-                );
-
-                _field.set(obj, value);
-            } catch (Exception e) {
-                logDeserializeError(_field, obj, value, e);
-            }
-        }
-    }
-
-    static class ObjectListFieldDeserializer extends FieldDeserializer {
-        private final Field _field;
-
-        ObjectListFieldDeserializer(Field field) {
-            _field = field;
-        }
-
-        @Override
-        void deserialize(AbstractHessianInput in, Object obj)
-                throws IOException {
-            Object value = null;
-
-            try {
-
-                Type[] types = ((ParameterizedType) _field.getGenericType()).getActualTypeArguments();
-                value = in.readObject(_field.getType(),
-                        isPrimitive(types[0]) ? (Class<?>) types[0] : null
-                );
-
-                _field.set(obj, value);
-            } catch (Exception e) {
-                logDeserializeError(_field, obj, value, e);
-            }
-        }
-    }
-
-    static class ObjectSetFieldDeserializer extends FieldDeserializer {
-        private final Field _field;
-
-        ObjectSetFieldDeserializer(Field field) {
-            _field = field;
-        }
-
-        @Override
-        void deserialize(AbstractHessianInput in, Object obj)
-                throws IOException {
-            Object value = null;
-
-            try {
-
-                Type[] types = ((ParameterizedType) _field.getGenericType()).getActualTypeArguments();
-                value = in.readObject(_field.getType(),
-                        isPrimitive(types[0]) ? (Class<?>) types[0] : null
-                );
-
-                _field.set(obj, value);
-            } catch (Exception e) {
-                logDeserializeError(_field, obj, value, e);
-            }
-        }
-    }
-
 
     static class IntFieldDeserializer extends FieldDeserializer {
         private final Field _field;
@@ -744,43 +643,4 @@ public class JavaDeserializer extends AbstractMapDeserializer {
         }
     }
 
-    /**
-     * @see java.lang.Boolean#TYPE
-     * @see java.lang.Character#TYPE
-     * @see java.lang.Byte#TYPE
-     * @see java.lang.Short#TYPE
-     * @see java.lang.Integer#TYPE
-     * @see java.lang.Long#TYPE
-     * @see java.lang.Float#TYPE
-     * @see java.lang.Double#TYPE
-     * @see java.lang.Void#TYPE
-     */
-    private static boolean isPrimitive(Type type) {
-        try {
-            if (type != null) {
-                if (type instanceof Class<?>) {
-                    Class<?> clazz = (Class<?>) type;
-                    return clazz.isPrimitive()
-                            || PRIMITIVE_TYPE.containsKey(clazz.getName());
-                }
-            }
-        } catch (Exception e) {
-            // ignore exception
-        }
-        return false;
-    }
-
-    static final Map<String, Boolean> PRIMITIVE_TYPE = new HashMap<String, Boolean>() {
-        {
-            put(Boolean.class.getName(), true);
-            put(Character.class.getName(), true);
-            put(Byte.class.getName(), true);
-            put(Short.class.getName(), true);
-            put(Integer.class.getName(), true);
-            put(Long.class.getName(), true);
-            put(Float.class.getName(), true);
-            put(Double.class.getName(), true);
-            put(Void.class.getName(), true);
-        }
-    };
 }

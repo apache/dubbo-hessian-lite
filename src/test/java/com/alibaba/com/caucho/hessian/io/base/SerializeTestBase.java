@@ -34,19 +34,34 @@ public class SerializeTestBase {
      * hessian serialize util
      *
      * @param data
-     * @param <T>
      * @return
+     * @param <T>
      * @throws IOException
      */
     protected <T> T baseHessianSerialize(T data) throws IOException {
+        return baseHessianSerialize(data, false);
+    }
+
+    /**
+     * hessian serialize util
+     *
+     * @param data
+     * @param isAllowNonSerializable
+     * @return
+     * @param <T>
+     * @throws IOException
+     */
+    protected <T> T baseHessianSerialize(T data, boolean isAllowNonSerializable) throws IOException {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         HessianOutput out = new HessianOutput(bout);
+        out.getSerializerFactory().setAllowNonSerializable(isAllowNonSerializable);
 
         out.writeObject(data);
         out.flush();
 
         ByteArrayInputStream bin = new ByteArrayInputStream(bout.toByteArray());
         HessianInput input = new HessianInput(bin);
+        input.getSerializerFactory().setAllowNonSerializable(isAllowNonSerializable);
         return (T) input.readObject();
     }
 
@@ -54,19 +69,34 @@ public class SerializeTestBase {
      * hessian2 serialize util
      *
      * @param data
-     * @param <T>
      * @return
+     * @param <T>
      * @throws IOException
      */
     protected <T> T baseHessian2Serialize(T data) throws IOException {
+        return baseHessian2Serialize(data, false);
+    }
+
+    /**
+     * hessian2 serialize util
+     *
+     * @param data
+     * @param isAllowNonSerializable
+     * @return
+     * @param <T>
+     * @throws IOException
+     */
+    protected <T> T baseHessian2Serialize(T data, boolean isAllowNonSerializable) throws IOException {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         Hessian2Output out = new Hessian2Output(bout);
+        out.findSerializerFactory().setAllowNonSerializable(isAllowNonSerializable);
 
         out.writeObject(data);
         out.flush();
 
         ByteArrayInputStream bin = new ByteArrayInputStream(bout.toByteArray());
         Hessian2Input input = new Hessian2Input(bin);
+        input.findSerializerFactory().setAllowNonSerializable(isAllowNonSerializable);
         return (T) input.readObject();
     }
 }

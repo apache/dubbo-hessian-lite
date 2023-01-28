@@ -48,6 +48,8 @@
 
 package com.alibaba.com.caucho.hessian.io;
 
+import com.alibaba.com.caucho.hessian.util.TypeUtil;
+
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
@@ -99,12 +101,11 @@ public class MapDeserializer extends AbstractMapDeserializer {
     }
 
     /**
-     *  support generic type of map, fix the type of short serialization <p>
+     *  support generic type of map, fix the type of byte/short serialization <p>
      *  eg: Map<String, Short> serialize & deserialize
-     *
      */
     @Override
-    public Object readMap(AbstractHessianInput in, Class<?> expectKeyType, Class<?> expectValueType) throws IOException {
+    public Object readMap(AbstractHessianInput in, Type actualKeyType, Type actualValueType) throws IOException {
         Map map;
 
         if (_type == null)
@@ -123,27 +124,27 @@ public class MapDeserializer extends AbstractMapDeserializer {
 
         in.addRef(map);
 
-        doReadMap(in, map, expectKeyType, expectValueType);
+        doReadMap(in, map, actualKeyType, actualValueType);
 
         in.readEnd();
 
         return map;
     }
 
-    protected void doReadMap(AbstractHessianInput in, Map map, Class<?> keyType, Class<?> valueType) throws IOException {
+    protected void doReadMap(AbstractHessianInput in, Map map, Type actualKeyType, Type actualValueType) throws IOException {
         Deserializer keyDeserializer = null, valueDeserializer = null;
 
         SerializerFactory factory = findSerializerFactory(in);
-        if(keyType != null){
-            keyDeserializer = factory.getDeserializer(keyType.getName());
+        if (TypeUtil.isByteOrShortClass(actualKeyType)) {
+            keyDeserializer = factory.getDeserializer(((Class<?>) actualKeyType).getName());
         }
-        if(valueType != null){
-            valueDeserializer = factory.getDeserializer(valueType.getName());
+        if (TypeUtil.isByteOrShortClass(actualValueType)) {
+            valueDeserializer = factory.getDeserializer(((Class<?>) actualValueType).getName());
         }
 
         while (!in.isEnd()) {
-            map.put(keyDeserializer != null ? keyDeserializer.readObject(in) : in.readObject(),
-                    valueDeserializer != null? valueDeserializer.readObject(in) : in.readObject());
+            map.put(keyDeserializer != null ? keyDeserializer.readObject(in) : in.readObject(actualKeyType),
+                    valueDeserializer != null ? valueDeserializer.readObject(in) : in.readObject(actualValueType));
         }
     }
 

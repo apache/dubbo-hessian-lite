@@ -33,13 +33,19 @@ public class Hessian2ReuseTest extends SerializeTestBase {
 
     private static final Hessian2Output h2o = new Hessian2Output(null);
 
-    @SuppressWarnings("unchecked")
     private static <T> T serializeAndDeserialize(T obj, Class<T> clazz) throws IOException {
+        return serializeAndDeserialize(obj, clazz, false);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> T serializeAndDeserialize(T obj, Class<T> clazz, boolean isAllowNonSerializable) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        h2o.findSerializerFactory().setAllowNonSerializable(isAllowNonSerializable);
         h2o.init(outputStream);
         h2o.writeObject(obj);
         h2o.flush();
 
+        h2i.findSerializerFactory().setAllowNonSerializable(isAllowNonSerializable);
         h2i.init(new ByteArrayInputStream(outputStream.toByteArray()));
         return (T) h2i.readObject(clazz);
     }
@@ -143,10 +149,10 @@ public class Hessian2ReuseTest extends SerializeTestBase {
             PersonType abc = new PersonType("ABC", 12, 128D, (short) 1, (byte) 2, shorts);
             obj.stringPersonTypeMap.put("P_" + i, abc);
 
-            Hessian2StringShortType newObj = serializeAndDeserialize(obj, Hessian2StringShortType.class);
+            Hessian2StringShortType newObj = serializeAndDeserialize(obj, Hessian2StringShortType.class, true);
             Assert.assertEquals(obj, newObj);
 
-            Hessian2StringShortType newObj2 = baseHessian2Serialize(obj);
+            Hessian2StringShortType newObj2 = baseHessian2Serialize(obj, true);
             Assert.assertEquals(newObj, newObj2);
         }
     }
