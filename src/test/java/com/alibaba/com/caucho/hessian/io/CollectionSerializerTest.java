@@ -38,7 +38,7 @@ public class CollectionSerializerTest extends SerializeTestBase {
         set.add(1111);
         set.add(2222);
 
-        Set deserialize = baseHessianSerialize(set);
+        Set deserialize = baseHessianSerialize(set, true);
         Assert.assertTrue(deserialize.equals(set));
     }
 

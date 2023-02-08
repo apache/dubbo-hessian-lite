@@ -42,7 +42,7 @@ public class Hessian2StringShortTest extends SerializeTestBase {
         stringShortMap.put("last", (short) 60);
         stringShort.stringShortMap = stringShortMap;
 
-        Hessian2StringShortType deserialize = baseHessian2Serialize(stringShort);
+        Hessian2StringShortType deserialize = baseHessian2Serialize(stringShort, true);
         assertTrue(deserialize.stringShortMap != null);
         assertTrue(deserialize.stringShortMap.size() == 2);
         assertTrue(deserialize.stringShortMap.get("last") instanceof Short);
@@ -59,7 +59,7 @@ public class Hessian2StringShortTest extends SerializeTestBase {
         stringByteMap.put("last", (byte) 60);
         stringShort.stringByteMap = stringByteMap;
 
-        Hessian2StringShortType deserialize = baseHessian2Serialize(stringShort);
+        Hessian2StringShortType deserialize = baseHessian2Serialize(stringShort, true);
         assertTrue(deserialize.stringByteMap != null);
         assertTrue(deserialize.stringByteMap.size() == 2);
         assertTrue(deserialize.stringByteMap.get("last") instanceof Byte);
@@ -105,6 +105,7 @@ public class Hessian2StringShortTest extends SerializeTestBase {
 
         ByteArrayInputStream bin = new ByteArrayInputStream(bout.toByteArray());
         Hessian2Input input = new Hessian2Input(bin);
+        input.findSerializerFactory().setAllowNonSerializable(true);
 
         List<Class<?>> keyValueType = new ArrayList<Class<?>>();
         keyValueType.add(String.class);
@@ -139,6 +140,7 @@ public class Hessian2StringShortTest extends SerializeTestBase {
 
         ByteArrayInputStream bin = new ByteArrayInputStream(bout.toByteArray());
         Hessian2Input input = new Hessian2Input(bin);
+        input.findSerializerFactory().setAllowNonSerializable(true);
 
         Hessian2StringShortType deserialize = (Hessian2StringShortType) input.readObject();
         assertTrue(deserialize.stringPersonTypeMap != null);
@@ -215,7 +217,7 @@ public class Hessian2StringShortTest extends SerializeTestBase {
         shortSet.add((short) 60);
         stringShort.shortSet = shortSet;
 
-        Hessian2StringShortType deserialize = baseHessian2Serialize(stringShort);
+        Hessian2StringShortType deserialize = baseHessian2Serialize(stringShort, true);
         assertTrue(deserialize.shortSet != null);
         assertTrue(deserialize.shortSet.size() == 2);
         assertTrue(deserialize.shortSet.contains((short) 0));
@@ -242,7 +244,7 @@ public class Hessian2StringShortTest extends SerializeTestBase {
             PersonType abc = new PersonType("ABC", 12, 128D, (short) 1, (byte) 2, shorts);
             obj.stringPersonTypeMap.put("P_" + i, abc);
 
-            Hessian2StringShortType newObj = baseHessian2Serialize(obj);
+            Hessian2StringShortType newObj = baseHessian2Serialize(obj, true);
             Assert.assertEquals(obj, newObj);
             System.out.println("ShortTypeTest.testHessian2StringShortType(): i=" + i + " passed!");
         }

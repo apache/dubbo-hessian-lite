@@ -44,7 +44,7 @@ public class Hessian1StringShortTest extends SerializeTestBase {
         stringShortMap.put("last", (short)60);
         stringShort.stringShortMap = stringShortMap;
 
-        Hessian2StringShortType deserialize = baseHessianSerialize(stringShort);
+        Hessian2StringShortType deserialize = baseHessianSerialize(stringShort, true);
         assertTrue(deserialize.stringShortMap != null);
         assertTrue(deserialize.stringShortMap.size() == 2);
         assertTrue(deserialize.stringShortMap.get("last") instanceof Short);
@@ -61,7 +61,7 @@ public class Hessian1StringShortTest extends SerializeTestBase {
         stringByteMap.put("last", (byte)60);
         stringShort.stringByteMap = stringByteMap;
 
-        Hessian2StringShortType deserialize = baseHessianSerialize(stringShort);
+        Hessian2StringShortType deserialize = baseHessianSerialize(stringShort, true);
         assertTrue(deserialize.stringByteMap != null);
         assertTrue(deserialize.stringByteMap.size() == 2);
         assertTrue(deserialize.stringByteMap.get("last") instanceof Byte);
@@ -140,6 +140,7 @@ public class Hessian1StringShortTest extends SerializeTestBase {
 
         ByteArrayInputStream bin = new ByteArrayInputStream(bout.toByteArray());
         HessianInput input = new HessianInput(bin);
+        input._serializerFactory.setAllowNonSerializable(true);
 
         Hessian2StringShortType deserialize = (Hessian2StringShortType) input.readObject();
         assertTrue(deserialize.stringPersonTypeMap != null);
