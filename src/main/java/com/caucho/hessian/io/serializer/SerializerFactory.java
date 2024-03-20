@@ -132,6 +132,12 @@ public class SerializerFactory extends AbstractSerializerFactory
   private boolean _isEnableUnsafeSerializer
     = (UnsafeSerializer.isEnabled()
         && UnsafeDeserializer.isEnabled());
+  /**
+   * For those classes are unknown in current classloader, record them in this set to avoid
+   * frequently class loading and to reduce performance overhead.
+   */
+  private Map<String, Object> _typeNotFoundDeserializerMap = new ConcurrentHashMap<>(8);
+  private static final Object PRESENT = new Object();
 
   private FieldDeserializer2Factory _fieldDeserializerFactory;
 
@@ -708,7 +714,7 @@ public class SerializerFactory extends AbstractSerializerFactory
   public Deserializer getDeserializer(String type)
     throws HessianProtocolException
   {
-    if (type == null || type.equals(""))
+    if (type == null || type.equals("") || _typeNotFoundDeserializerMap.containsKey(type))
       return null;
 
     Deserializer deserializer;
@@ -744,7 +750,7 @@ public class SerializerFactory extends AbstractSerializerFactory
         deserializer = getDeserializer(cl);
       } catch (Exception e) {
         log.warning("Hessian/Burlap: '" + type + "' is an unknown class in " + getClassLoader() + ":\n" + e);
-
+        _typeNotFoundDeserializerMap.put(type, PRESENT);
         log.log(Level.FINER, e.toString(), e);
       }
     }
