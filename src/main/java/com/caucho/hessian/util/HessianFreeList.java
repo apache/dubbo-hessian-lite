@@ -71,7 +71,7 @@ public final class HessianFreeList<T> {
   {
     _freeStack = new AtomicReferenceArray(size);
   }
-  
+
   /**
    * Try to get an object from the free list.  Returns null if the free list
    * is empty.
@@ -87,7 +87,7 @@ public final class HessianFreeList<T> {
     else
       return null;
   }
-  
+
   /**
    * Frees the object.  If the free list is full, the object will be garbage
    * collected.
@@ -100,7 +100,7 @@ public final class HessianFreeList<T> {
 
     if (top < _freeStack.length()) {
       boolean isFree = _freeStack.compareAndSet(top, null, obj);
-      
+
       _top.compareAndSet(top, top + 1);
 
       return isFree;
@@ -123,7 +123,7 @@ public final class HessianFreeList<T> {
   public void freeCareful(T obj)
   {
     if (checkDuplicate(obj))
-      throw new IllegalStateException("tried to free object twice: " + obj);
+      throw new IllegalStateException("tried to free object twice");
 
     free(obj);
   }

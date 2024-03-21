@@ -295,13 +295,11 @@ public class JavaSerializer extends AbstractSerializer
       }
     } catch (RuntimeException e) {
       throw new RuntimeException(e.getMessage() + "\n class: "
-                                 + obj.getClass().getName()
-                                 + " (object=" + obj + ")",
+                                 + obj.getClass().getName(),
                                  e);
     } catch (IOException e) {
       throw new IOExceptionWrapper(e.getMessage() + "\n class: "
-                                   + obj.getClass().getName()
-                                   + " (object=" + obj + ")",
+                                   + obj.getClass().getName(),
                                    e);
     }
   }

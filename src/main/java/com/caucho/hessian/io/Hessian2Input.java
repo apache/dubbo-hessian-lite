@@ -121,15 +121,6 @@ public class Hessian2Input
   // the chunk length
   private int _chunkLength;
 
-  private HessianDebugInputStream _dIs;
-
-  public Hessian2Input()
-  {
-    if (log.isLoggable(Level.FINEST)) {
-      _dIs = new HessianDebugInputStream(log, Level.FINEST);
-    }
-  }
-
   /**
    * Creates a new Hessian input stream, initialized with an
    * underlying input stream.
@@ -138,8 +129,6 @@ public class Hessian2Input
    */
   public Hessian2Input(InputStream is)
   {
-    this();
-
     init(is);
   }
 
@@ -217,11 +206,6 @@ public class Hessian2Input
   @Override
   public void init(InputStream is)
   {
-    if (_dIs != null) {
-      _dIs.initPacket(is);
-      is = _dIs;
-    }
-
     _is = is;
 
     reset();
@@ -229,11 +213,6 @@ public class Hessian2Input
 
   public void initPacket(InputStream is)
   {
-    if (_dIs != null) {
-      _dIs.initPacket(is);
-      is = _dIs;
-    }
-
     _is = is;
 
     resetReferences();
@@ -2867,7 +2846,7 @@ public class Hessian2Input
         if (obj != null) {
           return error("expected " + expect
                        + " at 0x" + Integer.toHexString(ch & 0xff)
-                       + " " + obj.getClass().getName() + " (" + obj + ")"
+                       + " " + obj.getClass().getName()
                        + "\n  " + context + "");
         }
         else

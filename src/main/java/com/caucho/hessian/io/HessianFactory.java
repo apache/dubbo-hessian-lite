@@ -256,15 +256,4 @@ public class HessianFactory
     return new HessianOutput(os);
   }
 
-  public OutputStream createHessian2DebugOutput(OutputStream os,
-                                                Logger log,
-                                                Level level)
-  {
-    HessianDebugOutputStream out
-      = new HessianDebugOutputStream(os, log, level);
-
-    out.startTop2();
-
-    return out;
-  }
 }
