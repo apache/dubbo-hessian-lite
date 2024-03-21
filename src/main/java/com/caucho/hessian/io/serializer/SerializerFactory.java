@@ -71,6 +71,7 @@ import com.caucho.hessian.io.deserializer.MapDeserializer;
 import com.caucho.hessian.io.deserializer.ObjectDeserializer;
 import com.caucho.hessian.io.deserializer.RemoteDeserializer;
 import com.caucho.hessian.io.deserializer.UnsafeDeserializer;
+import com.caucho.hessian.io.java8.ZoneIdSerializer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -348,6 +349,8 @@ public class SerializerFactory extends AbstractSerializerFactory
     else if (InetAddress.class.isAssignableFrom(cl)) {
       return InetAddressSerializer.create();
     }
+     else if (isZoneId(cl)) //must before "else if (JavaSerializer.getWriteReplace(cl) != null)"
+       return ZoneIdSerializer.getInstance();
     else if (JavaSerializer.getWriteReplace(cl) != null) {
       Serializer baseSerializer = getDefaultSerializer(cl);
 
@@ -840,5 +843,24 @@ public class SerializerFactory extends AbstractSerializerFactory
     }
 
     _systemClassLoader = systemClassLoader;
+  }
+
+  private static boolean isZoneId(Class cl) {
+    try {
+      return isJava8() && Class.forName("java.time.ZoneId").isAssignableFrom(cl);
+    } catch (ClassNotFoundException e) {
+      // ignore
+    }
+    return false;
+  }
+
+  /**
+   * check if the environment is java 8 or beyond
+   *
+   * @return if on java 8
+   */
+  private static boolean isJava8() {
+    String javaVersion = System.getProperty("java.specification.version");
+    return Double.valueOf(javaVersion) >= 1.8;
   }
 }
