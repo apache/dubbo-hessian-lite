@@ -48,7 +48,6 @@
 
 package com.caucho.hessian.io;
 
-import com.caucho.hessian.io.serializer.AbstractHessianOutput;
 import com.caucho.hessian.util.IdentityIntMap;
 
 import java.io.InputStream;

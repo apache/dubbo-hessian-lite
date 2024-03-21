@@ -18,9 +18,8 @@
 package com.caucho.hessian.io.java8;
 
 
-import com.caucho.hessian.io.serializer.AbstractHessianOutput;
-import com.caucho.hessian.io.serializer.AbstractSerializer;
-import jdk.internal.org.objectweb.asm.Handle;
+import com.caucho.hessian.io.AbstractHessianOutput;
+import com.caucho.hessian.io.AbstractSerializer;
 
 import java.io.IOException;
 

@@ -48,8 +48,6 @@
 
 package com.caucho.hessian.io;
 
-import com.caucho.hessian.io.serializer.SerializerFactory;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;

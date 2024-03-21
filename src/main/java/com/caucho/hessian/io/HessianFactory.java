@@ -51,7 +51,6 @@ package com.caucho.hessian.io;
 import java.util.logging.*;
 import java.io.*;
 
-import com.caucho.hessian.io.serializer.SerializerFactory;
 import com.caucho.hessian.util.HessianFreeList;
 
 /**

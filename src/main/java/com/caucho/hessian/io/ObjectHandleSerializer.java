@@ -48,9 +48,6 @@
 
 package com.caucho.hessian.io;
 
-import com.caucho.hessian.io.serializer.AbstractHessianOutput;
-import com.caucho.hessian.io.serializer.AbstractSerializer;
-
 import java.io.IOException;
 
 /**

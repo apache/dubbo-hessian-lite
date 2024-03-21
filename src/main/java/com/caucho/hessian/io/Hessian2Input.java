@@ -48,9 +48,6 @@
 
 package com.caucho.hessian.io;
 
-import com.caucho.hessian.io.serializer.ClassFactory;
-import com.caucho.hessian.io.serializer.SerializerFactory;
-
 import java.io.*;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
