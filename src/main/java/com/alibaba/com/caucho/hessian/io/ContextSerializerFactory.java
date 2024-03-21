@@ -371,7 +371,7 @@ public class ContextSerializerFactory {
         HashMap<Class, Class> classMap;
 
         classMap = new HashMap<Class, Class>();
-        initSerializerFiles("META-INF/hessian/serializers",
+        initSerializerFiles("META-INF/dubbo/hessian/serializers",
                 _serializerFiles,
                 classMap,
                 Serializer.class);
@@ -390,7 +390,7 @@ public class ContextSerializerFactory {
         }
 
         classMap = new HashMap<Class, Class>();
-        initSerializerFiles("META-INF/hessian/deserializers",
+        initSerializerFiles("META-INF/dubbo/hessian/deserializers",
                 _deserializerFiles,
                 classMap,
                 Deserializer.class);
