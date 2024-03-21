@@ -48,8 +48,18 @@
 
 package com.caucho.hessian.io.serializer;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 /**
@@ -57,118 +67,131 @@ import java.util.regex.Pattern;
  */
 public class ClassFactory
 {
-  private static ArrayList<Allow> _staticAllowList;
-
-  private static ArrayList<Allow> _staticDenyList;
+  protected static final Logger log
+          = Logger.getLogger(ClassFactory.class.getName());
+  private static final ArrayList<Allow> _staticAllowList;
+  private static final Map<String, Object> _allowSubClassSet = new ConcurrentHashMap<>();
+  private static final Map<String, Object> _allowClassSet = new ConcurrentHashMap<>();
 
   private ClassLoader _loader;
-
   private boolean _isWhitelist;
 
-  private ArrayList<Allow> _allowList;
+  private LinkedList<Allow> _allowList;
 
   ClassFactory(ClassLoader loader)
   {
     _loader = loader;
+    initAllow();
   }
 
   public Class<?> load(String className)
-    throws ClassNotFoundException
+          throws ClassNotFoundException
   {
     if (isAllow(className)) {
-      return Class.forName(className, false, _loader);
+      Class<?> aClass = Class.forName(className, false, _loader);
+
+      if (_allowClassSet.containsKey(className)) {
+        return aClass;
+      }
+
+      if (aClass.getInterfaces().length > 0) {
+        for (Class<?> anInterface : aClass.getInterfaces()) {
+          if(!isAllow(anInterface.getName())) {
+            log.log(Level.SEVERE, className + "'s interfaces: " + anInterface.getName() + " in blacklist or not in whitelist, deserialization with type 'HashMap' instead.");
+            return HashMap.class;
+          }
+        }
+      }
+
+      List<Class<?>> allSuperClasses = new LinkedList<>();
+
+      Class<?> superClass = aClass.getSuperclass();
+      while (superClass != null) {
+        // add current super class
+        allSuperClasses.add(superClass);
+        superClass = superClass.getSuperclass();
+      }
+
+      for (Class<?> aSuperClass : allSuperClasses) {
+        if(!isAllow(aSuperClass.getName())) {
+          log.log(Level.SEVERE, className + "'s superClass: " + aSuperClass.getName() + " in blacklist or not in whitelist, deserialization with type 'HashMap' instead.");
+          return HashMap.class;
+        }
+
+      }
+
+      _allowClassSet.put(className, className);
+      return aClass;
     }
     else {
+      log.log(Level.SEVERE, className + " in blacklist or not in whitelist, deserialization with type 'HashMap' instead.");
       return HashMap.class;
     }
   }
 
   private boolean isAllow(String className)
   {
-    ArrayList<Allow> allowList = _allowList;
+    LinkedList<Allow> allowList = _allowList;
 
     if (allowList == null) {
-      Boolean isAllow = isAllow(_staticDenyList, className);
-
-      if (isAllow != null) {
-        return isAllow;
-      }
-      else {
-        return true;
-      }
-
+      return true;
     }
 
-    Boolean isAllow = isAllow(_allowList, className);
-    if (isAllow != null) {
-      return isAllow;
+    if (_allowSubClassSet.containsKey(className)) {
+      return true;
     }
 
-    isAllow = isAllow(_staticAllowList, className);
-
-    if (isAllow != null) {
-      return isAllow;
-    }
-
-    return ! _isWhitelist;
-  }
-
-  private Boolean isAllow(ArrayList<Allow> allowList, String className)
-  {
-    if (allowList == null) {
-      return null;
-    }
-
-    int size = allowList.size();
-    for (int i = 0; i < size; i++) {
-      Allow allow = allowList.get(i);
-
+    for (Allow allow : allowList) {
       Boolean isAllow = allow.allow(className);
 
       if (isAllow != null) {
+        if (isAllow) {
+          _allowSubClassSet.put(className, className);
+        }
         return isAllow;
       }
     }
 
-    return null;
+    if (_isWhitelist) {
+      return false;
+    }
+
+    _allowSubClassSet.put(className, className);
+    return true;
   }
 
   public void setWhitelist(boolean isWhitelist)
   {
-    initAllow();
-
+    _allowClassSet.clear();
+    _allowSubClassSet.clear();
     _isWhitelist = isWhitelist;
+
+    initAllow();
   }
 
-  /**
-   * Allow a class or package based on a pattern.
-   *
-   * Examples: "java.util.*", "com.foo.io.Bean"
-   */
   public void allow(String pattern)
   {
+    _allowClassSet.clear();
+    _allowSubClassSet.clear();
     initAllow();
 
     synchronized (this) {
-      _allowList.add(new Allow(toPattern(pattern), true));
+      _allowList.addFirst(new Allow(toPattern(pattern), true));
     }
   }
 
-  /**
-   * Deny a class or package based on a pattern.
-   *
-   * Examples: "java.util.*", "com.foo.io.Bean"
-   */
   public void deny(String pattern)
   {
+    _allowClassSet.clear();
+    _allowSubClassSet.clear();
     initAllow();
 
     synchronized (this) {
-      _allowList.add(new Allow(toPattern(pattern), false));
+      _allowList.addFirst(new Allow(toPattern(pattern), false));
     }
   }
 
-  private String toPattern(String pattern)
+  private static String toPattern(String pattern)
   {
     pattern = pattern.replace(".", "\\.");
     pattern = pattern.replace("*", ".*");
@@ -180,8 +203,8 @@ public class ClassFactory
   {
     synchronized (this) {
       if (_allowList == null) {
-        _allowList = new ArrayList<Allow>();
-        _isWhitelist = true;
+        _allowList = new LinkedList<Allow>();
+        _allowList.addAll(_staticAllowList);
       }
     }
   }
@@ -189,6 +212,9 @@ public class ClassFactory
   static class Allow {
     private Boolean _isAllow;
     private Pattern _pattern;
+
+    public Allow() {
+    }
 
     private Allow(String pattern, boolean isAllow)
     {
@@ -207,19 +233,65 @@ public class ClassFactory
     }
   }
 
+  static class AllowPrefix extends Allow {
+    private Boolean _isAllow;
+    private String _prefix;
+
+    private AllowPrefix(String prefix, boolean isAllow)
+    {
+      super();
+      _isAllow = isAllow;
+      _prefix = prefix;
+    }
+
+    @Override
+    Boolean allow(String className)
+    {
+      if (className.startsWith(_prefix)) {
+        return _isAllow;
+      }
+      else {
+        return null;
+      }
+    }
+  }
+
   static {
-    ArrayList<Allow> blacklist = new ArrayList<Allow>();
+    _staticAllowList = new ArrayList<Allow>();
 
-    blacklist.add(new Allow("java\\.lang\\.Runtime", false));
-    blacklist.add(new Allow("java\\.lang\\.Process", false));
-    blacklist.add(new Allow("java\\.lang\\.System", false));
-    blacklist.add(new Allow("java\\.lang\\.Thread", false));
+    ClassLoader classLoader = ClassFactory.class.getClassLoader();
+    try {
+      String[] denyClasses = readLines(classLoader.getResourceAsStream("DENY_CLASS"));
+      for (String denyClass : denyClasses) {
+        if (denyClass.startsWith("#")) {
+          continue;
+        }
+        if (denyClass.endsWith(".")) {
+          _staticAllowList.add(new AllowPrefix(denyClass, false));
+        } else {
+          _staticAllowList.add(new Allow(toPattern(denyClass), false));
+        }
+      }
+    } catch (IOException ignore) {
 
-    _staticAllowList = new ArrayList<Allow>(blacklist);
+    }
+  }
 
-    _staticAllowList.add(new Allow("java\\..+", true));
-    _staticAllowList.add(new Allow("javax\\.management\\..+", true));
-
-    _staticDenyList = new ArrayList<Allow>(blacklist);
+  /**
+   * read lines.
+   *
+   * @param is input stream.
+   * @return lines.
+   * @throws IOException If an I/O error occurs
+   */
+  public static String[] readLines(InputStream is) throws IOException {
+    List<String> lines = new ArrayList<String>();
+    try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
+      String line;
+      while ((line = reader.readLine()) != null) {
+        lines.add(line);
+      }
+      return lines.toArray(new String[0]);
+    }
   }
 }
