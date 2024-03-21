@@ -54,21 +54,18 @@ import java.lang.reflect.Constructor;
  * Deserializing a JDK 1.4 StackTraceElement
  */
 public class StackTraceElementDeserializer extends JavaDeserializer {
-  public StackTraceElementDeserializer(FieldDeserializer2Factory fieldFactory)
-  {
-    super(StackTraceElement.class, fieldFactory);
-  }
+    public StackTraceElementDeserializer(FieldDeserializer2Factory fieldFactory) {
+        super(StackTraceElement.class, fieldFactory);
+    }
 
-  @Override
-  protected Constructor<?> getConstructor(Class<?> cl)
-  {
-    return null;
-  }
+    @Override
+    protected Constructor<?> getConstructor(Class<?> cl) {
+        return null;
+    }
 
-  @Override
-  protected Object instantiate()
-    throws Exception
-  {
-    return new StackTraceElement("", "", "", 0);
-  }
+    @Override
+    protected Object instantiate()
+            throws Exception {
+        return new StackTraceElement("", "", "", 0);
+    }
 }

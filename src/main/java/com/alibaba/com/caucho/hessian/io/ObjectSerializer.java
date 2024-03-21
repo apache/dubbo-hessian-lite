@@ -48,13 +48,9 @@
 
 package com.alibaba.com.caucho.hessian.io;
 
-import com.alibaba.com.caucho.hessian.io.Serializer;
-
-import java.io.IOException;
-
 /**
  * Serializing an object.
  */
 public interface ObjectSerializer {
-  public Serializer getObjectSerializer();
+    public Serializer getObjectSerializer();
 }

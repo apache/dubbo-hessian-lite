@@ -38,7 +38,7 @@ public class CollectionSerializerTest extends SerializeTestBase {
         set.add(1111);
         set.add(2222);
 
-        Set deserialize = baseHessianSerialize(set);
+        Set deserialize = baseHessian2Serialize(set);
         Assert.assertTrue(deserialize.equals(set));
     }
 
@@ -89,7 +89,7 @@ public class CollectionSerializerTest extends SerializeTestBase {
         list.add(1111);
         list.add(2222);
 
-        List deserialize = baseHessianSerialize(list);
+        List deserialize = baseHessian2Serialize(list);
         Assert.assertTrue(deserialize.equals(list));
     }
 
@@ -101,7 +101,7 @@ public class CollectionSerializerTest extends SerializeTestBase {
         vector.add(1111);
         vector.add(2222);
 
-        List deserialize = baseHessianSerialize(vector);
+        List deserialize = baseHessian2Serialize(vector);
         Assert.assertTrue(deserialize.equals(vector));
     }
 }

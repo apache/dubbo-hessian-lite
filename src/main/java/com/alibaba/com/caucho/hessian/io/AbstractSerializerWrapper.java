@@ -55,15 +55,14 @@ import java.util.logging.Logger;
  * Serializing an object.
  */
 abstract public class AbstractSerializerWrapper implements Serializer {
-  protected static final Logger log
-    = Logger.getLogger(AbstractSerializerWrapper.class.getName());
+    protected static final Logger log
+            = Logger.getLogger(AbstractSerializerWrapper.class.getName());
 
-  abstract protected Serializer getDelegate();
+    abstract protected Serializer getDelegate();
 
-  @Override
-  public void writeObject(Object obj, AbstractHessianOutput out)
-    throws IOException
-  {
-    getDelegate().writeObject(obj, out);
-  }
+    @Override
+    public void writeObject(Object obj, AbstractHessianOutput out)
+            throws IOException {
+        getDelegate().writeObject(obj, out);
+    }
 }

@@ -54,26 +54,23 @@ import java.util.logging.Logger;
 /**
  * Serializing an object for known object types.
  */
-public class JavaUnsharedSerializer extends JavaSerializer
-{
-  private static final Logger log
-    = Logger.getLogger(JavaUnsharedSerializer.class.getName());
+public class JavaUnsharedSerializer extends JavaSerializer {
+    private static final Logger log
+            = Logger.getLogger(JavaUnsharedSerializer.class.getName());
 
-  public JavaUnsharedSerializer(Class<?> cl)
-  {
-    super(cl);
-  }
-
-  @Override
-  public void writeObject(Object obj, AbstractHessianOutput out)
-    throws IOException
-  {
-    boolean oldUnshared = out.setUnshared(true);
-
-    try {
-      super.writeObject(obj, out);
-    } finally {
-      out.setUnshared(oldUnshared);
+    public JavaUnsharedSerializer(Class<?> cl) {
+        super(cl);
     }
-  }
+
+    @Override
+    public void writeObject(Object obj, AbstractHessianOutput out)
+            throws IOException {
+        boolean oldUnshared = out.setUnshared(true);
+
+        try {
+            super.writeObject(obj, out);
+        } finally {
+            out.setUnshared(oldUnshared);
+        }
+    }
 }

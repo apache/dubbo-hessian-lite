@@ -48,8 +48,6 @@
 
 package com.alibaba.com.caucho.hessian.io;
 
-import com.alibaba.com.caucho.hessian.io.HessianHandle;
-
 import java.util.BitSet;
 
 /**

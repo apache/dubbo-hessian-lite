@@ -54,6 +54,6 @@ import java.io.IOException;
  * Serializing an object for known object types.
  */
 public interface FieldDeserializer2 {
-  void deserialize(AbstractHessianInput in, Object obj)
-    throws IOException;
+    void deserialize(AbstractHessianInput in, Object obj)
+            throws IOException;
 }

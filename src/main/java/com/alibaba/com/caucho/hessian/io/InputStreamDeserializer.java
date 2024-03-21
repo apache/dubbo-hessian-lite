@@ -54,16 +54,14 @@ import java.io.IOException;
  * Serializing a stream object.
  */
 public class InputStreamDeserializer extends AbstractDeserializer {
-  public static final InputStreamDeserializer DESER
-    = new InputStreamDeserializer();
+    public static final InputStreamDeserializer DESER
+            = new InputStreamDeserializer();
 
-  public InputStreamDeserializer()
-  {
-  }
+    public InputStreamDeserializer() {
+    }
 
-  public Object readObject(AbstractHessianInput in)
-    throws IOException
-  {
-    return in.readInputStream();
-  }
+    public Object readObject(AbstractHessianInput in)
+            throws IOException {
+        return in.readInputStream();
+    }
 }

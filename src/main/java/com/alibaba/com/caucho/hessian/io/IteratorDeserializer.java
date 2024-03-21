@@ -55,31 +55,29 @@ import java.util.ArrayList;
  * Deserializing a JDK 1.2 Collection.
  */
 public class IteratorDeserializer extends AbstractListDeserializer {
-  private static IteratorDeserializer _deserializer;
+    private static IteratorDeserializer _deserializer;
 
-  public static IteratorDeserializer create()
-  {
-    if (_deserializer == null)
-      _deserializer = new IteratorDeserializer();
+    public static IteratorDeserializer create() {
+        if (_deserializer == null)
+            _deserializer = new IteratorDeserializer();
 
-    return _deserializer;
-  }
+        return _deserializer;
+    }
 
-  @Override
-  public Object readList(AbstractHessianInput in, int length)
-    throws IOException
-  {
-    ArrayList list = new ArrayList();
+    @Override
+    public Object readList(AbstractHessianInput in, int length)
+            throws IOException {
+        ArrayList list = new ArrayList();
 
-    in.addRef(list);
+        in.addRef(list);
 
-    while (! in.isEnd())
-      list.add(in.readObject());
+        while (!in.isEnd())
+            list.add(in.readObject());
 
-    in.readEnd();
+        in.readEnd();
 
-    return list.iterator();
-  }
+        return list.iterator();
+    }
 }
 
 

@@ -48,99 +48,86 @@
 
 package com.alibaba.com.caucho.hessian.io;
 
-import com.alibaba.com.caucho.hessian.io.AbstractHessianInput;
-import com.alibaba.com.caucho.hessian.io.Deserializer;
-
 import java.io.IOException;
 
 /**
  * Deserializing an object.
  */
 abstract public class AbstractDeserializerWrapper implements Deserializer {
-  abstract protected Deserializer getDelegate();
+    abstract protected Deserializer getDelegate();
 
-  @Override
-  public Class<?> getType()
-  {
-    return getDelegate().getType();
-  }
+    @Override
+    public Class<?> getType() {
+        return getDelegate().getType();
+    }
 
-  @Override
-  public boolean isReadResolve()
-  {
-    return getDelegate().isReadResolve();
-  }
+    @Override
+    public boolean isReadResolve() {
+        return getDelegate().isReadResolve();
+    }
 
-  @Override
-  public Object readObject(AbstractHessianInput in)
-    throws IOException
-  {
-    return getDelegate().readObject(in);
-  }
+    @Override
+    public Object readObject(AbstractHessianInput in)
+            throws IOException {
+        return getDelegate().readObject(in);
+    }
 
-  @Override
-  public Object readList(AbstractHessianInput in, int length)
-    throws IOException
-  {
-    return getDelegate().readList(in, length);
-  }
+    @Override
+    public Object readList(AbstractHessianInput in, int length)
+            throws IOException {
+        return getDelegate().readList(in, length);
+    }
 
-  @Override
-  public Object readLengthList(AbstractHessianInput in, int length)
-    throws IOException
-  {
-    return getDelegate().readLengthList(in, length);
-  }
+    @Override
+    public Object readLengthList(AbstractHessianInput in, int length)
+            throws IOException {
+        return getDelegate().readLengthList(in, length);
+    }
 
-  @Override
-  public Object readMap(AbstractHessianInput in)
-    throws IOException
-  {
-    return getDelegate().readMap(in);
-  }
+    @Override
+    public Object readMap(AbstractHessianInput in)
+            throws IOException {
+        return getDelegate().readMap(in);
+    }
 
-  /**
-   * Creates the field array for a class. The default
-   * implementation returns a String[] array.
-   *
-   * @param len number of items in the array
-   * @return the new empty array
-   */
-  @Override
-  public Object []createFields(int len)
-  {
-    return getDelegate().createFields(len);
-  }
+    /**
+     * Creates the field array for a class. The default
+     * implementation returns a String[] array.
+     *
+     * @param len number of items in the array
+     * @return the new empty array
+     */
+    @Override
+    public Object[] createFields(int len) {
+        return getDelegate().createFields(len);
+    }
 
-  /**
-   * Creates a field value class. The default
-   * implementation returns the String.
-   *
-   * @param len number of items in the array
-   * @return the new empty array
-   */
-  @Override
-  public Object createField(String name)
-  {
-    return getDelegate().createField(name);
-  }
+    /**
+     * Creates a field value class. The default
+     * implementation returns the String.
+     *
+     * @param len number of items in the array
+     * @return the new empty array
+     */
+    @Override
+    public Object createField(String name) {
+        return getDelegate().createField(name);
+    }
 
-  @Override
-  public Object readObject(AbstractHessianInput in,
-                           String []fieldNames)
-    throws IOException
-  {
-    return getDelegate().readObject(in, fieldNames);
-  }
+    @Override
+    public Object readObject(AbstractHessianInput in,
+                             String[] fieldNames)
+            throws IOException {
+        return getDelegate().readObject(in, fieldNames);
+    }
 
-  /**
-   * Reads an object instance from the input stream
-   */
-  @Override
-  public Object readObject(AbstractHessianInput in,
-                           Object []fields)
-    throws IOException
-  {
-    return getDelegate().readObject(in, fields);
-  }
+    /**
+     * Reads an object instance from the input stream
+     */
+    @Override
+    public Object readObject(AbstractHessianInput in,
+                             Object[] fields)
+            throws IOException {
+        return getDelegate().readObject(in, fields);
+    }
 }

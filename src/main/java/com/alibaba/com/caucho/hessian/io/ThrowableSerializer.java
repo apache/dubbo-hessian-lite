@@ -54,27 +54,24 @@ import java.io.IOException;
  * Serializing an object for known object types.
  */
 public class ThrowableSerializer extends AbstractSerializerWrapper {
-  private final Serializer _ser;
+    private final Serializer _ser;
 
-  public ThrowableSerializer(Serializer ser)
-  {
-    _ser = ser;
-  }
+    public ThrowableSerializer(Serializer ser) {
+        _ser = ser;
+    }
 
-  @Override
-  protected Serializer getDelegate()
-  {
-    return _ser;
-  }
+    @Override
+    protected Serializer getDelegate() {
+        return _ser;
+    }
 
-  @Override
-  public void writeObject(Object obj, AbstractHessianOutput out)
-    throws IOException
-  {
-    Throwable e = (Throwable) obj;
+    @Override
+    public void writeObject(Object obj, AbstractHessianOutput out)
+            throws IOException {
+        Throwable e = (Throwable) obj;
 
-    e.getStackTrace();
+        e.getStackTrace();
 
-    _ser.writeObject(obj, out);
-  }
+        _ser.writeObject(obj, out);
+    }
 }

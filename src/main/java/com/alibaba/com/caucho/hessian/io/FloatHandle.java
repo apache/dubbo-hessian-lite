@@ -48,36 +48,30 @@
 
 package com.alibaba.com.caucho.hessian.io;
 
-import java.net.URL;
 import java.io.Serializable;
 
 /**
  * Handle for Java Float objects.
  */
 public class FloatHandle implements Serializable {
-  private double _value;
+    private double _value;
 
-  private FloatHandle()
-  {
-  }
+    private FloatHandle() {
+    }
 
-  public FloatHandle(float value)
-  {
-    _value = value;
-  }
+    public FloatHandle(float value) {
+        _value = value;
+    }
 
-  public double getValue()
-  {
-    return _value;
-  }
+    public double getValue() {
+        return _value;
+    }
 
-  public Object readResolve()
-  {
-    return Double.parseDouble(String.valueOf(((Number) _value).floatValue()));
-  }
+    public Object readResolve() {
+        return Double.parseDouble(String.valueOf(((Number) _value).floatValue()));
+    }
 
-  public String toString()
-  {
-    return getClass().getSimpleName() + "[" + _value + "]";
-  }
+    public String toString() {
+        return getClass().getSimpleName() + "[" + _value + "]";
+    }
 }

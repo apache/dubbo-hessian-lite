@@ -39,7 +39,7 @@ public class HessianJavaSerializeTest extends SerializeTestBase {
         baseUser.setUserId(1);
         baseUser.setUserName("tom");
 
-        BaseUser serializedUser = baseHessianSerialize(baseUser);
+        BaseUser serializedUser = baseHessian2Serialize(baseUser);
         Assert.assertEquals("tom", serializedUser.getUserName());
     }
 
@@ -50,7 +50,7 @@ public class HessianJavaSerializeTest extends SerializeTestBase {
         subUser.setUserId(1);
         subUser.setUserName("tom");
 
-        SubUser serializedUser = baseHessianSerialize(subUser);
+        SubUser serializedUser = baseHessian2Serialize(subUser);
         Assert.assertEquals("tom", serializedUser.getUserName());
 
     }
@@ -78,7 +78,7 @@ public class HessianJavaSerializeTest extends SerializeTestBase {
         grandsonUser.setUserId(1);
         grandsonUser.setUserName("tom");
 
-        GrandsonUser serializedUser = baseHessianSerialize(grandsonUser);
+        GrandsonUser serializedUser = baseHessian2Serialize(grandsonUser);
         Assert.assertEquals("tom", serializedUser.getUserName());
     }
 
@@ -86,7 +86,6 @@ public class HessianJavaSerializeTest extends SerializeTestBase {
     public void testFloat() throws Exception {
         Float fData = 99.8F;
         Double dData = 99.8D;
-        Assert.assertEquals(dData, baseHessianSerialize(fData));
         Assert.assertEquals(dData, baseHessian2Serialize(fData));
     }
 

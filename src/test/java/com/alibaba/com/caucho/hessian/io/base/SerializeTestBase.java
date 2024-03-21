@@ -18,8 +18,6 @@ package com.alibaba.com.caucho.hessian.io.base;
 
 import com.alibaba.com.caucho.hessian.io.Hessian2Input;
 import com.alibaba.com.caucho.hessian.io.Hessian2Output;
-import com.alibaba.com.caucho.hessian.io.HessianInput;
-import com.alibaba.com.caucho.hessian.io.HessianOutput;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -30,25 +28,6 @@ import java.io.IOException;
  *
  */
 public class SerializeTestBase {
-    /**
-     * hessian serialize util
-     *
-     * @param data
-     * @param <T>
-     * @return
-     * @throws IOException
-     */
-    protected <T> T baseHessianSerialize(T data) throws IOException {
-        ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        HessianOutput out = new HessianOutput(bout);
-
-        out.writeObject(data);
-        out.flush();
-
-        ByteArrayInputStream bin = new ByteArrayInputStream(bout.toByteArray());
-        HessianInput input = new HessianInput(bin);
-        return (T) input.readObject();
-    }
 
     /**
      * hessian2 serialize util
