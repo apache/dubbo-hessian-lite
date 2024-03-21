@@ -308,6 +308,10 @@ public class SerializerFactory extends AbstractSerializerFactory {
         return _fieldDeserializerFactory;
     }
 
+    public boolean isEnableUnsafeSerializer() {
+        return _isEnableUnsafeSerializer;
+    }
+
     /**
      * Returns the serializer for a class.
      *
