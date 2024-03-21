@@ -80,6 +80,7 @@ import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -390,6 +391,9 @@ public class SerializerFactory extends AbstractSerializerFactory
 
     else if (Annotation.class.isAssignableFrom(cl))
       return new AnnotationSerializer(cl);
+
+    else if (BitSet.class.isAssignableFrom(cl))
+      return BitSetSerializer.create();
 
     return getDefaultSerializer(cl);
   }
