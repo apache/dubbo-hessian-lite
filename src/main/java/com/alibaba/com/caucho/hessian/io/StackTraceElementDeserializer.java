@@ -48,17 +48,27 @@
 
 package com.alibaba.com.caucho.hessian.io;
 
+import java.lang.reflect.Constructor;
+
 /**
  * Deserializing a JDK 1.4 StackTraceElement
  */
 public class StackTraceElementDeserializer extends JavaDeserializer {
-    public StackTraceElementDeserializer() {
-        super(StackTraceElement.class);
-    }
+  public StackTraceElementDeserializer(FieldDeserializer2Factory fieldFactory)
+  {
+    super(StackTraceElement.class, fieldFactory);
+  }
 
-    @Override
-    protected Object instantiate()
-            throws Exception {
-        return new StackTraceElement("", "", "", 0);
-    }
+  @Override
+  protected Constructor<?> getConstructor(Class<?> cl)
+  {
+    return null;
+  }
+
+  @Override
+  protected Object instantiate()
+    throws Exception
+  {
+    return new StackTraceElement("", "", "", 0);
+  }
 }
