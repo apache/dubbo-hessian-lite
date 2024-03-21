@@ -568,6 +568,11 @@ public class SerializerFactory extends AbstractSerializerFactory
     if (InputStream.class.equals(cl))
       return InputStreamDeserializer.DESER;
 
+    if (!Serializable.class.isAssignableFrom(cl)
+            && !_isAllowNonSerializable) {
+      throw new IllegalStateException("Serialized class " + cl.getName() + " must implement java.io.Serializable");
+    }
+
     if (_isEnableUnsafeSerializer) {
       return new UnsafeDeserializer(cl, _fieldDeserializerFactory);
     }
