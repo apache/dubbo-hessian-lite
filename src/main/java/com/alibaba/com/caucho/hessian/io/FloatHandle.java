@@ -55,7 +55,7 @@ import java.io.Serializable;
  * Handle for Java Float objects.
  */
 public class FloatHandle implements Serializable {
-  private float _value;
+  private double _value;
 
   private FloatHandle()
   {
@@ -66,14 +66,14 @@ public class FloatHandle implements Serializable {
     _value = value;
   }
 
-  public float getValue()
+  public double getValue()
   {
     return _value;
   }
 
   public Object readResolve()
   {
-    return new Float(_value);
+    return Double.parseDouble(String.valueOf(((Number) _value).floatValue()));
   }
 
   public String toString()
