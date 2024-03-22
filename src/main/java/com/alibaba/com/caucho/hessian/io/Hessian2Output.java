@@ -51,18 +51,19 @@ package com.alibaba.com.caucho.hessian.io;
 import com.alibaba.com.caucho.hessian.util.IdentityIntMap;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 
 /**
  * Output stream for Hessian 2 requests.
- * <p>
+ *
  * <p>Since HessianOutput does not depend on any classes other than
  * in the JDK, it can be extracted independently into a smaller package.
- * <p>
+ *
  * <p>HessianOutput is unbuffered, so any client needs to provide
  * its own buffering.
- * <p>
+ *
  * <pre>
  * OutputStream os = ...; // from http connection
  * Hessian2Output out = new Hessian2Output(os);
@@ -76,20 +77,35 @@ import java.util.HashMap;
 public class Hessian2Output
         extends AbstractHessianOutput
         implements Hessian2Constants {
-    public final static int SIZE = 4096;
+    // should match Resin buffer size for perf
+    public final static int SIZE = 8 * 1024;
+    // map of references
+    private final IdentityIntMap _refs
+            = new IdentityIntMap(256);
+    // map of classes
+    private final IdentityIntMap _classRefs
+            = new IdentityIntMap(256);
     private final byte[] _buffer = new byte[SIZE];
     // the output stream/
     protected OutputStream _os;
-    // map of references
-    private IdentityIntMap _refs = new IdentityIntMap();
+    private int _refCount = 0;
     private boolean _isCloseStreamOnClose;
-    // map of classes
-    private HashMap _classRefs;
     // map of types
-    private HashMap _typeRefs;
+    private HashMap<String, Integer> _typeRefs;
     private int _offset;
 
-    private boolean _isStreaming;
+    private boolean _isPacket;
+
+    private boolean _isUnshared;
+
+    /**
+     * Creates a new Hessian output stream, initialized with an
+     * underlying output stream.
+     *
+     * @param os the underlying output stream.
+     */
+    public Hessian2Output() {
+    }
 
     /**
      * Creates a new Hessian output stream, initialized with an
@@ -98,7 +114,7 @@ public class Hessian2Output
      * @param os the underlying output stream.
      */
     public Hessian2Output(OutputStream os) {
-        _os = os;
+        init(os);
     }
 
     @Override
@@ -108,21 +124,10 @@ public class Hessian2Output
         _os = os;
     }
 
-    /**
-     * Resets all counters and references
-     */
-    public void reset() {
+    public void initPacket(OutputStream os) {
         resetReferences();
 
-        if (_classRefs != null) {
-            _classRefs.clear();
-        }
-
-        if (_typeRefs != null) {
-            _typeRefs.clear();
-        }
-
-        _offset = 0;
+        _os = os;
     }
 
     public boolean isCloseStreamOnClose() {
@@ -134,26 +139,44 @@ public class Hessian2Output
     }
 
     /**
+     * Sets hessian to be "unshared", meaning it will not detect
+     * duplicate or circular references.
+     */
+    @Override
+    public boolean setUnshared(boolean isUnshared) {
+        boolean oldIsUnshared = _isUnshared;
+
+        _isUnshared = isUnshared;
+
+        return oldIsUnshared;
+    }
+
+    /**
      * Writes a complete method call.
      */
     @Override
     public void call(String method, Object[] args)
             throws IOException {
+        writeVersion();
+
         int length = args != null ? args.length : 0;
 
         startCall(method, length);
 
-        for (int i = 0; i < args.length; i++)
+        for (int i = 0; i < length; i++) {
             writeObject(args[i]);
+        }
 
         completeCall();
+
+        flush();
     }
 
     /**
      * Starts the method call.  Clients would use <code>startCall</code>
      * instead of <code>call</code> if they wanted finer control over
      * writing the arguments, or needed to write headers.
-     * <p>
+     *
      * <code><pre>
      * C
      * string # method name
@@ -168,7 +191,7 @@ public class Hessian2Output
         int offset = _offset;
 
         if (SIZE < offset + 32) {
-            flush();
+            flushBuffer();
             offset = _offset;
         }
 
@@ -183,7 +206,7 @@ public class Hessian2Output
     /**
      * Writes the call tag.  This would be followed by the
      * method and the arguments
-     * <p>
+     *
      * <code><pre>
      * C
      * </pre></code>
@@ -200,7 +223,7 @@ public class Hessian2Output
 
     /**
      * Starts an envelope.
-     * <p>
+     *
      * <code><pre>
      * E major minor
      * m b16 b8 method-name
@@ -213,7 +236,7 @@ public class Hessian2Output
         int offset = _offset;
 
         if (SIZE < offset + 32) {
-            flush();
+            flushBuffer();
             offset = _offset;
         }
 
@@ -224,9 +247,9 @@ public class Hessian2Output
 
     /**
      * Completes an envelope.
-     * <p>
+     *
      * <p>A successful completion will have a single value:
-     * <p>
+     *
      * <pre>
      * Z
      * </pre>
@@ -240,14 +263,13 @@ public class Hessian2Output
 
     /**
      * Writes the method tag.
-     * <p>
+     *
      * <code><pre>
      * string
      * </pre></code>
      *
      * @param method the method name to call.
      */
-    @Override
     public void writeMethod(String method)
             throws IOException {
         writeString(method);
@@ -255,7 +277,7 @@ public class Hessian2Output
 
     /**
      * Completes.
-     * <p>
+     *
      * <code><pre>
      * z
      * </pre></code>
@@ -265,16 +287,16 @@ public class Hessian2Output
             throws IOException {
     /*
     flushIfFull();
-    
+
     _buffer[_offset++] = (byte) 'Z';
     */
     }
 
     /**
      * Starts the reply
-     * <p>
+     *
      * <p>A successful completion will have a single value:
-     * <p>
+     *
      * <pre>
      * R
      * </pre>
@@ -292,6 +314,7 @@ public class Hessian2Output
     public void writeVersion()
             throws IOException {
         flushIfFull();
+
         _buffer[_offset++] = (byte) 'H';
         _buffer[_offset++] = (byte) 2;
         _buffer[_offset++] = (byte) 0;
@@ -299,9 +322,9 @@ public class Hessian2Output
 
     /**
      * Completes reading the reply
-     * <p>
+     *
      * <p>A successful completion will have a single value:
-     * <p>
+     *
      * <pre>
      * z
      * </pre>
@@ -313,9 +336,9 @@ public class Hessian2Output
 
     /**
      * Starts a packet
-     * <p>
+     *
      * <p>A message contains several objects encapsulated by a length</p>
-     * <p>
+     *
      * <pre>
      * p x02 x00
      * </pre>
@@ -331,9 +354,9 @@ public class Hessian2Output
 
     /**
      * Completes reading the message
-     * <p>
+     *
      * <p>A successful completion will have a single value:
-     * <p>
+     *
      * <pre>
      * z
      * </pre>
@@ -348,19 +371,19 @@ public class Hessian2Output
     /**
      * Writes a fault.  The fault will be written
      * as a descriptive string followed by an object:
-     * <p>
+     *
      * <code><pre>
      * F map
      * </pre></code>
-     * <p>
+     *
      * <code><pre>
      * F H
      * \x04code
      * \x10the fault code
-     * <p>
+     *
      * \x07message
      * \x11the fault message
-     * <p>
+     *
      * \x06detail
      * M\xnnjavax.ejb.FinderException
      *     ...
@@ -370,7 +393,6 @@ public class Hessian2Output
      *
      * @param code the fault code, a three digit
      */
-    @Override
     public void writeFault(String code, String message, Object detail)
             throws IOException {
         flushIfFull();
@@ -380,7 +402,7 @@ public class Hessian2Output
         _buffer[_offset++] = (byte) 'F';
         _buffer[_offset++] = (byte) 'H';
 
-        _refs.put(new HashMap(), _refs.size());
+        addRef(new Object(), _refCount++, false);
 
         writeString("code");
         writeString(code);
@@ -408,7 +430,9 @@ public class Hessian2Output
             return;
         }
 
-        Serializer serializer = findSerializerFactory().getSerializer(object.getClass());
+        Serializer serializer
+                = findSerializerFactory().getObjectSerializer(object.getClass());
+
         serializer.writeObject(object, this);
     }
 
@@ -416,7 +440,7 @@ public class Hessian2Output
      * Writes the list header to the stream.  List writers will call
      * <code>writeListBegin</code> followed by the list contents and then
      * call <code>writeListEnd</code>.
-     * <p>
+     *
      * <code><pre>
      * list ::= V type value* Z
      *      ::= v type int value*
@@ -424,7 +448,6 @@ public class Hessian2Output
      *
      * @return true for variable lists, false for fixed lists
      */
-    @Override
     public boolean writeListBegin(int length, String type)
             throws IOException {
         flushIfFull();
@@ -463,7 +486,6 @@ public class Hessian2Output
     /**
      * Writes the tail of the list to the stream for a variable-length list.
      */
-    @Override
     public void writeListEnd()
             throws IOException {
         flushIfFull();
@@ -475,17 +497,16 @@ public class Hessian2Output
      * Writes the map header to the stream.  Map writers will call
      * <code>writeMapBegin</code> followed by the map contents and then
      * call <code>writeMapEnd</code>.
-     * <p>
+     *
      * <code><pre>
      * map ::= M type (<value> <value>)* Z
      *     ::= H (<value> <value>)* Z
      * </pre></code>
      */
-    @Override
     public void writeMapBegin(String type)
             throws IOException {
         if (SIZE < _offset + 32)
-            flush();
+            flushBuffer();
 
         if (type != null) {
             _buffer[_offset++] = BC_MAP;
@@ -498,18 +519,17 @@ public class Hessian2Output
     /**
      * Writes the tail of the map to the stream.
      */
-    @Override
     public void writeMapEnd()
             throws IOException {
         if (SIZE < _offset + 32)
-            flush();
+            flushBuffer();
 
         _buffer[_offset++] = (byte) BC_END;
     }
 
     /**
      * Writes the object definition
-     * <p>
+     *
      * <code><pre>
      * C &lt;string> &lt;int> &lt;string>*
      * </pre></code>
@@ -517,16 +537,12 @@ public class Hessian2Output
     @Override
     public int writeObjectBegin(String type)
             throws IOException {
-        if (_classRefs == null)
-            _classRefs = new HashMap();
+        int newRef = _classRefs.size();
+        int ref = _classRefs.put(type, newRef, false);
 
-        Integer refV = (Integer) _classRefs.get(type);
-
-        if (refV != null) {
-            int ref = refV.intValue();
-
+        if (newRef != ref) {
             if (SIZE < _offset + 32)
-                flush();
+                flushBuffer();
 
             if (ref <= OBJECT_DIRECT_MAX) {
                 _buffer[_offset++] = (byte) (BC_OBJECT_DIRECT + ref);
@@ -537,12 +553,8 @@ public class Hessian2Output
 
             return ref;
         } else {
-            int ref = _classRefs.size();
-
-            _classRefs.put(type, Integer.valueOf(ref));
-
             if (SIZE < _offset + 32)
-                flush();
+                flushBuffer();
 
             _buffer[_offset++] = (byte) 'C';
 
@@ -585,7 +597,7 @@ public class Hessian2Output
         }
 
         if (_typeRefs == null)
-            _typeRefs = new HashMap();
+            _typeRefs = new HashMap<String, Integer>();
 
         Integer typeRefV = (Integer) _typeRefs.get(type);
 
@@ -603,7 +615,7 @@ public class Hessian2Output
     /**
      * Writes a boolean value to the stream.  The boolean will be written
      * with the following syntax:
-     * <p>
+     *
      * <code><pre>
      * T
      * F
@@ -615,7 +627,7 @@ public class Hessian2Output
     public void writeBoolean(boolean value)
             throws IOException {
         if (SIZE < _offset + 16)
-            flush();
+            flushBuffer();
 
         if (value)
             _buffer[_offset++] = (byte) 'T';
@@ -626,7 +638,7 @@ public class Hessian2Output
     /**
      * Writes an integer value to the stream.  The integer will be written
      * with the following syntax:
-     * <p>
+     *
      * <code><pre>
      * I b32 b24 b16 b8
      * </pre></code>
@@ -640,7 +652,7 @@ public class Hessian2Output
         byte[] buffer = _buffer;
 
         if (SIZE <= offset + 16) {
-            flush();
+            flushBuffer();
             offset = _offset;
         }
 
@@ -667,21 +679,20 @@ public class Hessian2Output
     /**
      * Writes a long value to the stream.  The long will be written
      * with the following syntax:
-     * <p>
+     *
      * <code><pre>
      * L b64 b56 b48 b40 b32 b24 b16 b8
      * </pre></code>
      *
      * @param value the long value to write.
      */
-    @Override
     public void writeLong(long value)
             throws IOException {
         int offset = _offset;
         byte[] buffer = _buffer;
 
         if (SIZE <= offset + 16) {
-            flush();
+            flushBuffer();
             offset = _offset;
         }
 
@@ -722,21 +733,20 @@ public class Hessian2Output
     /**
      * Writes a double value to the stream.  The double will be written
      * with the following syntax:
-     * <p>
+     *
      * <code><pre>
      * D b64 b56 b48 b40 b32 b24 b16 b8
      * </pre></code>
      *
      * @param value the double value to write.
      */
-    @Override
     public void writeDouble(double value)
             throws IOException {
         int offset = _offset;
         byte[] buffer = _buffer;
 
         if (SIZE <= offset + 16) {
-            flush();
+            flushBuffer();
             offset = _offset;
         }
 
@@ -804,7 +814,7 @@ public class Hessian2Output
 
     /**
      * Writes a date to the stream.
-     * <p>
+     *
      * <code><pre>
      * date ::= d   b7 b6 b5 b4 b3 b2 b1 b0
      *      ::= x65 b3 b2 b1 b0
@@ -812,11 +822,10 @@ public class Hessian2Output
      *
      * @param time the date in milliseconds from the epoch in UTC
      */
-    @Override
     public void writeUTCDate(long time)
             throws IOException {
         if (SIZE < _offset + 32)
-            flush();
+            flushBuffer();
 
         int offset = _offset;
         byte[] buffer = _buffer;
@@ -854,21 +863,20 @@ public class Hessian2Output
     /**
      * Writes a null value to the stream.
      * The null will be written with the following syntax
-     * <p>
+     *
      * <code><pre>
      * N
      * </pre></code>
      *
      * @param value the string value to write.
      */
-    @Override
     public void writeNull()
             throws IOException {
         int offset = _offset;
         byte[] buffer = _buffer;
 
         if (SIZE <= offset + 16) {
-            flush();
+            flushBuffer();
             offset = _offset;
         }
 
@@ -880,27 +888,26 @@ public class Hessian2Output
     /**
      * Writes a string value to the stream using UTF-8 encoding.
      * The string will be written with the following syntax:
-     * <p>
+     *
      * <code><pre>
      * S b16 b8 string-value
      * </pre></code>
      * <p>
      * If the value is null, it will be written as
-     * <p>
+     *
      * <code><pre>
      * N
      * </pre></code>
      *
      * @param value the string value to write.
      */
-    @Override
     public void writeString(String value)
             throws IOException {
         int offset = _offset;
         byte[] buffer = _buffer;
 
         if (SIZE <= offset + 16) {
-            flush();
+            flushBuffer();
             offset = _offset;
         }
 
@@ -918,7 +925,7 @@ public class Hessian2Output
                 offset = _offset;
 
                 if (SIZE <= offset + 16) {
-                    flush();
+                    flushBuffer();
                     offset = _offset;
                 }
 
@@ -943,7 +950,7 @@ public class Hessian2Output
             offset = _offset;
 
             if (SIZE <= offset + 16) {
-                flush();
+                flushBuffer();
                 offset = _offset;
             }
 
@@ -967,25 +974,24 @@ public class Hessian2Output
     /**
      * Writes a string value to the stream using UTF-8 encoding.
      * The string will be written with the following syntax:
-     * <p>
+     *
      * <code><pre>
      * S b16 b8 string-value
      * </pre></code>
      * <p>
      * If the value is null, it will be written as
-     * <p>
+     *
      * <code><pre>
      * N
      * </pre></code>
      *
      * @param value the string value to write.
      */
-    @Override
     public void writeString(char[] buffer, int offset, int length)
             throws IOException {
         if (buffer == null) {
             if (SIZE < _offset + 16)
-                flush();
+                flushBuffer();
 
             _buffer[_offset++] = (byte) ('N');
         } else {
@@ -993,7 +999,7 @@ public class Hessian2Output
                 int sublen = 0x8000;
 
                 if (SIZE < _offset + 16)
-                    flush();
+                    flushBuffer();
 
                 // chunk can't end in high surrogate
                 char tail = buffer[offset + sublen - 1];
@@ -1012,7 +1018,7 @@ public class Hessian2Output
             }
 
             if (SIZE < _offset + 16)
-                flush();
+                flushBuffer();
 
             if (length <= STRING_DIRECT_MAX) {
                 _buffer[_offset++] = (byte) (BC_STRING_DIRECT + length);
@@ -1032,25 +1038,24 @@ public class Hessian2Output
     /**
      * Writes a byte array to the stream.
      * The array will be written with the following syntax:
-     * <p>
+     *
      * <code><pre>
      * B b16 b18 bytes
      * </pre></code>
      * <p>
      * If the value is null, it will be written as
-     * <p>
+     *
      * <code><pre>
      * N
      * </pre></code>
      *
      * @param value the string value to write.
      */
-    @Override
     public void writeBytes(byte[] buffer)
             throws IOException {
         if (buffer == null) {
             if (SIZE < _offset + 16)
-                flush();
+                flushBuffer();
 
             _buffer[_offset++] = 'N';
         } else
@@ -1060,20 +1065,19 @@ public class Hessian2Output
     /**
      * Writes a byte array to the stream.
      * The array will be written with the following syntax:
-     * <p>
+     *
      * <code><pre>
      * B b16 b18 bytes
      * </pre></code>
      * <p>
      * If the value is null, it will be written as
-     * <p>
+     *
      * <code><pre>
      * N
      * </pre></code>
      *
      * @param value the string value to write.
      */
-    @Override
     public void writeBytes(byte[] buffer, int offset, int length)
             throws IOException {
         if (buffer == null) {
@@ -1082,8 +1086,6 @@ public class Hessian2Output
 
             _buffer[_offset++] = (byte) 'N';
         } else {
-            flush();
-
             while (SIZE - _offset - 3 < length) {
                 int sublen = SIZE - _offset - 3;
 
@@ -1131,39 +1133,38 @@ public class Hessian2Output
 
     /**
      * Writes a byte buffer to the stream.
-     * <p>
+     *
      * <code><pre>
      * </pre></code>
      */
-    @Override
     public void writeByteBufferStart()
             throws IOException {
     }
 
     /**
      * Writes a byte buffer to the stream.
-     * <p>
+     *
      * <code><pre>
      * b b16 b18 bytes
      * </pre></code>
      */
-    @Override
     public void writeByteBufferPart(byte[] buffer, int offset, int length)
             throws IOException {
         while (length > 0) {
-            int sublen = length;
+            flushIfFull();
 
-            if (0x8000 < sublen)
-                sublen = 0x8000;
+            int sublen = _buffer.length - _offset;
 
-            flush(); // bypass buffer
+            if (length < sublen)
+                sublen = length;
 
-            _os.write(BC_BINARY_CHUNK);
-            _os.write(sublen >> 8);
-            _os.write(sublen);
+            _buffer[_offset++] = BC_BINARY_CHUNK;
+            _buffer[_offset++] = (byte) (sublen >> 8);
+            _buffer[_offset++] = (byte) sublen;
 
-            _os.write(buffer, offset, sublen);
+            System.arraycopy(buffer, offset, _buffer, _offset, sublen);
 
+            _offset += sublen;
             length -= sublen;
             offset += sublen;
         }
@@ -1171,12 +1172,11 @@ public class Hessian2Output
 
     /**
      * Writes a byte buffer to the stream.
-     * <p>
+     *
      * <code><pre>
      * b b16 b18 bytes
      * </pre></code>
      */
-    @Override
     public void writeByteBufferEnd(byte[] buffer, int offset, int length)
             throws IOException {
         writeBytes(buffer, offset, length);
@@ -1191,8 +1191,37 @@ public class Hessian2Output
     }
 
     /**
+     * Writes a full output stream.
+     */
+    @Override
+    public void writeByteStream(InputStream is)
+            throws IOException {
+        while (true) {
+            int len = SIZE - _offset - 3;
+
+            if (len < 16) {
+                flushBuffer();
+                len = SIZE - _offset - 3;
+            }
+
+            len = is.read(_buffer, _offset + 3, len);
+
+            if (len <= 0) {
+                _buffer[_offset++] = BC_BINARY_DIRECT;
+                return;
+            }
+
+            _buffer[_offset + 0] = (byte) BC_BINARY_CHUNK;
+            _buffer[_offset + 1] = (byte) (len >> 8);
+            _buffer[_offset + 2] = (byte) (len);
+
+            _offset += len + 3;
+        }
+    }
+
+    /**
      * Writes a reference.
-     * <p>
+     *
      * <code><pre>
      * x51 &lt;int>
      * </pre></code>
@@ -1203,7 +1232,7 @@ public class Hessian2Output
     protected void writeRef(int value)
             throws IOException {
         if (SIZE < _offset + 16)
-            flush();
+            flushBuffer();
 
         _buffer[_offset++] = (byte) BC_REF;
 
@@ -1218,17 +1247,32 @@ public class Hessian2Output
     @Override
     public boolean addRef(Object object)
             throws IOException {
-        int ref = _refs.get(object);
+        if (_isUnshared) {
+            _refCount++;
+            return false;
+        }
 
-        if (ref >= 0) {
+        int newRef = _refCount;
+
+        int ref = addRef(object, newRef, false);
+
+        if (ref != newRef) {
             writeRef(ref);
 
             return true;
         } else {
-            _refs.put(object, _refs.size());
+            _refCount++;
 
             return false;
         }
+    }
+
+    @Override
+    public int getRef(Object obj) {
+        if (_isUnshared)
+            return -1;
+
+        return _refs.get(obj);
     }
 
     /**
@@ -1237,7 +1281,9 @@ public class Hessian2Output
     @Override
     public boolean removeRef(Object obj)
             throws IOException {
-        if (_refs != null) {
+        if (_isUnshared) {
+            return false;
+        } else if (_refs != null) {
             _refs.remove(obj);
 
             return true;
@@ -1251,73 +1297,101 @@ public class Hessian2Output
     @Override
     public boolean replaceRef(Object oldRef, Object newRef)
             throws IOException {
-        Integer value = (Integer) _refs.remove(oldRef);
+        if (_isUnshared) {
+            return false;
+        }
 
-        if (value != null) {
-            _refs.put(newRef, value);
+        int value = _refs.get(oldRef);
+
+        if (value >= 0) {
+            addRef(newRef, value, true);
+
+            _refs.remove(oldRef);
+
             return true;
         } else
             return false;
     }
 
-    /**
-     * Resets the references for streaming.
-     */
-    @Override
-    public void resetReferences() {
-        if (_refs != null)
-            _refs.clear();
+    private int addRef(Object value, int newRef, boolean isReplace) {
+        int prevRef = _refs.put(value, newRef, isReplace);
+
+        return prevRef;
     }
 
     /**
      * Starts the streaming message
-     * <p>
+     *
      * <p>A streaming message starts with 'P'</p>
-     * <p>
+     *
      * <pre>
      * P x02 x00
      * </pre>
      */
     public void writeStreamingObject(Object obj)
             throws IOException {
-        startStreamingPacket();
+        startPacket();
 
         writeObject(obj);
 
-        endStreamingPacket();
+        endPacket();
     }
 
     /**
      * Starts a streaming packet
-     * <p>
-     * <p>A streaming message starts with 'P'</p>
-     * <p>
-     * <pre>
-     * P x02 x00
-     * </pre>
+     *
+     * <p>A streaming contains a set of chunks, ending with a zero chunk.
+     * Each chunk is a length followed by data where the length is
+     * encoded by (b1xxxxxxxx)* b0xxxxxxxx</p>
      */
-    public void startStreamingPacket()
+    public void startPacket()
             throws IOException {
-        if (_refs != null)
+        if (_refs != null) {
             _refs.clear();
+            _refCount = 0;
+        }
 
-        flush();
+        flushBuffer();
 
-        _isStreaming = true;
-        _offset = 3;
+        _isPacket = true;
+        _offset = 4;
+        _buffer[0] = (byte) 0x05; // 0x05 = binary
+        _buffer[1] = (byte) 0x55;
+        _buffer[2] = (byte) 0x55;
+        _buffer[3] = (byte) 0x55;
     }
 
-    public void endStreamingPacket()
+    public void endPacket()
             throws IOException {
-        int len = _offset - 3;
+        int offset = _offset;
 
-        _buffer[0] = (byte) 'P';
-        _buffer[1] = (byte) (len >> 8);
-        _buffer[2] = (byte) len;
+        OutputStream os = _os;
 
-        _isStreaming = false;
+        if (os == null) {
+            _offset = 0;
+            return;
+        }
 
-        flush();
+        int len = offset - 4;
+
+        if (len < 0x7e) {
+            _buffer[2] = _buffer[0];
+            _buffer[3] = (byte) (len);
+        } else {
+            _buffer[1] = (byte) (0x7e);
+            _buffer[2] = (byte) (len >> 8);
+            _buffer[3] = (byte) (len);
+        }
+
+        _isPacket = false;
+        _offset = 0;
+
+        if (os == null) {
+        } else if (len < 0x7e) {
+            os.write(_buffer, 2, offset - 2);
+        } else {
+            os.write(_buffer, 0, offset);
+        }
     }
 
     /**
@@ -1328,7 +1402,7 @@ public class Hessian2Output
     public void printLenString(String v)
             throws IOException {
         if (SIZE < _offset + 16)
-            flush();
+            flushBuffer();
 
         if (v == null) {
             _buffer[_offset++] = (byte) (0);
@@ -1365,7 +1439,7 @@ public class Hessian2Output
         for (int i = 0; i < length; i++) {
             if (SIZE <= offset + 16) {
                 _offset = offset;
-                flush();
+                flushBuffer();
                 offset = _offset;
             }
 
@@ -1399,7 +1473,7 @@ public class Hessian2Output
         for (int i = 0; i < length; i++) {
             if (SIZE <= offset + 16) {
                 _offset = offset;
-                flush();
+                flushBuffer();
                 offset = _offset;
             }
 
@@ -1425,12 +1499,10 @@ public class Hessian2Output
         int offset = _offset;
 
         if (SIZE < offset + 32) {
-            _offset = 0;
-            _os.write(_buffer, 0, offset);
+            flushBuffer();
         }
     }
 
-    @Override
     public final void flush()
             throws IOException {
         flushBuffer();
@@ -1443,23 +1515,33 @@ public class Hessian2Output
             throws IOException {
         int offset = _offset;
 
-        if (!_isStreaming && offset > 0) {
+        OutputStream os = _os;
+
+        if (!_isPacket && offset > 0) {
             _offset = 0;
+            if (os != null)
+                os.write(_buffer, 0, offset);
+        } else if (_isPacket && offset > 4) {
+            int len = offset - 4;
 
-            _os.write(_buffer, 0, offset);
-        } else if (_isStreaming && offset > 3) {
-            int len = offset - 3;
-            _buffer[0] = 'p';
-            _buffer[1] = (byte) (len >> 8);
-            _buffer[2] = (byte) len;
-            _offset = 3;
+            _buffer[0] |= (byte) 0x80;
+            _buffer[1] = (byte) (0x7e);
+            _buffer[2] = (byte) (len >> 8);
+            _buffer[3] = (byte) (len);
+            _offset = 4;
 
-            _os.write(_buffer, 0, offset);
+            if (os != null)
+                os.write(_buffer, 0, offset);
+
+            _buffer[0] = (byte) 0x00;
+            _buffer[1] = (byte) 0x56;
+            _buffer[2] = (byte) 0x56;
+            _buffer[3] = (byte) 0x56;
         }
     }
 
     @Override
-    public final void close()
+    public void close()
             throws IOException {
         // hessian/3a8c
         flush();
@@ -1473,13 +1555,47 @@ public class Hessian2Output
         }
     }
 
+    public void free() {
+        reset();
+
+        _os = null;
+        _isCloseStreamOnClose = false;
+    }
+
+    /**
+     * Resets the references for streaming.
+     */
+    @Override
+    public void resetReferences() {
+        if (_refs != null) {
+            _refs.clear();
+            _refCount = 0;
+        }
+    }
+
+    /**
+     * Resets all counters and references
+     */
+    public void reset() {
+        if (_refs != null) {
+            _refs.clear();
+            _refCount = 0;
+        }
+
+        _classRefs.clear();
+        _typeRefs = null;
+        _offset = 0;
+        _isPacket = false;
+        _isUnshared = false;
+    }
+
     class BytesOutputStream extends OutputStream {
         private int _startOffset;
 
         BytesOutputStream()
                 throws IOException {
             if (SIZE < _offset + 16) {
-                Hessian2Output.this.flush();
+                Hessian2Output.this.flushBuffer();
             }
 
             _startOffset = _offset;
@@ -1496,7 +1612,7 @@ public class Hessian2Output
                 _buffer[_startOffset + 1] = (byte) (length >> 8);
                 _buffer[_startOffset + 2] = (byte) (length);
 
-                Hessian2Output.this.flush();
+                Hessian2Output.this.flushBuffer();
 
                 _startOffset = _offset;
                 _offset += 3;
@@ -1529,7 +1645,7 @@ public class Hessian2Output
                     _buffer[_startOffset + 1] = (byte) (chunkLength >> 8);
                     _buffer[_startOffset + 2] = (byte) (chunkLength);
 
-                    Hessian2Output.this.flush();
+                    Hessian2Output.this.flushBuffer();
 
                     _startOffset = _offset;
                     _offset += 3;
@@ -1552,7 +1668,7 @@ public class Hessian2Output
             _buffer[startOffset + 1] = (byte) (length >> 8);
             _buffer[startOffset + 2] = (byte) (length);
 
-            Hessian2Output.this.flush();
+            Hessian2Output.this.flushBuffer();
         }
     }
 }

@@ -54,7 +54,6 @@ import java.io.IOException;
  * Serializing a remote object.
  */
 public class ClassSerializer extends AbstractSerializer {
-    @Override
     public void writeObject(Object obj, AbstractHessianOutput out)
             throws IOException {
         Class cl = (Class) obj;

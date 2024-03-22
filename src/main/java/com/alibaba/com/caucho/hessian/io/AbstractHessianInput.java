@@ -50,13 +50,13 @@ package com.alibaba.com.caucho.hessian.io;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Reader;
-import java.util.List;
 
 /**
  * Abstract base class for Hessian requests.  Hessian users should only
  * need to use the methods in this class.
- * <p>
+ *
  * <pre>
  * AbstractHessianInput in = ...; // get input
  * String value;
@@ -68,6 +68,7 @@ import java.util.List;
  */
 abstract public class AbstractHessianInput {
     private HessianRemoteResolver resolver;
+    private byte[] _buffer;
 
     /**
      * Initialize the Hessian stream with the underlying input stream.
@@ -100,11 +101,9 @@ abstract public class AbstractHessianInput {
     public void setSerializerFactory(SerializerFactory ser) {
     }
 
-    public abstract boolean checkAndReadNull();
-
     /**
      * Reads the call
-     * <p>
+     *
      * <pre>
      * c major minor
      * </pre>
@@ -121,7 +120,7 @@ abstract public class AbstractHessianInput {
 
     /**
      * Reads a header, returning null if there are no headers.
-     * <p>
+     *
      * <pre>
      * H b16 b8 value
      * </pre>
@@ -131,9 +130,9 @@ abstract public class AbstractHessianInput {
 
     /**
      * Starts reading the call
-     * <p>
+     *
      * <p>A successful completion will have a single value:
-     * <p>
+     *
      * <pre>
      * m b16 b8 method
      * </pre>
@@ -153,9 +152,9 @@ abstract public class AbstractHessianInput {
 
     /**
      * Starts reading the call, including the headers.
-     * <p>
+     *
      * <p>The call expects the following protocol data
-     * <p>
+     *
      * <pre>
      * c major minor
      * m b16 b8 method
@@ -166,9 +165,9 @@ abstract public class AbstractHessianInput {
 
     /**
      * Completes reading the call
-     * <p>
+     *
      * <p>The call expects the following protocol data
-     * <p>
+     *
      * <pre>
      * Z
      * </pre>
@@ -185,9 +184,9 @@ abstract public class AbstractHessianInput {
 
     /**
      * Starts reading the reply
-     * <p>
+     *
      * <p>A successful completion will have a single value:
-     * <p>
+     *
      * <pre>
      * r
      * v
@@ -197,10 +196,18 @@ abstract public class AbstractHessianInput {
             throws Throwable;
 
     /**
+     * Starts reading the body of the reply, i.e. after the 'r' has been
+     * parsed.
+     */
+    public void startReplyBody()
+            throws Throwable {
+    }
+
+    /**
      * Completes reading the call
-     * <p>
+     *
      * <p>A successful completion will have a single value:
-     * <p>
+     *
      * <pre>
      * z
      * </pre>
@@ -210,7 +217,7 @@ abstract public class AbstractHessianInput {
 
     /**
      * Reads a boolean
-     * <p>
+     *
      * <pre>
      * T
      * F
@@ -221,7 +228,7 @@ abstract public class AbstractHessianInput {
 
     /**
      * Reads a null
-     * <p>
+     *
      * <pre>
      * N
      * </pre>
@@ -231,7 +238,7 @@ abstract public class AbstractHessianInput {
 
     /**
      * Reads an integer
-     * <p>
+     *
      * <pre>
      * I b32 b24 b16 b8
      * </pre>
@@ -241,7 +248,7 @@ abstract public class AbstractHessianInput {
 
     /**
      * Reads a long
-     * <p>
+     *
      * <pre>
      * L b64 b56 b48 b40 b32 b24 b16 b8
      * </pre>
@@ -251,7 +258,7 @@ abstract public class AbstractHessianInput {
 
     /**
      * Reads a double.
-     * <p>
+     *
      * <pre>
      * D b64 b56 b48 b40 b32 b24 b16 b8
      * </pre>
@@ -261,7 +268,7 @@ abstract public class AbstractHessianInput {
 
     /**
      * Reads a date.
-     * <p>
+     *
      * <pre>
      * T b64 b56 b48 b40 b32 b24 b16 b8
      * </pre>
@@ -271,7 +278,7 @@ abstract public class AbstractHessianInput {
 
     /**
      * Reads a string encoded in UTF-8
-     * <p>
+     *
      * <pre>
      * s b16 b8 non-final string chunk
      * S b16 b8 final string chunk
@@ -282,7 +289,7 @@ abstract public class AbstractHessianInput {
 
     /**
      * Reads an XML node encoded in UTF-8
-     * <p>
+     *
      * <pre>
      * x b16 b8 non-final xml chunk
      * X b16 b8 final xml chunk
@@ -297,7 +304,7 @@ abstract public class AbstractHessianInput {
      * Starts reading a string.  All the characters must be read before
      * calling the next method.  The actual characters will be read with
      * the reader's read() or read(char [], int, int).
-     * <p>
+     *
      * <pre>
      * s b16 b8 non-final string chunk
      * S b16 b8 final string chunk
@@ -309,7 +316,7 @@ abstract public class AbstractHessianInput {
     /**
      * Starts reading a byte array using an input stream.  All the bytes
      * must be read before calling the following method.
-     * <p>
+     *
      * <pre>
      * b b16 b8 non-final binary chunk
      * B b16 b8 final binary chunk
@@ -319,8 +326,40 @@ abstract public class AbstractHessianInput {
             throws IOException;
 
     /**
+     * Reads data to an output stream.
+     *
+     * <pre>
+     * b b16 b8 non-final binary chunk
+     * B b16 b8 final binary chunk
+     * </pre>
+     */
+    public boolean readToOutputStream(OutputStream os)
+            throws IOException {
+        InputStream is = readInputStream();
+
+        if (is == null)
+            return false;
+
+        if (_buffer == null)
+            _buffer = new byte[256];
+
+        try {
+            int len;
+
+            while ((len = is.read(_buffer, 0, _buffer.length)) > 0) {
+                os.write(_buffer, 0, len);
+            }
+
+            return true;
+        } finally {
+            is.close();
+        }
+    }
+
+
+    /**
      * Reads a byte array.
-     * <p>
+     *
      * <pre>
      * b b16 b8 non-final binary chunk
      * B b16 b8 final binary chunk
@@ -339,37 +378,14 @@ abstract public class AbstractHessianInput {
 
     /**
      * Reads an arbitrary object from the input stream.
-     *
-     * @param expectedClass the expected class if the protocol doesn't supply it.
-     * @param expectedTypes the runtime type hints, eg: expectedClass equals Map, expectedTypes can
-     *                      equals String.class, Short.class
-     */
-    public Object readObject(Class expectedClass, Class<?>... expectedTypes)
-            throws IOException {
-        throw new UnsupportedOperationException(String.valueOf(this));
-    }
-
-    /**
-     * Reads an arbitrary object from the input stream.
      */
     abstract public Object readObject()
             throws IOException;
 
     /**
-     * Reads an arbitrary object from the input stream.
-     *
-     * @param expectedTypes the runtime type hints, eg: expectedTypes can
-     *                      equals String.class, Short.class for HashMap
-     */
-    public Object readObject(List<Class<?>> expectedTypes)
-            throws IOException {
-        throw new UnsupportedOperationException(String.valueOf(this));
-    }
-
-    /**
      * Reads a remote object reference to the stream.  The type is the
      * type of the remote interface.
-     * <p>
+     *
      * <code><pre>
      * 'r' 't' b16 b8 type url
      * </pre></code>
@@ -379,7 +395,7 @@ abstract public class AbstractHessianInput {
 
     /**
      * Reads a reference
-     * <p>
+     *
      * <pre>
      * R b32 b24 b16 b8
      * </pre>

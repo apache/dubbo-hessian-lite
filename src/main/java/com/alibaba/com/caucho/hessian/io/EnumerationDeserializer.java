@@ -64,7 +64,6 @@ public class EnumerationDeserializer extends AbstractListDeserializer {
         return _deserializer;
     }
 
-    @Override
     public Object readList(AbstractHessianInput in, int length)
             throws IOException {
         Vector list = new Vector();

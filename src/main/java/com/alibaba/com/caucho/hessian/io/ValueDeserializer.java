@@ -54,7 +54,6 @@ import java.io.IOException;
  * Deserializing a string valued object
  */
 abstract public class ValueDeserializer extends AbstractDeserializer {
-    @Override
     public Object readMap(AbstractHessianInput in)
             throws IOException {
         String initValue = null;
@@ -73,7 +72,6 @@ abstract public class ValueDeserializer extends AbstractDeserializer {
         return create(initValue);
     }
 
-    @Override
     public Object readObject(AbstractHessianInput in, String[] fieldNames)
             throws IOException {
         String initValue = null;

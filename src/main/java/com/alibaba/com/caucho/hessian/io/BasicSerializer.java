@@ -54,7 +54,8 @@ import java.util.Date;
 /**
  * Serializing an object for known object types.
  */
-public class BasicSerializer extends AbstractSerializer {
+public class BasicSerializer extends AbstractSerializer
+        implements ObjectSerializer {
     public static final int NULL = 0;
     public static final int BOOLEAN = NULL + 1;
     public static final int BYTE = BOOLEAN + 1;
@@ -66,7 +67,8 @@ public class BasicSerializer extends AbstractSerializer {
     public static final int CHARACTER = DOUBLE + 1;
     public static final int CHARACTER_OBJECT = CHARACTER + 1;
     public static final int STRING = CHARACTER_OBJECT + 1;
-    public static final int DATE = STRING + 1;
+    public static final int STRING_BUILDER = STRING + 1;
+    public static final int DATE = STRING_BUILDER + 1;
     public static final int NUMBER = DATE + 1;
     public static final int OBJECT = NUMBER + 1;
 
@@ -81,16 +83,37 @@ public class BasicSerializer extends AbstractSerializer {
     public static final int STRING_ARRAY = CHARACTER_ARRAY + 1;
     public static final int OBJECT_ARRAY = STRING_ARRAY + 1;
 
-    private int code;
+    public static final int BYTE_HANDLE = OBJECT_ARRAY + 1;
+    public static final int SHORT_HANDLE = BYTE_HANDLE + 1;
+    public static final int FLOAT_HANDLE = SHORT_HANDLE + 1;
+    private static final BasicSerializer FLOAT_HANDLE_SERIALIZER
+            = new BasicSerializer(FLOAT_HANDLE);
+    private static final BasicSerializer SHORT_HANDLE_SERIALIZER
+            = new BasicSerializer(SHORT_HANDLE);
+    private static final BasicSerializer BYTE_HANDLE_SERIALIZER
+            = new BasicSerializer(BYTE_HANDLE);
+    private int _code;
 
     public BasicSerializer(int code) {
-        this.code = code;
+        _code = code;
     }
 
-    @Override
+    public Serializer getObjectSerializer() {
+        switch (_code) {
+            case BYTE:
+                return BYTE_HANDLE_SERIALIZER;
+            case SHORT:
+                return SHORT_HANDLE_SERIALIZER;
+            case FLOAT:
+                return FLOAT_HANDLE_SERIALIZER;
+            default:
+                return this;
+        }
+    }
+
     public void writeObject(Object obj, AbstractHessianOutput out)
             throws IOException {
-        switch (code) {
+        switch (_code) {
             case BOOLEAN:
                 out.writeBoolean(((Boolean) obj).booleanValue());
                 break;
@@ -119,6 +142,10 @@ public class BasicSerializer extends AbstractSerializer {
 
             case STRING:
                 out.writeString((String) obj);
+                break;
+
+            case STRING_BUILDER:
+                out.writeString(((StringBuilder) obj).toString());
                 break;
 
             case DATE:
@@ -269,8 +296,24 @@ public class BasicSerializer extends AbstractSerializer {
                 out.writeNull();
                 break;
 
+            case OBJECT:
+                ObjectHandleSerializer.SER.writeObject(obj, out);
+                break;
+
+            case BYTE_HANDLE:
+                out.writeObject(new ByteHandle((Byte) obj));
+                break;
+
+            case SHORT_HANDLE:
+                out.writeObject(new ShortHandle((Short) obj));
+                break;
+
+            case FLOAT_HANDLE:
+                out.writeObject(new FloatHandle((Float) obj));
+                break;
+
             default:
-                throw new RuntimeException(code + " " + String.valueOf(obj.getClass()));
+                throw new RuntimeException(_code + " unknown code for " + obj.getClass());
         }
     }
 }

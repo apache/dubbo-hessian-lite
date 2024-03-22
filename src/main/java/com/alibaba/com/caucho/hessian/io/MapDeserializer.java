@@ -50,7 +50,6 @@ package com.alibaba.com.caucho.hessian.io;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
@@ -60,16 +59,16 @@ import java.util.TreeMap;
  * Deserializing a JDK 1.2 Map.
  */
 public class MapDeserializer extends AbstractMapDeserializer {
-    private Class _type;
-    private Constructor _ctor;
+    private Class<?> _type;
+    private Constructor<?> _ctor;
 
-    public MapDeserializer(Class type) {
+    public MapDeserializer(Class<?> type) {
         if (type == null)
             type = HashMap.class;
 
         _type = type;
 
-        Constructor[] ctors = type.getConstructors();
+        Constructor<?>[] ctors = type.getConstructors();
         for (int i = 0; i < ctors.length; i++) {
             if (ctors[i].getParameterTypes().length == 0)
                 _ctor = ctors[i];
@@ -84,27 +83,15 @@ public class MapDeserializer extends AbstractMapDeserializer {
         }
     }
 
-    @Override
-    public Class getType() {
+    public Class<?> getType() {
         if (_type != null)
             return _type;
         else
             return HashMap.class;
     }
 
-    @Override
     public Object readMap(AbstractHessianInput in)
             throws IOException {
-        return readMap(in, null, null);
-    }
-
-    /**
-     *  support generic type of map, fix the type of short serialization <p>
-     *  eg: Map<String, Short> serialize & deserialize
-     *
-     */
-    @Override
-    public Object readMap(AbstractHessianInput in, Class<?> expectKeyType, Class<?> expectValueType) throws IOException {
         Map map;
 
         if (_type == null)
@@ -123,35 +110,21 @@ public class MapDeserializer extends AbstractMapDeserializer {
 
         in.addRef(map);
 
-        doReadMap(in, map, expectKeyType, expectValueType);
+        while (!in.isEnd()) {
+            map.put(in.readObject(), in.readObject());
+        }
 
         in.readEnd();
 
         return map;
     }
 
-    protected void doReadMap(AbstractHessianInput in, Map map, Class<?> keyType, Class<?> valueType) throws IOException {
-        Deserializer keyDeserializer = null, valueDeserializer = null;
-
-        SerializerFactory factory = findSerializerFactory(in);
-        if(keyType != null){
-            keyDeserializer = factory.getDeserializer(keyType.getName());
-        }
-        if(valueType != null){
-            valueDeserializer = factory.getDeserializer(valueType.getName());
-        }
-
-        while (!in.isEnd()) {
-            map.put(keyDeserializer != null ? keyDeserializer.readObject(in) : in.readObject(),
-                    valueDeserializer != null? valueDeserializer.readObject(in) : in.readObject());
-        }
-    }
-
     @Override
     public Object readObject(AbstractHessianInput in,
-                             String[] fieldNames)
+                             Object[] fields)
             throws IOException {
-        Map map = createMap();
+        String[] fieldNames = (String[]) fields;
+        Map<Object, Object> map = createMap();
 
         int ref = in.addRef(map);
 

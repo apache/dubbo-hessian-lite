@@ -49,11 +49,12 @@
 package com.alibaba.com.caucho.hessian.io;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
  * Abstract output stream for Hessian requests.
- * <p>
+ *
  * <pre>
  * OutputStream os = ...; // from http connection
  * AbstractOutput out = new HessianSerializerOutput(os);
@@ -67,11 +68,20 @@ import java.io.OutputStream;
 abstract public class AbstractHessianOutput {
     // serializer factory
     protected SerializerFactory _serializerFactory;
+    // serializer factory
+    private SerializerFactory _defaultSerializerFactory;
+    private byte[] _byteBuffer;
 
     /**
      * Gets the serializer factory.
      */
     public SerializerFactory getSerializerFactory() {
+        // the default serializer factory cannot be modified by external
+        // callers
+        if (_serializerFactory == _defaultSerializerFactory) {
+            _serializerFactory = new SerializerFactory();
+        }
+
         return _serializerFactory;
     }
 
@@ -85,11 +95,14 @@ abstract public class AbstractHessianOutput {
     /**
      * Gets the serializer factory.
      */
-    public final SerializerFactory findSerializerFactory() {
+    protected final SerializerFactory findSerializerFactory() {
         SerializerFactory factory = _serializerFactory;
 
-        if (factory == null)
-            _serializerFactory = factory = new SerializerFactory();
+        if (factory == null) {
+            factory = SerializerFactory.createDefault();
+            _defaultSerializerFactory = factory;
+            _serializerFactory = factory;
+        }
 
         return factory;
     }
@@ -98,6 +111,10 @@ abstract public class AbstractHessianOutput {
      * Initialize the output with a new underlying stream.
      */
     public void init(OutputStream os) {
+    }
+
+    public boolean setUnshared(boolean isUnshared) {
+        throw new UnsupportedOperationException(getClass().getSimpleName());
     }
 
     /**
@@ -117,7 +134,7 @@ abstract public class AbstractHessianOutput {
 
     /**
      * Starts the method call:
-     * <p>
+     *
      * <code><pre>
      * C
      * </pre></code>
@@ -129,7 +146,7 @@ abstract public class AbstractHessianOutput {
 
     /**
      * Starts the method call:
-     * <p>
+     *
      * <code><pre>
      * C string int
      * </pre></code>
@@ -151,7 +168,7 @@ abstract public class AbstractHessianOutput {
 
     /**
      * Writes the method tag.
-     * <p>
+     *
      * <code><pre>
      * string
      * </pre></code>
@@ -163,7 +180,7 @@ abstract public class AbstractHessianOutput {
 
     /**
      * Completes the method call:
-     * <p>
+     *
      * <code><pre>
      * </pre></code>
      */
@@ -173,7 +190,7 @@ abstract public class AbstractHessianOutput {
     /**
      * Writes a boolean value to the stream.  The boolean will be written
      * with the following syntax:
-     * <p>
+     *
      * <code><pre>
      * T
      * F
@@ -187,7 +204,7 @@ abstract public class AbstractHessianOutput {
     /**
      * Writes an integer value to the stream.  The integer will be written
      * with the following syntax:
-     * <p>
+     *
      * <code><pre>
      * I b32 b24 b16 b8
      * </pre></code>
@@ -200,7 +217,7 @@ abstract public class AbstractHessianOutput {
     /**
      * Writes a long value to the stream.  The long will be written
      * with the following syntax:
-     * <p>
+     *
      * <code><pre>
      * L b64 b56 b48 b40 b32 b24 b16 b8
      * </pre></code>
@@ -213,7 +230,7 @@ abstract public class AbstractHessianOutput {
     /**
      * Writes a double value to the stream.  The double will be written
      * with the following syntax:
-     * <p>
+     *
      * <code><pre>
      * D b64 b56 b48 b40 b32 b24 b16 b8
      * </pre></code>
@@ -225,7 +242,7 @@ abstract public class AbstractHessianOutput {
 
     /**
      * Writes a date to the stream.
-     * <p>
+     *
      * <code><pre>
      * T  b64 b56 b48 b40 b32 b24 b16 b8
      * </pre></code>
@@ -238,7 +255,7 @@ abstract public class AbstractHessianOutput {
     /**
      * Writes a null value to the stream.
      * The null will be written with the following syntax
-     * <p>
+     *
      * <code><pre>
      * N
      * </pre></code>
@@ -251,13 +268,13 @@ abstract public class AbstractHessianOutput {
     /**
      * Writes a string value to the stream using UTF-8 encoding.
      * The string will be written with the following syntax:
-     * <p>
+     *
      * <code><pre>
      * S b16 b8 string-value
      * </pre></code>
      * <p>
      * If the value is null, it will be written as
-     * <p>
+     *
      * <code><pre>
      * N
      * </pre></code>
@@ -270,13 +287,13 @@ abstract public class AbstractHessianOutput {
     /**
      * Writes a string value to the stream using UTF-8 encoding.
      * The string will be written with the following syntax:
-     * <p>
+     *
      * <code><pre>
      * S b16 b8 string-value
      * </pre></code>
      * <p>
      * If the value is null, it will be written as
-     * <p>
+     *
      * <code><pre>
      * N
      * </pre></code>
@@ -289,13 +306,13 @@ abstract public class AbstractHessianOutput {
     /**
      * Writes a byte array to the stream.
      * The array will be written with the following syntax:
-     * <p>
+     *
      * <code><pre>
      * B b16 b18 bytes
      * </pre></code>
      * <p>
      * If the value is null, it will be written as
-     * <p>
+     *
      * <code><pre>
      * N
      * </pre></code>
@@ -308,13 +325,13 @@ abstract public class AbstractHessianOutput {
     /**
      * Writes a byte array to the stream.
      * The array will be written with the following syntax:
-     * <p>
+     *
      * <code><pre>
      * B b16 b18 bytes
      * </pre></code>
      * <p>
      * If the value is null, it will be written as
-     * <p>
+     *
      * <code><pre>
      * N
      * </pre></code>
@@ -332,7 +349,7 @@ abstract public class AbstractHessianOutput {
 
     /**
      * Writes a byte buffer to the stream.
-     * <p>
+     *
      * <code><pre>
      * b b16 b18 bytes
      * </pre></code>
@@ -346,7 +363,7 @@ abstract public class AbstractHessianOutput {
 
     /**
      * Writes the last chunk of a byte buffer to the stream.
-     * <p>
+     *
      * <code><pre>
      * b b16 b18 bytes
      * </pre></code>
@@ -359,8 +376,39 @@ abstract public class AbstractHessianOutput {
             throws IOException;
 
     /**
+     * Writes a full output stream.
+     */
+    public void writeByteStream(InputStream is)
+            throws IOException {
+        writeByteBufferStart();
+
+        if (_byteBuffer == null)
+            _byteBuffer = new byte[1024];
+
+        byte[] buffer = _byteBuffer;
+
+        int len;
+        while ((len = is.read(buffer, 0, buffer.length)) > 0) {
+            if (len < buffer.length) {
+                int len2 = is.read(buffer, len, buffer.length - len);
+
+                if (len2 < 0) {
+                    writeByteBufferEnd(buffer, 0, len);
+                    return;
+                }
+
+                len += len2;
+            }
+
+            writeByteBufferPart(buffer, 0, len);
+        }
+
+        writeByteBufferEnd(buffer, 0, 0);
+    }
+
+    /**
      * Writes a reference.
-     * <p>
+     *
      * <code><pre>
      * Q int
      * </pre></code>
@@ -373,8 +421,10 @@ abstract public class AbstractHessianOutput {
     /**
      * Removes a reference.
      */
-    abstract public boolean removeRef(Object obj)
-            throws IOException;
+    public boolean removeRef(Object obj)
+            throws IOException {
+        return false;
+    }
 
     /**
      * Replaces a reference from one object to another.
@@ -386,7 +436,7 @@ abstract public class AbstractHessianOutput {
      * Adds an object to the reference list.  If the object already exists,
      * writes the reference, otherwise, the caller is responsible for
      * the serialization.
-     * <p>
+     *
      * <code><pre>
      * R b32 b24 b16 b8
      * </pre></code>
@@ -396,6 +446,12 @@ abstract public class AbstractHessianOutput {
      */
     abstract public boolean addRef(Object object)
             throws IOException;
+
+    /**
+     * @param obj
+     * @return
+     */
+    abstract public int getRef(Object obj);
 
     /**
      * Resets the references for streaming.
@@ -413,7 +469,7 @@ abstract public class AbstractHessianOutput {
      * Writes the list header to the stream.  List writers will call
      * <code>writeListBegin</code> followed by the list contents and then
      * call <code>writeListEnd</code>.
-     * <p>
+     *
      * <code><pre>
      * V
      *   x13 java.util.ArrayList   # type
@@ -437,7 +493,7 @@ abstract public class AbstractHessianOutput {
      * Writes the map header to the stream.  Map writers will call
      * <code>writeMapBegin</code> followed by the map contents and then
      * call <code>writeMapEnd</code>.
-     * <p>
+     *
      * <code><pre>
      * M type (<key> <value>)* Z
      * </pre></code>
@@ -456,7 +512,7 @@ abstract public class AbstractHessianOutput {
      * Map for Hessian 1.0.  Object writers will call
      * <code>writeObjectBegin</code> followed by the map contents and then
      * call <code>writeObjectEnd</code>.
-     * <p>
+     *
      * <code><pre>
      * C type int <key>*
      * C int <value>*

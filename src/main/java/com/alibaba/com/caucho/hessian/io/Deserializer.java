@@ -51,11 +51,14 @@ package com.alibaba.com.caucho.hessian.io;
 import java.io.IOException;
 
 /**
- * Deserializing an object.
- *
+ * Deserializing an object. Custom deserializers should extend
+ * from AbstractDeserializer to avoid issues with signature
+ * changes.
  */
 public interface Deserializer {
-    public Class getType();
+    public Class<?> getType();
+
+    public boolean isReadResolve();
 
     public Object readObject(AbstractHessianInput in)
             throws IOException;
@@ -63,47 +66,43 @@ public interface Deserializer {
     public Object readList(AbstractHessianInput in, int length)
             throws IOException;
 
-    /**
-     * deserialize list object from expect type.
-     *
-     * @param in
-     * @param length
-     * @param expectType
-     * @return
-     * @throws IOException
-     */
-    public Object readList(AbstractHessianInput in, int length, Class<?> expectType)
-            throws IOException;
-
     public Object readLengthList(AbstractHessianInput in, int length)
-            throws IOException;
-
-    /**
-     * deserialize list object from expect type.
-     *
-     * @param in
-     * @param length
-     * @param expectType
-     * @return
-     * @throws IOException
-     */
-    public Object readLengthList(AbstractHessianInput in, int length, Class<?> expectType)
             throws IOException;
 
     public Object readMap(AbstractHessianInput in)
             throws IOException;
 
     /**
-     *  deserialize map object from expect key and value type.
-     * @param in
-     * @param expectKeyType
-     * @param expectValueType
-     * @return
+     * Creates an empty array for the deserializers field
+     * entries.
+     *
+     * @param len number of fields to be read
+     * @return empty array of the proper field type.
+     */
+    public Object[] createFields(int len);
+
+    /**
+     * Returns the deserializer's field reader for the given name.
+     *
+     * @param name the field name
+     * @return the deserializer's internal field reader
+     */
+    public Object createField(String name);
+
+    /**
+     * Reads the object from the input stream, given the field
+     * definition.
+     *
+     * @param in     the input stream
+     * @param fields the deserializer's own field marshal
+     * @return the new object
      * @throws IOException
      */
-    public Object readMap(AbstractHessianInput in, Class<?> expectKeyType, Class<?> expectValueType)
+    public Object readObject(AbstractHessianInput in,
+                             Object[] fields)
             throws IOException;
 
-    public Object readObject(AbstractHessianInput in, String[] fieldNames)
+    public Object readObject(AbstractHessianInput in,
+                             String[] fieldNames)
             throws IOException;
 }

@@ -69,13 +69,12 @@ public class EnumSerializer extends AbstractSerializer {
         }
     }
 
-    @Override
     public void writeObject(Object obj, AbstractHessianOutput out)
             throws IOException {
         if (out.addRef(obj))
             return;
 
-        Class cl = obj.getClass();
+        Class<?> cl = obj.getClass();
 
         if (!cl.isEnum() && cl.getSuperclass().isEnum())
             cl = cl.getSuperclass();

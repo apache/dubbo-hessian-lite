@@ -54,11 +54,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -67,28 +65,70 @@ import java.util.regex.Pattern;
 /**
  * Loads a class from the classloader.
  */
-public class ClassFactory
-{
+public class ClassFactory {
     protected static final Logger log
             = Logger.getLogger(ClassFactory.class.getName());
     private static final ArrayList<Allow> _staticAllowList;
     private static final Map<String, Object> _allowSubClassSet = new ConcurrentHashMap<>();
     private static final Map<String, Object> _allowClassSet = new ConcurrentHashMap<>();
 
+    static {
+        _staticAllowList = new ArrayList<Allow>();
+
+        ClassLoader classLoader = ClassFactory.class.getClassLoader();
+        try {
+            String[] denyClasses = readLines(classLoader.getResourceAsStream("DENY_CLASS"));
+            for (String denyClass : denyClasses) {
+                if (denyClass.startsWith("#")) {
+                    continue;
+                }
+                if (denyClass.endsWith(".")) {
+                    _staticAllowList.add(new AllowPrefix(denyClass, false));
+                } else {
+                    _staticAllowList.add(new Allow(toPattern(denyClass), false));
+                }
+            }
+        } catch (IOException ignore) {
+
+        }
+    }
+
     private ClassLoader _loader;
     private boolean _isWhitelist;
-
     private LinkedList<Allow> _allowList;
 
-    ClassFactory(ClassLoader loader)
-    {
+    ClassFactory(ClassLoader loader) {
         _loader = loader;
         initAllow();
     }
 
+    private static String toPattern(String pattern) {
+        pattern = pattern.replace(".", "\\.");
+        pattern = pattern.replace("*", ".*");
+
+        return pattern;
+    }
+
+    /**
+     * read lines.
+     *
+     * @param is input stream.
+     * @return lines.
+     * @throws IOException If an I/O error occurs
+     */
+    public static String[] readLines(InputStream is) throws IOException {
+        List<String> lines = new ArrayList<String>();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                lines.add(line);
+            }
+            return lines.toArray(new String[0]);
+        }
+    }
+
     public Class<?> load(String className)
-            throws ClassNotFoundException
-    {
+            throws ClassNotFoundException {
         if (isAllow(className)) {
             Class<?> aClass = Class.forName(className, false, _loader);
 
@@ -98,7 +138,7 @@ public class ClassFactory
 
             if (aClass.getInterfaces().length > 0) {
                 for (Class<?> anInterface : aClass.getInterfaces()) {
-                    if(!isAllow(anInterface.getName())) {
+                    if (!isAllow(anInterface.getName())) {
                         log.log(Level.SEVERE, className + "'s interfaces: " + anInterface.getName() + " in blacklist or not in whitelist, deserialization with type 'HashMap' instead.");
                         return HashMap.class;
                     }
@@ -115,7 +155,7 @@ public class ClassFactory
             }
 
             for (Class<?> aSuperClass : allSuperClasses) {
-                if(!isAllow(aSuperClass.getName())) {
+                if (!isAllow(aSuperClass.getName())) {
                     log.log(Level.SEVERE, className + "'s superClass: " + aSuperClass.getName() + " in blacklist or not in whitelist, deserialization with type 'HashMap' instead.");
                     return HashMap.class;
                 }
@@ -124,15 +164,13 @@ public class ClassFactory
 
             _allowClassSet.put(className, className);
             return aClass;
-        }
-        else {
+        } else {
             log.log(Level.SEVERE, className + " in blacklist or not in whitelist, deserialization with type 'HashMap' instead.");
             return HashMap.class;
         }
     }
 
-    private boolean isAllow(String className)
-    {
+    private boolean isAllow(String className) {
         LinkedList<Allow> allowList = _allowList;
 
         if (allowList == null) {
@@ -162,8 +200,7 @@ public class ClassFactory
         return true;
     }
 
-    public void setWhitelist(boolean isWhitelist)
-    {
+    public void setWhitelist(boolean isWhitelist) {
         _allowClassSet.clear();
         _allowSubClassSet.clear();
         _isWhitelist = isWhitelist;
@@ -171,8 +208,7 @@ public class ClassFactory
         initAllow();
     }
 
-    public void allow(String pattern)
-    {
+    public void allow(String pattern) {
         _allowClassSet.clear();
         _allowSubClassSet.clear();
         initAllow();
@@ -182,8 +218,7 @@ public class ClassFactory
         }
     }
 
-    public void deny(String pattern)
-    {
+    public void deny(String pattern) {
         _allowClassSet.clear();
         _allowSubClassSet.clear();
         initAllow();
@@ -193,16 +228,7 @@ public class ClassFactory
         }
     }
 
-    private static String toPattern(String pattern)
-    {
-        pattern = pattern.replace(".", "\\.");
-        pattern = pattern.replace("*", ".*");
-
-        return pattern;
-    }
-
-    private void initAllow()
-    {
+    private void initAllow() {
         synchronized (this) {
             if (_allowList == null) {
                 _allowList = new LinkedList<Allow>();
@@ -218,18 +244,15 @@ public class ClassFactory
         public Allow() {
         }
 
-        private Allow(String pattern, boolean isAllow)
-        {
+        private Allow(String pattern, boolean isAllow) {
             _isAllow = isAllow;
             _pattern = Pattern.compile(pattern);
         }
 
-        Boolean allow(String className)
-        {
+        Boolean allow(String className) {
             if (_pattern.matcher(className).matches()) {
                 return _isAllow;
-            }
-            else {
+            } else {
                 return null;
             }
         }
@@ -239,61 +262,19 @@ public class ClassFactory
         private Boolean _isAllow;
         private String _prefix;
 
-        private AllowPrefix(String prefix, boolean isAllow)
-        {
+        private AllowPrefix(String prefix, boolean isAllow) {
             super();
             _isAllow = isAllow;
             _prefix = prefix;
         }
 
         @Override
-        Boolean allow(String className)
-        {
+        Boolean allow(String className) {
             if (className.startsWith(_prefix)) {
                 return _isAllow;
-            }
-            else {
+            } else {
                 return null;
             }
-        }
-    }
-
-    static {
-        _staticAllowList = new ArrayList<Allow>();
-
-        ClassLoader classLoader = ClassFactory.class.getClassLoader();
-        try {
-            String[] denyClasses = readLines(classLoader.getResourceAsStream("DENY_CLASS"));
-            for (String denyClass : denyClasses) {
-                if (denyClass.startsWith("#")) {
-                    continue;
-                }
-                if (denyClass.endsWith(".")) {
-                    _staticAllowList.add(new AllowPrefix(denyClass, false));
-                } else {
-                    _staticAllowList.add(new Allow(toPattern(denyClass), false));
-                }
-            }
-        } catch (IOException ignore) {
-
-        }
-    }
-
-    /**
-     * read lines.
-     *
-     * @param is input stream.
-     * @return lines.
-     * @throws IOException If an I/O error occurs
-     */
-    public static String[] readLines(InputStream is) throws IOException {
-        List<String> lines = new ArrayList<String>();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                lines.add(line);
-            }
-            return lines.toArray(new String[0]);
         }
     }
 }

@@ -53,13 +53,17 @@ import java.io.IOException;
 /**
  * Deserializing an object.
  */
-abstract public class AbstractDeserializer implements Deserializer {
-    @Override
-    public Class getType() {
+public class AbstractDeserializer implements Deserializer {
+    public static final NullDeserializer NULL = new NullDeserializer();
+
+    public Class<?> getType() {
         return Object.class;
     }
 
-    @Override
+    public boolean isReadResolve() {
+        return false;
+    }
+
     public Object readObject(AbstractHessianInput in)
             throws IOException {
         Object obj = in.readObject();
@@ -72,35 +76,16 @@ abstract public class AbstractDeserializer implements Deserializer {
             throw error(className + ": unexpected null value");
     }
 
-    @Override
     public Object readList(AbstractHessianInput in, int length)
             throws IOException {
         throw new UnsupportedOperationException(String.valueOf(this));
     }
 
-    @Override
-    public Object readList(AbstractHessianInput in, int length, Class<?> expectType) throws IOException {
-        if (expectType == null) {
-            return readList(in, length);
-        }
-        throw new UnsupportedOperationException(String.valueOf(this));
-    }
-
-    @Override
     public Object readLengthList(AbstractHessianInput in, int length)
             throws IOException {
         throw new UnsupportedOperationException(String.valueOf(this));
     }
 
-    @Override
-    public Object readLengthList(AbstractHessianInput in, int length, Class<?> expectType) throws IOException {
-        if (expectType == null) {
-            return readLengthList(in, length);
-        }
-        throw new UnsupportedOperationException(String.valueOf(this));
-    }
-
-    @Override
     public Object readMap(AbstractHessianInput in)
             throws IOException {
         Object obj = in.readObject();
@@ -113,18 +98,43 @@ abstract public class AbstractDeserializer implements Deserializer {
             throw error(className + ": unexpected null value");
     }
 
-    @Override
-    public Object readMap(AbstractHessianInput in, Class<?> expectKeyType, Class<?> expectValueType) throws IOException {
-        if (expectKeyType == null && expectValueType == null) {
-            return readMap(in);
-        }
-        throw new UnsupportedOperationException(String.valueOf(this));
+    /**
+     * Creates the field array for a class. The default
+     * implementation returns a String[] array.
+     *
+     * @param len number of items in the array
+     * @return the new empty array
+     */
+    public Object[] createFields(int len) {
+        return new String[len];
+    }
+
+    /**
+     * Creates a field value class. The default
+     * implementation returns the String.
+     *
+     * @param len number of items in the array
+     * @return the new empty array
+     */
+    public Object createField(String name) {
+        return name;
     }
 
     @Override
-    public Object readObject(AbstractHessianInput in, String[] fieldNames)
+    public Object readObject(AbstractHessianInput in,
+                             String[] fieldNames)
             throws IOException {
-        throw new UnsupportedOperationException(String.valueOf(this));
+        return readObject(in, (Object[]) fieldNames);
+    }
+
+    /**
+     * Reads an object instance from the input stream
+     */
+    @Override
+    public Object readObject(AbstractHessianInput in,
+                             Object[] fields)
+            throws IOException {
+        throw new UnsupportedOperationException(toString());
     }
 
     protected HessianProtocolException error(String msg) {
@@ -138,13 +148,10 @@ abstract public class AbstractDeserializer implements Deserializer {
             return "0x" + Integer.toHexString(ch & 0xff);
     }
 
-    protected SerializerFactory findSerializerFactory(AbstractHessianInput in) {
-        SerializerFactory serializerFactory = null;
-        if (in instanceof Hessian2Input) {
-            serializerFactory = ((Hessian2Input) in).findSerializerFactory();
-        } else if (in instanceof HessianInput) {
-            serializerFactory = ((HessianInput) in).getSerializerFactory();
-        }
-        return serializerFactory == null ? new SerializerFactory() : serializerFactory;
+    /**
+     * The NullDeserializer exists as a marker for the factory classes so
+     * they save a null result.
+     */
+    static final class NullDeserializer extends AbstractDeserializer {
     }
 }

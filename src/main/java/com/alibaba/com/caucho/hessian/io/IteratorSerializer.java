@@ -64,7 +64,6 @@ public class IteratorSerializer extends AbstractSerializer {
         return _serializer;
     }
 
-    @Override
     public void writeObject(Object obj, AbstractHessianOutput out)
             throws IOException {
         Iterator iter = (Iterator) obj;

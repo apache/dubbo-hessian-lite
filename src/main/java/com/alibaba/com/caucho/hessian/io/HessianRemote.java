@@ -52,7 +52,7 @@ package com.alibaba.com.caucho.hessian.io;
  * Encapsulates a remote address when no stub is available, e.g. for
  * Java MicroEdition.
  */
-public class HessianRemote {
+public class HessianRemote implements java.io.Serializable {
     private String type;
     private String url;
 
@@ -97,7 +97,6 @@ public class HessianRemote {
     /**
      * Defines the hashcode.
      */
-    @Override
     public int hashCode() {
         return url.hashCode();
     }
@@ -105,7 +104,6 @@ public class HessianRemote {
     /**
      * Defines equality
      */
-    @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof HessianRemote))
             return false;
@@ -118,8 +116,7 @@ public class HessianRemote {
     /**
      * Readable version of the remote.
      */
-    @Override
     public String toString() {
-        return "[HessianRemote " + url + "]";
+        return "HessianRemote[" + url + "]";
     }
 }

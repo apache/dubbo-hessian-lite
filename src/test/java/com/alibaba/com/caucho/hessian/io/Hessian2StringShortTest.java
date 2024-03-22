@@ -82,7 +82,8 @@ public class Hessian2StringShortTest extends SerializeTestBase {
 
         ByteArrayInputStream bin = new ByteArrayInputStream(bout.toByteArray());
         Hessian2Input input = new Hessian2Input(bin);
-        Map deserialize = (Map) input.readObject(HashMap.class, String.class, Short.class);
+//        Map deserialize = (Map) input.readObject(HashMap.class, String.class, Short.class);
+        Map deserialize = (Map) input.readObject(HashMap.class);
         assertTrue(deserialize != null);
         assertTrue(deserialize.size() == 2);
         assertTrue(deserialize.get("last") instanceof Short);
@@ -110,7 +111,7 @@ public class Hessian2StringShortTest extends SerializeTestBase {
         keyValueType.add(String.class);
         keyValueType.add(short.class);
 
-        Map deserialize = (Map) input.readObject(keyValueType);
+        Map deserialize = (Map) input.readObject(Map.class);
         assertTrue(deserialize != null);
         assertTrue(deserialize.size() == 2);
         assertTrue(deserialize.get("last") instanceof Short);
@@ -171,7 +172,7 @@ public class Hessian2StringShortTest extends SerializeTestBase {
 
         ByteArrayInputStream bin = new ByteArrayInputStream(bout.toByteArray());
         Hessian2Input input = new Hessian2Input(bin);
-        List<Short> deserialize = (List) input.readObject(ArrayList.class, Short.class);
+        List<Short> deserialize = (List) input.readObject(ArrayList.class);
         assertTrue(deserialize != null);
         assertTrue(deserialize.size() == 2);
         assertTrue(deserialize.get(1) instanceof Short);
@@ -198,7 +199,7 @@ public class Hessian2StringShortTest extends SerializeTestBase {
         List<Class<?>> valueType = new ArrayList<Class<?>>();
         valueType.add(short.class);
 
-        List<Short> deserialize = (List) input.readObject(valueType);
+        List<Short> deserialize = (List) input.readObject(List.class);
         assertTrue(deserialize != null);
         assertTrue(deserialize.size() == 2);
         assertTrue(deserialize.get(1) instanceof Short);

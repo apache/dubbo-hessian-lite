@@ -67,63 +67,32 @@ public class CollectionDeserializer extends AbstractListDeserializer {
         _type = type;
     }
 
-    @Override
     public Class getType() {
         return _type;
     }
 
-    @Override
     public Object readList(AbstractHessianInput in, int length)
             throws IOException {
-        return readList(in, length, _type);
-    }
-
-    @Override
-    public Object readList(AbstractHessianInput in, int length, Class<?> expectType) throws IOException {
         Collection list = createList();
 
         in.addRef(list);
 
-        Deserializer deserializer = null;
-
-        SerializerFactory factory = findSerializerFactory(in);
-        if (expectType != null) {
-            deserializer = factory.getDeserializer(expectType.getName());
-        }
-
-        while (!in.isEnd()) {
-            list.add(deserializer != null ? deserializer.readObject(in) : in.readObject());
-        }
-
+        while (!in.isEnd())
+            list.add(in.readObject());
 
         in.readEnd();
 
         return list;
     }
 
-    @Override
     public Object readLengthList(AbstractHessianInput in, int length)
             throws IOException {
-        return readList(in, length, null);
-    }
-
-    @Override
-    public Object readLengthList(AbstractHessianInput in, int length, Class<?> expectType) throws IOException {
         Collection list = createList();
 
         in.addRef(list);
 
-        Deserializer deserializer = null;
-
-        SerializerFactory factory = findSerializerFactory(in);
-        if (expectType != null) {
-            deserializer = factory.getDeserializer(expectType.getName());
-        }
-
-        for (; length > 0; length--) {
-            list.add(deserializer != null ? deserializer.readObject(in) : in.readObject());
-        }
-
+        for (; length > 0; length--)
+            list.add(in.readObject());
 
         return list;
     }
@@ -161,8 +130,7 @@ public class CollectionDeserializer extends AbstractListDeserializer {
         return list;
     }
 
-    public String toString()
-    {
+    public String toString() {
         return getClass().getSimpleName() + "[" + _type + "]";
     }
 }

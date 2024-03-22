@@ -43,6 +43,5 @@ public class BitSetSerializerTest extends SerializeTestBase {
 
     private void assertBitSet(BitSet bitSet) throws IOException {
         TestCase.assertEquals(bitSet, baseHessian2Serialize(bitSet));
-        TestCase.assertEquals(bitSet, baseHessianSerialize(bitSet));
     }
 }

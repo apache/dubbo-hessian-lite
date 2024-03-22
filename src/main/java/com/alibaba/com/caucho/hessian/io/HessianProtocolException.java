@@ -98,7 +98,6 @@ public class HessianProtocolException extends IOException {
     /**
      * Returns the underlying cause.
      */
-    @Override
     public Throwable getCause() {
         return getRootCause();
     }

@@ -48,6 +48,8 @@
 
 package com.alibaba.com.caucho.hessian.io;
 
+import com.alibaba.com.caucho.hessian.HessianException;
+
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 
@@ -58,18 +60,19 @@ public class SqlDateDeserializer extends AbstractDeserializer {
     private Class _cl;
     private Constructor _constructor;
 
-    public SqlDateDeserializer(Class cl)
-            throws NoSuchMethodException {
-        _cl = cl;
-        _constructor = cl.getConstructor(new Class[]{long.class});
+    public SqlDateDeserializer(Class cl) {
+        try {
+            _cl = cl;
+            _constructor = cl.getConstructor(new Class[]{long.class});
+        } catch (NoSuchMethodException e) {
+            throw new HessianException(e);
+        }
     }
 
-    @Override
     public Class getType() {
         return _cl;
     }
 
-    @Override
     public Object readMap(AbstractHessianInput in)
             throws IOException {
         int ref = in.addRef(null);
@@ -94,9 +97,11 @@ public class SqlDateDeserializer extends AbstractDeserializer {
         return value;
     }
 
-    @Override
-    public Object readObject(AbstractHessianInput in, String[] fieldNames)
+    public Object readObject(AbstractHessianInput in,
+                             Object[] fields)
             throws IOException {
+        String[] fieldNames = (String[]) fields;
+
         int ref = in.addRef(null);
 
         long initValue = Long.MIN_VALUE;

@@ -48,13 +48,15 @@
 
 package com.alibaba.com.caucho.hessian.io;
 
+import com.alibaba.com.caucho.hessian.HessianException;
+
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 
 /**
  * Deserializing a string valued object
  */
-public class StringValueDeserializer extends AbstractDeserializer {
+public class StringValueDeserializer extends AbstractStringValueDeserializer {
     private Class _cl;
     private Constructor _constructor;
 
@@ -73,48 +75,7 @@ public class StringValueDeserializer extends AbstractDeserializer {
     }
 
     @Override
-    public Object readMap(AbstractHessianInput in)
-            throws IOException {
-        String value = null;
-
-        while (!in.isEnd()) {
-            String key = in.readString();
-
-            if (key.equals("value"))
-                value = in.readString();
-            else
-                in.readObject();
-        }
-
-        in.readMapEnd();
-
-        Object object = create(value);
-
-        in.addRef(object);
-
-        return object;
-    }
-
-    @Override
-    public Object readObject(AbstractHessianInput in, String[] fieldNames)
-            throws IOException {
-        String value = null;
-
-        for (int i = 0; i < fieldNames.length; i++) {
-            if ("value".equals(fieldNames[i]))
-                value = in.readString();
-            else
-                in.readObject();
-        }
-
-        Object object = create(value);
-
-        in.addRef(object);
-
-        return object;
-    }
-
-    private Object create(String value)
+    protected Object create(String value)
             throws IOException {
         if (value == null)
             throw new IOException(_cl.getName() + " expects name.");
@@ -122,7 +83,8 @@ public class StringValueDeserializer extends AbstractDeserializer {
         try {
             return _constructor.newInstance(new Object[]{value});
         } catch (Exception e) {
-            throw new IOExceptionWrapper(e);
+            throw new HessianException(_cl.getName() + ": value=" + value + "\n" + e,
+                    e);
         }
     }
 }

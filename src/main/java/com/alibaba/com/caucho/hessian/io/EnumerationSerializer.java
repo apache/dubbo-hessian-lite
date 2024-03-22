@@ -64,7 +64,6 @@ public class EnumerationSerializer extends AbstractSerializer {
         return _serializer;
     }
 
-    @Override
     public void writeObject(Object obj, AbstractHessianOutput out)
             throws IOException {
         Enumeration iter = (Enumeration) obj;

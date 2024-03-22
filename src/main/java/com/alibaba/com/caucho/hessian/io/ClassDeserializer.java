@@ -85,12 +85,10 @@ public class ClassDeserializer extends AbstractMapDeserializer {
         _loader = loader;
     }
 
-    @Override
     public Class getType() {
         return Class.class;
     }
 
-    @Override
     public Object readMap(AbstractHessianInput in)
             throws IOException {
         int ref = in.addRef(null);
@@ -115,9 +113,10 @@ public class ClassDeserializer extends AbstractMapDeserializer {
         return value;
     }
 
-    @Override
-    public Object readObject(AbstractHessianInput in, String[] fieldNames)
+    public Object readObject(AbstractHessianInput in, Object[] fields)
             throws IOException {
+        String[] fieldNames = (String[]) fields;
+
         int ref = in.addRef(null);
 
         String name = null;

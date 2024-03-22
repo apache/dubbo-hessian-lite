@@ -53,6 +53,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
+import java.util.Locale;
 
 /**
  * Serializing an object for known object types.
@@ -116,12 +117,10 @@ public class BeanDeserializer extends AbstractMapDeserializer {
             throw new UnsupportedOperationException();
     }
 
-    @Override
     public Class getType() {
         return _type;
     }
 
-    @Override
     public Object readMap(AbstractHessianInput in)
             throws IOException {
         try {
@@ -248,9 +247,9 @@ public class BeanDeserializer extends AbstractMapDeserializer {
                 }
 
                 if (j == 1)
-                    name = name.substring(0, j).toLowerCase() + name.substring(j);
+                    name = name.substring(0, j).toLowerCase(Locale.ENGLISH) + name.substring(j);
                 else if (j > 1)
-                    name = name.substring(0, j - 1).toLowerCase() + name.substring(j - 1);
+                    name = name.substring(0, j - 1).toLowerCase(Locale.ENGLISH) + name.substring(j - 1);
 
 
                 methodMap.put(name, method);

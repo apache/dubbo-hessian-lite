@@ -74,7 +74,6 @@ public class CollectionSerializer extends AbstractSerializer {
         _sendJavaType = sendJavaType;
     }
 
-    @Override
     public void writeObject(Object obj, AbstractHessianOutput out)
             throws IOException {
         if (out.addRef(obj))
@@ -83,7 +82,27 @@ public class CollectionSerializer extends AbstractSerializer {
         Collection list = (Collection) obj;
 
         Class cl = obj.getClass();
-        boolean hasEnd = out.writeListBegin(list.size(), obj.getClass().getName());
+        boolean hasEnd;
+
+        if (cl.equals(ArrayList.class)
+                || !Serializable.class.isAssignableFrom(cl)) {
+            hasEnd = out.writeListBegin(list.size(), null);
+        } else if (!_sendJavaType) {
+            hasEnd = false;
+
+            // hessian/3a19
+            for (; cl != null; cl = cl.getSuperclass()) {
+                if (cl.getName().startsWith("java.")) {
+                    hasEnd = out.writeListBegin(list.size(), cl.getName());
+                    break;
+                }
+            }
+
+            if (cl == null)
+                hasEnd = out.writeListBegin(list.size(), null);
+        } else {
+            hasEnd = out.writeListBegin(list.size(), obj.getClass().getName());
+        }
 
         Iterator iter = list.iterator();
         while (iter.hasNext()) {
