@@ -8,9 +8,10 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.stream.IntStream;
 
-public class ImmutableTest extends SerializeTestBase {
+public class RecordTest extends SerializeTestBase {
 
     @Test
     public void testImmutableCollections() throws IOException {
@@ -99,6 +100,15 @@ public class ImmutableTest extends SerializeTestBase {
      * Test where the record component object is an array of records.
      */
     public record RecordWithArray(RecordRectangle[] recordArray) implements Serializable {
+        @Override
+        public boolean equals(Object obj) {
+            return Arrays.equals(recordArray, ((RecordWithArray) obj).recordArray);
+        }
+
+        @Override
+        public int hashCode() {
+            return Arrays.hashCode(recordArray);
+        }
     }
 
     @Test
@@ -199,7 +209,16 @@ public class ImmutableTest extends SerializeTestBase {
 
 
     void testEquals(Object object) throws IOException {
-        TestCase.assertEquals(object, baseHessian2Serialize(object));
-        TestCase.assertEquals(object.hashCode(), baseHessian2Serialize(object).hashCode());
+        if (object instanceof Object[]) {
+            Object[] src = (Object[]) object;
+            Object[] dst = baseHessian2Serialize(src);
+            TestCase.assertEquals(src.length, dst.length);
+            for (int i = 0; i < src.length; i++) {
+                TestCase.assertEquals(src[i], dst[i]);
+            }
+        } else {
+            TestCase.assertEquals(object, baseHessian2Serialize(object));
+            TestCase.assertEquals(object.hashCode(), baseHessian2Serialize(object).hashCode());
+        }
     }
 }

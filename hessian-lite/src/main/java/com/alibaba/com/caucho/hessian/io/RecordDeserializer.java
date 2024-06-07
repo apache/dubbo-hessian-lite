@@ -50,16 +50,16 @@ package com.alibaba.com.caucho.hessian.io;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Serializing an object for known object types.
  */
 public class RecordDeserializer extends AbstractDeserializer {
     private RecordUtil.RecordComponent[] _components;
+    private Map<String, RecordUtil.RecordComponent> _componentMap;
     private Constructor _constructor;
     private Class _cl;
 
@@ -67,7 +67,16 @@ public class RecordDeserializer extends AbstractDeserializer {
         _cl = cl;
         _components = RecordUtil.getRecordComponents(cl);
         _constructor = RecordUtil.getCanonicalConstructor(cl);
+        _componentMap = new ConcurrentHashMap<>();
+        for (RecordUtil.RecordComponent component : _components) {
+            _componentMap.put(component.name(), component);
+        }
     }
+
+    public Class<?> getType() {
+        return _cl;
+    }
+
     @Override
     public Object readObject(AbstractHessianInput in,
                              Object[] fields)
@@ -90,13 +99,14 @@ public class RecordDeserializer extends AbstractDeserializer {
         try {
             Object[] args = new Object[_components.length];
 
-            Map<String, Object> fieldMap = new HashMap<String, Object>();
             for (String fieldName : fieldNames) {
-                fieldMap.put(fieldName, in.readObject());
-            }
-            for (int i = 0, componentsLength = _components.length; i < componentsLength; i++) {
-                RecordUtil.RecordComponent component = _components[i];
-                args[i] = fieldMap.get(component.name());
+                RecordUtil.RecordComponent component = _componentMap.get(fieldName);
+                Object target;
+                target = in.readObject(component.type());
+                if (component.type() == float.class || component.type() == Float.class) {
+                    target = (float) ((double) target);
+                }
+                args[component.index()] = target;
             }
             Object obj = _constructor.newInstance(args);
             in.addRef(obj);
