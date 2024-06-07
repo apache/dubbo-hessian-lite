@@ -42,15 +42,15 @@
 
     <dependencies>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit_version}</version>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.9.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-all</artifactId>
-            <version>${hamcrest_version}</version>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.9.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -63,12 +63,21 @@
 
     <profiles>
         <profile>
-            <id>jdk8</id>
+            <id>base</id>
             <activation>
                 <jdk>1.8</jdk>
             </activation>
             <modules>
                 <module>hessian-lite</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>jdk8</id>
+            <activation>
+                <jdk>[1.8,)</jdk>
+            </activation>
+            <modules>
+                <module>java-8-test</module>
             </modules>
         </profile>
         <profile>

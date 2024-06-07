@@ -20,16 +20,17 @@ import com.alibaba.com.caucho.hessian.io.base.SerializeTestBase;
 import com.alibaba.com.caucho.hessian.io.beans.Hessian2StringShortType;
 import com.alibaba.com.caucho.hessian.io.beans.PersonType;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 
 public class Hessian2StringShortTest extends SerializeTestBase {
 
@@ -244,7 +245,7 @@ public class Hessian2StringShortTest extends SerializeTestBase {
             obj.stringPersonTypeMap.put("P_" + i, abc);
 
             Hessian2StringShortType newObj = baseHessian2Serialize(obj);
-            Assert.assertEquals(obj, newObj);
+            Assertions.assertEquals(obj, newObj);
             System.out.println("ShortTypeTest.testHessian2StringShortType(): i=" + i + " passed!");
         }
     }

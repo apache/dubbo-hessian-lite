@@ -18,6 +18,9 @@ package com.alibaba.com.caucho.hessian.io;
 
 import com.alibaba.com.caucho.hessian.io.base.SerializeTestBase;
 import com.alibaba.com.caucho.hessian.io.beans.SubUser;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -27,8 +30,6 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.junit.Assert;
-import org.junit.Test;
 
 public class CollectionSerializerTest extends SerializeTestBase {
     @Test
@@ -39,7 +40,7 @@ public class CollectionSerializerTest extends SerializeTestBase {
         set.add(2222);
 
         Set deserialize = baseHessian2Serialize(set);
-        Assert.assertTrue(deserialize.equals(set));
+        Assertions.assertTrue(deserialize.equals(set));
     }
 
     @Test
@@ -63,9 +64,9 @@ public class CollectionSerializerTest extends SerializeTestBase {
                             subUser.setWeightList(list2);
                             subUser.setSexyList(list3);
                             SubUser serializeUser = baseHessian2Serialize(subUser);
-                            Assert.assertEquals(subUser.getAgeList(), serializeUser.getAgeList());
-                            Assert.assertEquals(subUser.getWeightList(), serializeUser.getWeightList());
-                            Assert.assertEquals(subUser.getSexyList(), serializeUser.getSexyList());
+                            Assertions.assertEquals(subUser.getAgeList(), serializeUser.getAgeList());
+                            Assertions.assertEquals(subUser.getWeightList(), serializeUser.getWeightList());
+                            Assertions.assertEquals(subUser.getSexyList(), serializeUser.getSexyList());
                         } catch (Throwable e) {
                             error.incrementAndGet();
                         }
@@ -76,7 +77,7 @@ public class CollectionSerializerTest extends SerializeTestBase {
         }
         try {
             latch.await();
-            Assert.assertEquals(0, error.get());
+            Assertions.assertEquals(0, error.get());
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -90,7 +91,7 @@ public class CollectionSerializerTest extends SerializeTestBase {
         list.add(2222);
 
         List deserialize = baseHessian2Serialize(list);
-        Assert.assertTrue(deserialize.equals(list));
+        Assertions.assertTrue(deserialize.equals(list));
     }
 
 
@@ -102,6 +103,6 @@ public class CollectionSerializerTest extends SerializeTestBase {
         vector.add(2222);
 
         List deserialize = baseHessian2Serialize(vector);
-        Assert.assertTrue(deserialize.equals(vector));
+        Assertions.assertTrue(deserialize.equals(vector));
     }
 }

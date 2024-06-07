@@ -16,8 +16,8 @@
  */
 package com.alibaba.com.caucho.hessian.io;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -33,7 +33,7 @@ public class SerializerFactoryTest {
         Serializer s1 = serializerFactory.getSerializer(klass);
         Serializer s2 = serializerFactory.getSerializer(klass);
 
-        Assert.assertTrue("several Serializer!", s1 == s2);
+        Assertions.assertSame(s1, s2, "serveral Serializer!");
     }
 
     @Test
@@ -51,7 +51,7 @@ public class SerializerFactoryTest {
                 @Override
                 public void run() {
                     try {
-                        Assert.assertTrue("serveral Serializer!", s == serializerFactory.getSerializer(klass));
+                        Assertions.assertSame(s, serializerFactory.getSerializer(klass), "serveral Serializer!");
                     } catch (HessianProtocolException e) {
                         e.printStackTrace();
                     }
@@ -70,7 +70,7 @@ public class SerializerFactoryTest {
         Deserializer d1 = serializerFactory.getDeserializer(klass);
         Deserializer d2 = serializerFactory.getDeserializer(klass);
 
-        Assert.assertTrue("several Deserializer!", d1 == d2);
+        Assertions.assertSame(d1, d2, "several Deserializer!");
     }
 
     @Test
@@ -78,22 +78,22 @@ public class SerializerFactoryTest {
         final SerializerFactory serializerFactory = new SerializerFactory();
         try {
             serializerFactory.getSerializer(TestImpl.class);
-            Assert.fail();
+            Assertions.fail();
         } catch (RuntimeException e) {
-            Assert.assertEquals(IllegalStateException.class, e.getClass());
-            Assert.assertTrue(e.getMessage().equals("Serialized class com.alibaba.com.caucho.hessian.io.TestImpl must implement java.io.Serializable"));
+            Assertions.assertEquals(IllegalStateException.class, e.getClass());
+            Assertions.assertTrue(e.getMessage().equals("Serialized class com.alibaba.com.caucho.hessian.io.TestImpl must implement java.io.Serializable"));
         }
 
         try {
             serializerFactory.getDeserializer(TestImpl.class);
-            Assert.fail();
+            Assertions.fail();
         } catch (RuntimeException e) {
-            Assert.assertEquals(IllegalStateException.class, e.getClass());
-            Assert.assertTrue(e.getMessage().startsWith("Serialized class com.alibaba.com.caucho.hessian.io.TestImpl must implement java.io.Serializable"));
+            Assertions.assertEquals(IllegalStateException.class, e.getClass());
+            Assertions.assertTrue(e.getMessage().startsWith("Serialized class com.alibaba.com.caucho.hessian.io.TestImpl must implement java.io.Serializable"));
         }
 
-        Assert.assertNotNull(serializerFactory.getSerializer(TestClass.class));
-        Assert.assertNotNull(serializerFactory.getDeserializer(TestClass.class));
+        Assertions.assertNotNull(serializerFactory.getSerializer(TestClass.class));
+        Assertions.assertNotNull(serializerFactory.getDeserializer(TestClass.class));
     }
 
     @Test
@@ -111,7 +111,7 @@ public class SerializerFactoryTest {
                 @Override
                 public void run() {
                     try {
-                        Assert.assertTrue("serveral Deserializer!", s == serializerFactory.getDeserializer(klass));
+                        Assertions.assertSame(s, serializerFactory.getDeserializer(klass), "serveral Deserializer!");
                     } catch (HessianProtocolException e) {
                         e.printStackTrace();
                     }
@@ -128,12 +128,12 @@ public class SerializerFactoryTest {
 
         final String testClassName = TestClass.class.getName();
         Deserializer d1 = serializerFactory.getDeserializer(testClassName);
-        Assert.assertTrue("TestClass Deserializer!", d1 != null);
+        Assertions.assertNotNull(d1, "TestClass Deserializer!");
 
         Deserializer d2 = serializerFactory.getDeserializer("com.test.NotExistClass");
-        Assert.assertTrue("NotExistClass Deserializer!", d2 == null);
+        Assertions.assertNull(d2, "NotExistClass Deserializer!");
         //again check NotExistClass, there should be no warning like Hessian/Burlap:.....
         Deserializer d3 = serializerFactory.getDeserializer("com.test.NotExistClass");
-        Assert.assertTrue("NotExistClass Deserializer!", d3 == null);
+        Assertions.assertNull(d3, "NotExistClass Deserializer!");
     }
 }

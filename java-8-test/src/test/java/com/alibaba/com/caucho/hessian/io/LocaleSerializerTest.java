@@ -19,11 +19,10 @@ package com.alibaba.com.caucho.hessian.io;
 import java.io.IOException;
 import java.util.Locale;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.alibaba.com.caucho.hessian.io.base.SerializeTestBase;
-
-import junit.framework.TestCase;
 
 public class LocaleSerializerTest extends SerializeTestBase {
 
@@ -39,6 +38,6 @@ public class LocaleSerializerTest extends SerializeTestBase {
     }
 
     private void assertLocale(Locale locale) throws IOException {
-        TestCase.assertEquals(locale, baseHessian2Serialize(locale));
+        Assertions.assertEquals(locale, baseHessian2Serialize(locale));
     }
 }

@@ -18,8 +18,8 @@ package org.apache.dubbo.hessian.java11;
 
 import org.apache.dubbo.hessian.java11.base.SerializeTestBase;
 
-import junit.framework.TestCase;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -69,8 +69,8 @@ public class ImmutableTest extends SerializeTestBase {
     }
 
     void testEquals(Object object) throws IOException {
-        TestCase.assertEquals(object.hashCode(), baseHessian2Serialize(object).hashCode());
-        TestCase.assertEquals(object, baseHessian2Serialize(object));
+        Assertions.assertEquals(object.hashCode(), baseHessian2Serialize(object).hashCode());
+        Assertions.assertEquals(object, baseHessian2Serialize(object));
     }
 
 

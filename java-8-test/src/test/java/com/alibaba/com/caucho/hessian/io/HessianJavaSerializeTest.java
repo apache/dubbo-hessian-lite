@@ -20,8 +20,8 @@ import com.alibaba.com.caucho.hessian.io.base.SerializeTestBase;
 import com.alibaba.com.caucho.hessian.io.beans.BaseUser;
 import com.alibaba.com.caucho.hessian.io.beans.GrandsonUser;
 import com.alibaba.com.caucho.hessian.io.beans.SubUser;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -43,7 +43,7 @@ public class HessianJavaSerializeTest extends SerializeTestBase {
         baseUser.setUserName("tom");
 
         BaseUser serializedUser = baseHessian2Serialize(baseUser);
-        Assert.assertEquals("tom", serializedUser.getUserName());
+        Assertions.assertEquals("tom", serializedUser.getUserName());
     }
 
 
@@ -54,7 +54,7 @@ public class HessianJavaSerializeTest extends SerializeTestBase {
         subUser.setUserName("tom");
 
         SubUser serializedUser = baseHessian2Serialize(subUser);
-        Assert.assertEquals("tom", serializedUser.getUserName());
+        Assertions.assertEquals("tom", serializedUser.getUserName());
 
     }
 
@@ -71,7 +71,7 @@ public class HessianJavaSerializeTest extends SerializeTestBase {
         subUser.setAgeList(list);
 
         SubUser serializedUser = baseHessian2Serialize(subUser);
-        Assert.assertEquals(subUser.getAgeList(), serializedUser.getAgeList());
+        Assertions.assertEquals(subUser.getAgeList(), serializedUser.getAgeList());
 
     }
 
@@ -82,14 +82,14 @@ public class HessianJavaSerializeTest extends SerializeTestBase {
         grandsonUser.setUserName("tom");
 
         GrandsonUser serializedUser = baseHessian2Serialize(grandsonUser);
-        Assert.assertEquals("tom", serializedUser.getUserName());
+        Assertions.assertEquals("tom", serializedUser.getUserName());
     }
 
     @Test
     public void testFloat() throws Exception {
         Float fData = 99.8F;
         Double dData = 99.8D;
-        Assert.assertEquals(dData, baseHessian2Serialize(fData));
+        Assertions.assertEquals(dData, baseHessian2Serialize(fData));
     }
 
 }

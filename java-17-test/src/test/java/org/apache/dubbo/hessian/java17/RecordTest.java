@@ -20,9 +20,8 @@ package org.apache.dubbo.hessian.java17;
 
 import org.apache.dubbo.hessian.java17.base.SerializeTestBase;
 
-import junit.framework.TestCase;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -194,14 +193,14 @@ public class RecordTest extends SerializeTestBase {
     public void testRecordWithParametersReordered1() throws IOException {
         var r = new R(1L, 1, "foo");
         R1 r1 = (R1) baseHessian2Serialize(r, R1.class);
-        Assert.assertEquals(new R1(1, 1L, "foo"), r1);
+        Assertions.assertEquals(new R1(1, 1L, "foo"), r1);
     }
 
     @Test
     public void testRecordWithParametersReordered2() throws IOException {
         var r = new R(1L, 1, "foo");
         R2 r2 = (R2) baseHessian2Serialize(r, R2.class);
-        Assert.assertEquals(new R2("foo", 1, 1L), r2);
+        Assertions.assertEquals(new R2("foo", 1, 1L), r2);
     }
 
     public static record RecordWithSuperType(Number n) implements Serializable {
@@ -230,13 +229,13 @@ public class RecordTest extends SerializeTestBase {
         if (object instanceof Object[]) {
             Object[] src = (Object[]) object;
             Object[] dst = baseHessian2Serialize(src);
-            TestCase.assertEquals(src.length, dst.length);
+            Assertions.assertEquals(src.length, dst.length);
             for (int i = 0; i < src.length; i++) {
-                TestCase.assertEquals(src[i], dst[i]);
+                Assertions.assertEquals(src[i], dst[i]);
             }
         } else {
-            TestCase.assertEquals(object, baseHessian2Serialize(object));
-            TestCase.assertEquals(object.hashCode(), baseHessian2Serialize(object).hashCode());
+            Assertions.assertEquals(object, baseHessian2Serialize(object));
+            Assertions.assertEquals(object.hashCode(), baseHessian2Serialize(object).hashCode());
         }
     }
 }

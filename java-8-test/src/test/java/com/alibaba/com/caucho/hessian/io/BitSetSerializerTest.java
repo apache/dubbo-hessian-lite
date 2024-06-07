@@ -16,15 +16,12 @@
  */
 package com.alibaba.com.caucho.hessian.io;
 
+import com.alibaba.com.caucho.hessian.io.base.SerializeTestBase;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import java.io.IOException;
 import java.util.BitSet;
-import java.util.Locale;
-
-import org.junit.Test;
-
-import com.alibaba.com.caucho.hessian.io.base.SerializeTestBase;
-
-import junit.framework.TestCase;
 
 public class BitSetSerializerTest extends SerializeTestBase {
 
@@ -42,6 +39,6 @@ public class BitSetSerializerTest extends SerializeTestBase {
     }
 
     private void assertBitSet(BitSet bitSet) throws IOException {
-        TestCase.assertEquals(bitSet, baseHessian2Serialize(bitSet));
+        Assertions.assertEquals(bitSet, baseHessian2Serialize(bitSet));
     }
 }

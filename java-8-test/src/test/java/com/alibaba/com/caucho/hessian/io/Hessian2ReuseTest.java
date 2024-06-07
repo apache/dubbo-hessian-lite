@@ -18,8 +18,8 @@ package com.alibaba.com.caucho.hessian.io;
 
 import com.alibaba.com.caucho.hessian.io.base.SerializeTestBase;
 import com.alibaba.com.caucho.hessian.io.beans.*;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -50,10 +50,10 @@ public class Hessian2ReuseTest extends SerializeTestBase {
             String obj = "Hello, Hessian2, round:" + i;
 
             String newObj = serializeAndDeserialize(obj, String.class);
-            Assert.assertEquals(obj, newObj);
+            Assertions.assertEquals(obj, newObj);
 
             String newObj2 = baseHessian2Serialize(obj);
-            Assert.assertEquals(newObj, newObj2);
+            Assertions.assertEquals(newObj, newObj2);
         }
     }
 
@@ -72,10 +72,10 @@ public class Hessian2ReuseTest extends SerializeTestBase {
             obj.setUserName(String.valueOf(System.currentTimeMillis()));
 
             BaseUser newObj = serializeAndDeserialize(obj, BaseUser.class);
-            Assert.assertEquals(obj, newObj);
+            Assertions.assertEquals(obj, newObj);
 
             BaseUser newObj2 = baseHessian2Serialize(obj);
-            Assert.assertEquals(newObj, newObj2);
+            Assertions.assertEquals(newObj, newObj2);
         }
     }
 
@@ -90,10 +90,10 @@ public class Hessian2ReuseTest extends SerializeTestBase {
             obj.setWeightList(Arrays.asList(120D, 130D, 140D));
 
             SubUser newObj = serializeAndDeserialize(obj, SubUser.class);
-            Assert.assertEquals(obj, newObj);
+            Assertions.assertEquals(obj, newObj);
 
             SubUser newObj2 = baseHessian2Serialize(obj);
-            Assert.assertEquals(newObj, newObj2);
+            Assertions.assertEquals(newObj, newObj2);
         }
     }
 
@@ -108,10 +108,10 @@ public class Hessian2ReuseTest extends SerializeTestBase {
             obj.setWeightList(Arrays.asList(120D, 130D, 140D));
 
             SubUser newObj = serializeAndDeserialize(obj, SubUser.class);
-            Assert.assertEquals(obj, newObj);
+            Assertions.assertEquals(obj, newObj);
 
             SubUser newObj2 = baseHessian2Serialize(obj);
-            Assert.assertEquals(newObj, newObj2);
+            Assertions.assertEquals(newObj, newObj2);
         }
     }
 
@@ -144,10 +144,10 @@ public class Hessian2ReuseTest extends SerializeTestBase {
             obj.stringPersonTypeMap.put("P_" + i, abc);
 
             Hessian2StringShortType newObj = serializeAndDeserialize(obj, Hessian2StringShortType.class);
-            Assert.assertEquals(obj, newObj);
+            Assertions.assertEquals(obj, newObj);
 
             Hessian2StringShortType newObj2 = baseHessian2Serialize(obj);
-            Assert.assertEquals(newObj, newObj2);
+            Assertions.assertEquals(newObj, newObj2);
         }
     }
 

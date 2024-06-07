@@ -17,11 +17,12 @@
 
 package com.alibaba.com.caucho.hessian.io.writereplace;
 
-import static org.junit.Assert.assertEquals;
-
 import com.alibaba.com.caucho.hessian.io.base.SerializeTestBase;
+import org.junit.jupiter.api.Test;
+
 import java.io.Serializable;
-import org.junit.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 public class Hessian2WriteReplaceTest extends SerializeTestBase {

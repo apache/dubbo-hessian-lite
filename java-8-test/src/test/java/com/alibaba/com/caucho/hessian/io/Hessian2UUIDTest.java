@@ -1,16 +1,17 @@
 package com.alibaba.com.caucho.hessian.io;
 
 import com.alibaba.com.caucho.hessian.io.base.SerializeTestBase;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 
 /**
  * fix hessian serialize bug:
@@ -22,7 +23,7 @@ public class Hessian2UUIDTest extends SerializeTestBase {
 	public void testUUIDObject() throws IOException {
 		UUID actual = UUID.randomUUID();
 		UUID deserialize = baseHessian2Serialize(actual);
-		Assert.assertEquals(actual, deserialize);
+		assertEquals(actual, deserialize);
 	}
 
 	@Test
