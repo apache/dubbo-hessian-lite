@@ -189,6 +189,12 @@ public class RecordTest extends SerializeTestBase {
     public record R2(String s, int i, long l) implements Serializable {
     }
 
+    public record R3(String s) implements Serializable {
+    }
+
+    public record R4(String s, int i, long l, String newOne) implements Serializable {
+    }
+
     @Test
     public void testRecordWithParametersReordered1() throws IOException {
         var r = new R(1L, 1, "foo");
@@ -201,6 +207,20 @@ public class RecordTest extends SerializeTestBase {
         var r = new R(1L, 1, "foo");
         R2 r2 = (R2) baseHessian2Serialize(r, R2.class);
         Assertions.assertEquals(new R2("foo", 1, 1L), r2);
+    }
+
+    @Test
+    public void testRecordWithParametersReordered3() throws IOException {
+        var r = new R(1L, 1, "foo");
+        R3 r3 = (R3) baseHessian2Serialize(r, R3.class);
+        Assertions.assertEquals(new R3("foo"), r3);
+    }
+
+    @Test
+    public void testRecordWithParametersReordered4() throws IOException {
+        var r = new R(1L, 1, "foo");
+        R4 r4 = (R4) baseHessian2Serialize(r, R4.class);
+        Assertions.assertEquals(new R4("foo", 1, 1L, null), r4);
     }
 
     public static record RecordWithSuperType(Number n) implements Serializable {

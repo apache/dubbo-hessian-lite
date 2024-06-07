@@ -69,6 +69,11 @@ public class RecordDeserializer extends AbstractDeserializer {
 
             for (String fieldName : fieldNames) {
                 RecordUtil.RecordComponent component = _componentMap.get(fieldName);
+                if (component == null) {
+                    // ignore this field
+                    in.readObject();
+                    continue;
+                }
                 Object target;
                 target = in.readObject(component.type());
                 if (component.type() == float.class || component.type() == Float.class) {
