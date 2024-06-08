@@ -23,3 +23,5 @@ java.util.ImmutableCollections$MapN=com.alibaba.com.caucho.hessian.io.java9.MapN
 java.util.ImmutableCollections$Set12=com.alibaba.com.caucho.hessian.io.java9.Set12Serializer
 java.util.ImmutableCollections$SetN=com.alibaba.com.caucho.hessian.io.java9.SetNSerializer
 java.util.ImmutableCollections$SubList=com.alibaba.com.caucho.hessian.io.java9.SubListSerializer
+java.util.Collections.UnmodifiableRandomAccessList=com.alibaba.com.caucho.hessian.io.java8.UnmodifiableRandomAccessListSerializer
+java.util.Collections.SynchronizedRandomAccessList=com.alibaba.com.caucho.hessian.io.java8.SynchronizedRandomAccessListSerializer
