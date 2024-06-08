@@ -66,7 +66,7 @@ public class RecordDeserializer extends AbstractDeserializer {
             throws IOException {
         try {
             Object[] args = new Object[_components.length];
-
+            boolean readedIndex[] = new boolean[_components.length];
             for (String fieldName : fieldNames) {
                 RecordUtil.RecordComponent component = _componentMap.get(fieldName);
                 if (component == null) {
@@ -80,6 +80,12 @@ public class RecordDeserializer extends AbstractDeserializer {
                     target = (float) ((double) target);
                 }
                 args[component.index()] = target;
+                readedIndex[component.index()] = true;
+            }
+            for (int i = 0; i < readedIndex.length; i++) {
+                if (!readedIndex[i]) {
+                    args[i] = getParamArg(_components[i].type());
+                }
             }
             Object obj = _constructor.newInstance(args);
             in.addRef(obj);
@@ -90,6 +96,29 @@ public class RecordDeserializer extends AbstractDeserializer {
         } catch (Exception e) {
             throw new IOExceptionWrapper(_cl.getName() + ":" + e, e);
         }
+    }
+
+    protected static Object getParamArg(Class<?> cl) {
+        if (!cl.isPrimitive())
+            return null;
+        else if (boolean.class.equals(cl))
+            return Boolean.FALSE;
+        else if (byte.class.equals(cl))
+            return Byte.valueOf((byte) 0);
+        else if (short.class.equals(cl))
+            return Short.valueOf((short) 0);
+        else if (char.class.equals(cl))
+            return Character.valueOf((char) 0);
+        else if (int.class.equals(cl))
+            return Integer.valueOf(0);
+        else if (long.class.equals(cl))
+            return Long.valueOf(0);
+        else if (float.class.equals(cl))
+            return Float.valueOf(0);
+        else if (double.class.equals(cl))
+            return Double.valueOf(0);
+        else
+            throw new UnsupportedOperationException();
     }
 
 }
