@@ -2,3 +2,7 @@ java.io.File=com.alibaba.com.caucho.hessian.io.FileDeserializer
 java.math.BigDecimal=com.alibaba.com.caucho.hessian.io.BigDecimalDeserializer
 javax.management.ObjectName=com.alibaba.com.caucho.hessian.io.ObjectNameDeserializer
 java.util.concurrent.atomic.LongAdder$SerializationProxy=com.alibaba.com.caucho.hessian.io.atomic.LongAdderDeserializer
+java.net.InetAddress=com.alibaba.com.caucho.hessian.io.socket.InetAddressDeserializer
+java.net.InetAddress$InetAddressHolder=com.alibaba.com.caucho.hessian.io.socket.InetAddressHolderDeserializer
+java.net.Inet6Address=com.alibaba.com.caucho.hessian.io.socket.Inet6AddressDeserializer
+java.net.Inet6Address$Inet6AddressHolder=com.alibaba.com.caucho.hessian.io.socket.Inet6AddressHolderDeserializer
