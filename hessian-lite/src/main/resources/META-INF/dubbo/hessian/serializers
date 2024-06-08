@@ -38,3 +38,4 @@ java.time.chrono.JapaneseEra=com.alibaba.com.caucho.hessian.io.chronology.Japane
 java.time.chrono.HijrahDate=com.alibaba.com.caucho.hessian.io.chronology.HijrahDateSerializer
 java.time.chrono.MinguoDate=com.alibaba.com.caucho.hessian.io.chronology.MinguoDateSerializer
 java.time.chrono.ThaiBuddhistDate=com.alibaba.com.caucho.hessian.io.chronology.ThaiBuddhistDateSerializer
+java.util.concurrent.atomic.LongAdder=com.alibaba.com.caucho.hessian.io.atomic.LongAdderSerializer

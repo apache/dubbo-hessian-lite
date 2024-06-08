@@ -1,3 +1,4 @@
 java.io.File=com.alibaba.com.caucho.hessian.io.FileDeserializer
 java.math.BigDecimal=com.alibaba.com.caucho.hessian.io.BigDecimalDeserializer
 javax.management.ObjectName=com.alibaba.com.caucho.hessian.io.ObjectNameDeserializer
+java.util.concurrent.atomic.LongAdder$SerializationProxy=com.alibaba.com.caucho.hessian.io.atomic.LongAdderDeserializer
