@@ -67,4 +67,11 @@ public class CollectionsTest extends SerializeTestBase {
         Assertions.assertEquals(unmodifiableList, baseHessian2Serialize(unmodifiableList));
     }
 
+
+    @Test
+    void testCopiesList() throws IOException {
+        List<Integer> copiesList = Collections.nCopies(3, 1);
+        Assertions.assertEquals(copiesList, baseHessian2Serialize(copiesList));
+        Assertions.assertEquals(copiesList.subList(1, 2), baseHessian2Serialize(copiesList.subList(1, 2)));
+    }
 }

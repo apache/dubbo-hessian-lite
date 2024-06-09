@@ -7,3 +7,4 @@ java.net.InetAddress$InetAddressHolder=com.alibaba.com.caucho.hessian.io.socket.
 java.net.Inet6Address=com.alibaba.com.caucho.hessian.io.socket.Inet6AddressDeserializer
 java.net.Inet6Address$Inet6AddressHolder=com.alibaba.com.caucho.hessian.io.socket.Inet6AddressHolderDeserializer
 java.net.UnixDomainSocketAddress$Ser=com.alibaba.com.caucho.hessian.io.socket.UnixDomainSocketAddressSerDeserializer
+java.net.InetSocketAddress=com.alibaba.com.caucho.hessian.io.socket.InetSocketAddressDeserializer

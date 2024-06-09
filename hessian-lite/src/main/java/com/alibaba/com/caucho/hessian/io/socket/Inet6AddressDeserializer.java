@@ -61,7 +61,8 @@ public class Inet6AddressDeserializer extends AbstractDeserializer {
                 }
             }
             if (inet4Address != null) {
-                inet6Address = Inet6Address.getByAddress("", inet6Address.getAddress(), inet6Address.getScopeId());
+                inet6Address = Inet6Address.getByAddress(inet4Address.getHostName(), inet6Address.getAddress(),
+                        inet6Address.getScopeId() <= 0 ? -1 : inet6Address.getScopeId());
             }
 
             in.addRef(inet6Address);
