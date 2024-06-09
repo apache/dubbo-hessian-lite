@@ -20,7 +20,6 @@ import com.alibaba.com.caucho.hessian.io.AbstractHessianOutput;
 import com.alibaba.com.caucho.hessian.io.AbstractSerializer;
 
 import java.io.IOException;
-import java.time.chrono.AbstractChronology;
 import java.time.chrono.ChronoPeriod;
 
 public class ChronoPeriodImplSerializer <T> extends AbstractSerializer {

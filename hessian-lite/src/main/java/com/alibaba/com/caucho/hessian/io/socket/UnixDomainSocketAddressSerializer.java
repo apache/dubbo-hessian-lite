@@ -24,7 +24,6 @@ import com.alibaba.com.caucho.hessian.io.HessianFieldException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.InetAddress;
 import java.nio.file.Path;
 
 public class UnixDomainSocketAddressSerializer extends AbstractSerializer {

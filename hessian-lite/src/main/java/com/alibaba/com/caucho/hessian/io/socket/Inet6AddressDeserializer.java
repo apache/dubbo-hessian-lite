@@ -23,7 +23,6 @@ import com.alibaba.com.caucho.hessian.io.IOExceptionWrapper;
 import java.io.IOException;
 import java.net.Inet6Address;
 import java.net.InetAddress;
-import java.util.concurrent.atomic.LongAdder;
 
 public class Inet6AddressDeserializer extends AbstractDeserializer {
     public Class<?> getType() {

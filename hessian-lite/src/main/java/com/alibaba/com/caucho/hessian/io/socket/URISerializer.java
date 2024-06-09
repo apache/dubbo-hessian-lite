@@ -16,16 +16,11 @@
  */
 package com.alibaba.com.caucho.hessian.io.socket;
 
-import com.alibaba.com.caucho.hessian.HessianException;
 import com.alibaba.com.caucho.hessian.io.AbstractHessianOutput;
 import com.alibaba.com.caucho.hessian.io.AbstractSerializer;
-import com.alibaba.com.caucho.hessian.io.HessianFieldException;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URI;
-import java.nio.file.Path;
 
 public class URISerializer extends AbstractSerializer {
 

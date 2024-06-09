@@ -21,9 +21,7 @@ import com.alibaba.com.caucho.hessian.io.AbstractHessianInput;
 import com.alibaba.com.caucho.hessian.io.IOExceptionWrapper;
 
 import java.io.IOException;
-import java.net.Inet4Address;
 import java.net.InetAddress;
-import java.util.concurrent.atomic.LongAdder;
 
 public class InetAddressDeserializer extends AbstractDeserializer {
     public Class<?> getType() {

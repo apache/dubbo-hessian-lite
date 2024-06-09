@@ -19,7 +19,6 @@ package com.alibaba.com.caucho.hessian.io.atomic;
 import com.alibaba.com.caucho.hessian.io.AbstractDeserializer;
 import com.alibaba.com.caucho.hessian.io.AbstractHessianInput;
 import com.alibaba.com.caucho.hessian.io.IOExceptionWrapper;
-import com.alibaba.com.caucho.hessian.io.RecordUtil;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.LongAdder;

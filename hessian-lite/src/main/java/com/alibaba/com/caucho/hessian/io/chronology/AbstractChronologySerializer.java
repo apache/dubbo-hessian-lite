@@ -18,7 +18,6 @@ package com.alibaba.com.caucho.hessian.io.chronology;
 
 import com.alibaba.com.caucho.hessian.io.AbstractHessianOutput;
 import com.alibaba.com.caucho.hessian.io.AbstractSerializer;
-import com.alibaba.com.caucho.hessian.io.java8.DurationHandle;
 
 import java.io.IOException;
 import java.time.chrono.AbstractChronology;

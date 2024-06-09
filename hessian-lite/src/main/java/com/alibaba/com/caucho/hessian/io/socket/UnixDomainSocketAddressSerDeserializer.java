@@ -22,8 +22,6 @@ import com.alibaba.com.caucho.hessian.io.IOExceptionWrapper;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.net.InetAddress;
-import java.util.concurrent.atomic.LongAdder;
 
 public class UnixDomainSocketAddressSerDeserializer extends AbstractDeserializer {
     private static Method UnixDomainSocketAddressOf = null;
