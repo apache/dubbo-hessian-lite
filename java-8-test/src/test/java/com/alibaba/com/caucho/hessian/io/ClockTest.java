@@ -16,30 +16,23 @@
  */
 package com.alibaba.com.caucho.hessian.io;
 
+
 import com.alibaba.com.caucho.hessian.io.base.SerializeTestBase;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.time.Clock;
+import java.time.ZoneId;
 
-public class URITest extends SerializeTestBase {
+public class ClockTest extends SerializeTestBase {
     @Test
-    void testStr() throws IOException, URISyntaxException {
-        URI originalURI = new URI("http://username:password@www.example.com:8080/path/to/resource?param1=value1&param2=value2#fragment");
+    void test() throws IOException {
+        Clock originalClock = Clock.system(ZoneId.of("Asia/Shanghai"));
 
-        URI result = baseHessian2Serialize(originalURI);
+        Clock result = baseHessian2Serialize(originalClock);
 
-        Assertions.assertEquals(originalURI.toString(), result.toString());
-    }
-
-    @Test
-    void testEmp() throws IOException, URISyntaxException {
-        URI originalURI = new URI("http", "username:password", "www.example.com", 8080, "/path/to/resource", "param1=value1&param2=value2", "fragment");
-
-        URI result = baseHessian2Serialize(originalURI);
-
-        Assertions.assertEquals(originalURI.toString(), result.toString());
+        Assertions.assertEquals(originalClock.millis(), result.millis());
+        Assertions.assertEquals(originalClock.getZone(), result.getZone());
     }
 }

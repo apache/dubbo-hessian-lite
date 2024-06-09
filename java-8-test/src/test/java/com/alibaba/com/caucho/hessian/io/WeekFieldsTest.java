@@ -21,25 +21,16 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.time.temporal.WeekFields;
+import java.util.Locale;
 
-public class URITest extends SerializeTestBase {
+public class WeekFieldsTest extends SerializeTestBase {
     @Test
-    void testStr() throws IOException, URISyntaxException {
-        URI originalURI = new URI("http://username:password@www.example.com:8080/path/to/resource?param1=value1&param2=value2#fragment");
+    void test() throws IOException {
+        WeekFields originalWeekFields = WeekFields.of(Locale.FRANCE);
 
-        URI result = baseHessian2Serialize(originalURI);
+        WeekFields result = baseHessian2Serialize(originalWeekFields);
 
-        Assertions.assertEquals(originalURI.toString(), result.toString());
-    }
-
-    @Test
-    void testEmp() throws IOException, URISyntaxException {
-        URI originalURI = new URI("http", "username:password", "www.example.com", 8080, "/path/to/resource", "param1=value1&param2=value2", "fragment");
-
-        URI result = baseHessian2Serialize(originalURI);
-
-        Assertions.assertEquals(originalURI.toString(), result.toString());
+        Assertions.assertEquals(originalWeekFields, result);
     }
 }
