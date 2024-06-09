@@ -21,22 +21,32 @@ import com.alibaba.com.caucho.hessian.io.AbstractHessianInput;
 import com.alibaba.com.caucho.hessian.io.IOExceptionWrapper;
 
 import java.io.IOException;
-import java.net.Inet6Address;
+import java.lang.reflect.Method;
 import java.net.InetAddress;
+import java.util.concurrent.atomic.LongAdder;
 
-public class Inet6AddressHolderDeserializer extends AbstractDeserializer {
+public class UnixDomainSocketAddressSerDeserializer extends AbstractDeserializer {
+    private static Method UnixDomainSocketAddressOf = null;
+
+    static {
+        try {
+            Class<?> cl = Class.forName("java.net.UnixDomainSocketAddress");
+            UnixDomainSocketAddressOf = cl.getMethod("of", String.class);
+        } catch (Exception e) {
+            // UnixDomainSocketAddress only available since Java 16
+        }
+    }
+
     @Override
     public Object readObject(AbstractHessianInput in,
                              Object[] fields)
             throws IOException {
         try {
             return readObject(in, (String[]) fields);
-        } catch (IOException e) {
-            throw e;
-        } catch (RuntimeException e) {
+        } catch (IOException | RuntimeException e) {
             throw e;
         } catch (Exception e) {
-            throw new IOExceptionWrapper("java.net.Inet6Address$Inet6AddressHolder:" + e, e);
+            throw new IOExceptionWrapper("java.net.UnixDomainSocketAddress:" + e, e);
         }
     }
 
@@ -45,20 +55,16 @@ public class Inet6AddressHolderDeserializer extends AbstractDeserializer {
                              String[] fieldNames)
             throws IOException {
         try {
-            byte[] ipaddress = new byte[16];
-            int scope_id = 0;
+            String pathname = null;
             for (String fieldName : fieldNames) {
-                if ("ipaddress".equals(fieldName)) {
-                    ipaddress = (byte[]) in.readObject();
-                } else if ("scope_id".equals(fieldName)) {
-                    scope_id = in.readInt();
+                if ("pathname".equals(fieldName)) {
+                    pathname = in.readString();
                 } else {
                     in.readObject();
                 }
             }
 
-
-            InetAddress obj = Inet6Address.getByAddress("", ipaddress, scope_id);
+            Object obj = UnixDomainSocketAddressOf.invoke(null, pathname);
 
             in.addRef(obj);
 
@@ -66,9 +72,7 @@ public class Inet6AddressHolderDeserializer extends AbstractDeserializer {
         } catch (IOException e) {
             throw e;
         } catch (Exception e) {
-            throw new IOExceptionWrapper("java.net.Inet6Address$Inet6AddressHolder:" + e, e);
+            throw new IOExceptionWrapper("java.net.UnixDomainSocketAddress:" + e, e);
         }
     }
-
-
 }

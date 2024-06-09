@@ -36,7 +36,7 @@ public class InetAddressHolderDeserializer extends AbstractDeserializer {
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
-            throw new IOExceptionWrapper(LongAdder.class.getName() + ":" + e, e);
+            throw new IOExceptionWrapper("java.net.InetAddress$InetAddressHolder:" + e, e);
         }
     }
 
@@ -72,7 +72,7 @@ public class InetAddressHolderDeserializer extends AbstractDeserializer {
         } catch (IOException e) {
             throw e;
         } catch (Exception e) {
-            throw new IOExceptionWrapper(LongAdder.class.getName() + ":" + e, e);
+            throw new IOExceptionWrapper("java.net.InetAddress$InetAddressHolder:" + e, e);
         }
     }
 }

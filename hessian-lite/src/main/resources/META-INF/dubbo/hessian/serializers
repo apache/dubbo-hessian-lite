@@ -41,3 +41,4 @@ java.time.chrono.ThaiBuddhistDate=com.alibaba.com.caucho.hessian.io.chronology.T
 java.util.concurrent.atomic.LongAdder=com.alibaba.com.caucho.hessian.io.atomic.LongAdderSerializer
 java.net.Inet4Address=com.alibaba.com.caucho.hessian.io.socket.Inet4AddressSerializer
 java.net.Inet6Address=com.alibaba.com.caucho.hessian.io.socket.Inet6AddressSerializer
+java.net.UnixDomainSocketAddress=com.alibaba.com.caucho.hessian.io.socket.UnixDomainSocketAddressSerializer

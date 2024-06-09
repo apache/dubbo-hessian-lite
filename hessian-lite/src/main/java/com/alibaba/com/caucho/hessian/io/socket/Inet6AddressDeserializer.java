@@ -41,7 +41,7 @@ public class Inet6AddressDeserializer extends AbstractDeserializer {
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
-            throw new IOExceptionWrapper(LongAdder.class.getName() + ":" + e, e);
+            throw new IOExceptionWrapper("java.net.Inet6Address:" + e, e);
         }
     }
 
@@ -70,7 +70,7 @@ public class Inet6AddressDeserializer extends AbstractDeserializer {
         } catch (IOException e) {
             throw e;
         } catch (Exception e) {
-            throw new IOExceptionWrapper(LongAdder.class.getName() + ":" + e, e);
+            throw new IOExceptionWrapper("java.net.Inet6Address:" + e, e);
         }
     }
 }
