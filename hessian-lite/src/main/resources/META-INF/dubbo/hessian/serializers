@@ -43,3 +43,4 @@ java.net.Inet4Address=com.alibaba.com.caucho.hessian.io.socket.Inet4AddressSeria
 java.net.Inet6Address=com.alibaba.com.caucho.hessian.io.socket.Inet6AddressSerializer
 java.net.UnixDomainSocketAddress=com.alibaba.com.caucho.hessian.io.socket.UnixDomainSocketAddressSerializer
 java.net.InetSocketAddress=com.alibaba.com.caucho.hessian.io.socket.InetSocketAddressSerializer
+java.net.URI=com.alibaba.com.caucho.hessian.io.socket.URISerializer

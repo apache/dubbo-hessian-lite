@@ -21,23 +21,24 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.text.NumberFormat;
-import java.util.Locale;
-import java.util.Properties;
+import java.util.ArrayList;
+import java.util.concurrent.PriorityBlockingQueue;
 
-public class NumberFormatTest extends SerializeTestBase {
+public class PriorityBlockingQueueTest extends SerializeTestBase {
     @Test
     void test() throws IOException {
-        NumberFormat originalNumberFormat = NumberFormat.getInstance(Locale.US);
+        PriorityBlockingQueue<Integer> originalPriorityBlockingQueue = new PriorityBlockingQueue<>(16, Integer::compareTo);
+        originalPriorityBlockingQueue.add(1);
+        originalPriorityBlockingQueue.add(2);
+        originalPriorityBlockingQueue.add(4);
+        originalPriorityBlockingQueue.add(-1);
 
-        NumberFormat result = baseHessian2Serialize(originalNumberFormat);
+        PriorityBlockingQueue<Integer> result = baseHessian2Serialize(originalPriorityBlockingQueue);
 
-        Assertions.assertEquals(originalNumberFormat.getMaximumFractionDigits(), result.getMaximumFractionDigits());
-        Assertions.assertEquals(originalNumberFormat.getMaximumIntegerDigits(), result.getMaximumIntegerDigits());
-        Assertions.assertEquals(originalNumberFormat.getMinimumFractionDigits(), result.getMinimumFractionDigits());
-        Assertions.assertEquals(originalNumberFormat.getMinimumIntegerDigits(), result.getMinimumIntegerDigits());
-        Assertions.assertEquals(originalNumberFormat.getRoundingMode(), result.getRoundingMode());
-        // TODO Support currency
-//        Assertions.assertEquals(originalNumberFormat.getCurrency(), result.getCurrency());
+        Assertions.assertEquals(new ArrayList<>(originalPriorityBlockingQueue), new ArrayList<>(result));
+
+        originalPriorityBlockingQueue.add(3);
+        result.add(3);
+        Assertions.assertEquals(new ArrayList<>(originalPriorityBlockingQueue), new ArrayList<>(result));
     }
 }

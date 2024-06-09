@@ -21,23 +21,16 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.text.NumberFormat;
-import java.util.Locale;
-import java.util.Properties;
+import java.net.URI;
+import java.net.URISyntaxException;
 
-public class NumberFormatTest extends SerializeTestBase {
+public class URITest extends SerializeTestBase {
     @Test
-    void test() throws IOException {
-        NumberFormat originalNumberFormat = NumberFormat.getInstance(Locale.US);
+    void test() throws IOException, URISyntaxException {
+        URI originalURI = new URI("https://github.com");
 
-        NumberFormat result = baseHessian2Serialize(originalNumberFormat);
+        URI result = baseHessian2Serialize(originalURI);
 
-        Assertions.assertEquals(originalNumberFormat.getMaximumFractionDigits(), result.getMaximumFractionDigits());
-        Assertions.assertEquals(originalNumberFormat.getMaximumIntegerDigits(), result.getMaximumIntegerDigits());
-        Assertions.assertEquals(originalNumberFormat.getMinimumFractionDigits(), result.getMinimumFractionDigits());
-        Assertions.assertEquals(originalNumberFormat.getMinimumIntegerDigits(), result.getMinimumIntegerDigits());
-        Assertions.assertEquals(originalNumberFormat.getRoundingMode(), result.getRoundingMode());
-        // TODO Support currency
-//        Assertions.assertEquals(originalNumberFormat.getCurrency(), result.getCurrency());
+        Assertions.assertEquals(originalURI, result);
     }
 }
