@@ -21,25 +21,23 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.util.EnumSet;
 
-public class URITest extends SerializeTestBase {
+enum TestEnumSet {
+    ONE, TWO, THREE
+}
+
+public class EnumSetTest extends SerializeTestBase {
     @Test
-    void testStr() throws IOException, URISyntaxException {
-        URI originalURI = new URI("http://username:password@www.example.com:8080/path/to/resource?param1=value1&param2=value2#fragment");
+    void test() throws IOException {
+        EnumSet<TestEnumSet> originalEnumSet = EnumSet.of(TestEnumSet.ONE, TestEnumSet.TWO);
 
-        URI result = baseHessian2Serialize(originalURI);
+        EnumSet<TestEnumSet> result = baseHessian2Serialize(originalEnumSet);
 
-        Assertions.assertEquals(originalURI, result);
-    }
+        Assertions.assertEquals(originalEnumSet, result);
 
-    @Test
-    void testEmp() throws IOException, URISyntaxException {
-        URI originalURI = new URI("http", "username:password", "www.example.com", 8080, "/path/to/resource", "param1=value1&param2=value2", "fragment");
-
-        URI result = baseHessian2Serialize(originalURI);
-
-        Assertions.assertEquals(originalURI, result);
+        originalEnumSet.add(TestEnumSet.THREE);
+        result.add(TestEnumSet.THREE);
+        Assertions.assertEquals(originalEnumSet, result);
     }
 }
