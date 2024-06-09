@@ -19,11 +19,12 @@ package com.alibaba.com.caucho.hessian.io;
 import com.alibaba.com.caucho.hessian.io.base.SerializeTestBase;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledForJreRange;
+import org.junit.jupiter.api.condition.JRE;
 
 import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.Locale;
-import java.util.Properties;
 
 public class NumberFormatTest extends SerializeTestBase {
     @Test
@@ -39,5 +40,42 @@ public class NumberFormatTest extends SerializeTestBase {
         Assertions.assertEquals(originalNumberFormat.getRoundingMode(), result.getRoundingMode());
         // TODO Support currency
 //        Assertions.assertEquals(originalNumberFormat.getCurrency(), result.getCurrency());
+    }
+
+    @Test
+    @EnabledForJreRange(max = JRE.JAVA_11)
+    void testCompact() throws IOException {
+        NumberFormat obj = NumberFormat.getInstance(Locale.US);
+        Assertions.assertEquals(obj.getMaximumFractionDigits(), baseHessian2Serialize(obj).getMaximumFractionDigits());
+        Assertions.assertEquals(obj.getMaximumIntegerDigits(), baseHessian2Serialize(obj).getMaximumIntegerDigits());
+        Assertions.assertEquals(obj.getMinimumFractionDigits(), baseHessian2Serialize(obj).getMinimumFractionDigits());
+        Assertions.assertEquals(obj.getMinimumIntegerDigits(), baseHessian2Serialize(obj).getMinimumIntegerDigits());
+        Assertions.assertEquals(obj.getRoundingMode(), baseHessian2Serialize(obj).getRoundingMode());
+        // TODO Support currency
+//        Assertions.assertEquals(obj.getCurrency(), baseHessian2Serialize(obj).getCurrency());
+
+        Assertions.assertEquals(obj.getMaximumFractionDigits(), hessian3ToHessian3(obj).getMaximumFractionDigits());
+        Assertions.assertEquals(obj.getMaximumIntegerDigits(), hessian3ToHessian3(obj).getMaximumIntegerDigits());
+        Assertions.assertEquals(obj.getMinimumFractionDigits(), hessian3ToHessian3(obj).getMinimumFractionDigits());
+        Assertions.assertEquals(obj.getMinimumIntegerDigits(), hessian3ToHessian3(obj).getMinimumIntegerDigits());
+        Assertions.assertEquals(obj.getRoundingMode(), hessian3ToHessian3(obj).getRoundingMode());
+        // TODO Support currency
+//        Assertions.assertEquals(obj.getCurrency(), hessian3ToHessian3(obj).getCurrency());
+
+        Assertions.assertEquals(obj.getMaximumFractionDigits(), hessian4ToHessian3(obj).getMaximumFractionDigits());
+        Assertions.assertEquals(obj.getMaximumIntegerDigits(), hessian4ToHessian3(obj).getMaximumIntegerDigits());
+        Assertions.assertEquals(obj.getMinimumFractionDigits(), hessian4ToHessian3(obj).getMinimumFractionDigits());
+        Assertions.assertEquals(obj.getMinimumIntegerDigits(), hessian4ToHessian3(obj).getMinimumIntegerDigits());
+        Assertions.assertEquals(obj.getRoundingMode(), hessian4ToHessian3(obj).getRoundingMode());
+        // TODO Support currency
+//        Assertions.assertEquals(obj.getCurrency(), hessian4ToHessian3(obj).getCurrency());
+
+        Assertions.assertEquals(obj.getMaximumFractionDigits(), hessian3ToHessian4(obj).getMaximumFractionDigits());
+        Assertions.assertEquals(obj.getMaximumIntegerDigits(), hessian3ToHessian4(obj).getMaximumIntegerDigits());
+        Assertions.assertEquals(obj.getMinimumFractionDigits(), hessian3ToHessian4(obj).getMinimumFractionDigits());
+        Assertions.assertEquals(obj.getMinimumIntegerDigits(), hessian3ToHessian4(obj).getMinimumIntegerDigits());
+        Assertions.assertEquals(obj.getRoundingMode(), hessian3ToHessian4(obj).getRoundingMode());
+        // TODO Support currency
+//        Assertions.assertEquals(obj.getCurrency(), hessian3ToHessian4(obj).getCurrency());
     }
 }

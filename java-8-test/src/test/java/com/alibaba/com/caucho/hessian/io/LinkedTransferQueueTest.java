@@ -19,6 +19,8 @@ package com.alibaba.com.caucho.hessian.io;
 import com.alibaba.com.caucho.hessian.io.base.SerializeTestBase;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledForJreRange;
+import org.junit.jupiter.api.condition.JRE;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,5 +41,18 @@ public class LinkedTransferQueueTest extends SerializeTestBase {
         originalLinkedTransferQueue.offer(4);
         result.offer(4);
         Assertions.assertEquals(new ArrayList<>(originalLinkedTransferQueue), new ArrayList<>(result));
+    }
+
+    @Test
+    @EnabledForJreRange(max = JRE.JAVA_11)
+    void testCompact() throws IOException {
+        LinkedTransferQueue<Integer> obj = new LinkedTransferQueue<>();
+        obj.offer(1);
+        obj.offer(2);
+        obj.offer(3);
+        Assertions.assertEquals(new ArrayList<>(obj), new ArrayList<>(baseHessian2Serialize(obj)));
+        Assertions.assertEquals(new ArrayList<>(obj), new ArrayList<>(hessian3ToHessian3(obj)));
+        Assertions.assertEquals(new ArrayList<>(obj), new ArrayList<>(hessian4ToHessian3(obj)));
+        Assertions.assertEquals(new ArrayList<>(obj), new ArrayList<>(hessian3ToHessian4(obj)));
     }
 }

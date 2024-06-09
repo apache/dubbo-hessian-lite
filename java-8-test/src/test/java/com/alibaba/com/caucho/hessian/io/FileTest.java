@@ -19,6 +19,8 @@ package com.alibaba.com.caucho.hessian.io;
 import com.alibaba.com.caucho.hessian.io.base.SerializeTestBase;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledForJreRange;
+import org.junit.jupiter.api.condition.JRE;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,5 +33,15 @@ public class FileTest extends SerializeTestBase {
         File result = baseHessian2Serialize(originalFile);
 
         Assertions.assertEquals(originalFile, result);
+    }
+
+    @Test
+    @EnabledForJreRange(max = JRE.JAVA_11)
+    void testCompact() throws IOException {
+        File obj = new File("test.txt");
+        Assertions.assertEquals(obj, baseHessian2Serialize(obj));
+        Assertions.assertEquals(obj, hessian3ToHessian3(obj));
+        Assertions.assertEquals(obj, hessian4ToHessian3(obj));
+        Assertions.assertEquals(obj, hessian3ToHessian4(obj));
     }
 }

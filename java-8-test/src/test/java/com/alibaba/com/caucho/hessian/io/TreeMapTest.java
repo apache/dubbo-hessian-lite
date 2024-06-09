@@ -19,6 +19,8 @@ package com.alibaba.com.caucho.hessian.io;
 import com.alibaba.com.caucho.hessian.io.base.SerializeTestBase;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledForJreRange;
+import org.junit.jupiter.api.condition.JRE;
 
 import java.io.IOException;
 import java.util.Map;
@@ -41,6 +43,18 @@ public class TreeMapTest extends SerializeTestBase {
         Assertions.assertEquals(originalTreeMap, result);
     }
 
+    @Test
+    @EnabledForJreRange(max = JRE.JAVA_11)
+    void testCompact() throws IOException {
+        TreeMap<String, Integer> obj = new TreeMap<>();
+        obj.put("one", 1);
+        obj.put("two", 2);
+        obj.put("three", 3);
+        Assertions.assertEquals(obj, baseHessian2Serialize(obj));
+        Assertions.assertEquals(obj, hessian3ToHessian3(obj));
+        Assertions.assertEquals(obj, hessian4ToHessian3(obj));
+        Assertions.assertEquals(obj, hessian3ToHessian4(obj));
+    }
 
     @Test
     void testWithComparator() throws IOException {

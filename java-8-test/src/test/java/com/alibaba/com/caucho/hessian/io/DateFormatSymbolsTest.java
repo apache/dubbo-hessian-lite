@@ -19,6 +19,8 @@ package com.alibaba.com.caucho.hessian.io;
 import com.alibaba.com.caucho.hessian.io.base.SerializeTestBase;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledForJreRange;
+import org.junit.jupiter.api.condition.JRE;
 
 import java.io.IOException;
 import java.text.DateFormatSymbols;
@@ -37,5 +39,38 @@ public class DateFormatSymbolsTest extends SerializeTestBase {
         Assertions.assertArrayEquals(originalDateFormatSymbols.getShortMonths(), result.getShortMonths());
         Assertions.assertArrayEquals(originalDateFormatSymbols.getWeekdays(), result.getWeekdays());
         Assertions.assertArrayEquals(originalDateFormatSymbols.getShortWeekdays(), result.getShortWeekdays());
+    }
+
+    @Test
+    @EnabledForJreRange(max = JRE.JAVA_11)
+    void testCompact() throws IOException {
+        DateFormatSymbols obj = new DateFormatSymbols(Locale.US);
+//        Assertions.assertArrayEquals(obj.getAmPmStrings(), baseHessian2Serialize(obj).getAmPmStrings());
+//        Assertions.assertArrayEquals(obj.getEras(), baseHessian2Serialize(obj).getEras());
+//        Assertions.assertArrayEquals(obj.getMonths(), baseHessian2Serialize(obj).getMonths());
+//        Assertions.assertArrayEquals(obj.getShortMonths(), baseHessian2Serialize(obj).getShortMonths());
+//        Assertions.assertArrayEquals(obj.getWeekdays(), baseHessian2Serialize(obj).getWeekdays());
+//        Assertions.assertArrayEquals(obj.getShortWeekdays(), baseHessian2Serialize(obj).getShortWeekdays());
+//
+        Assertions.assertArrayEquals(obj.getAmPmStrings(), hessian3ToHessian3(obj).getAmPmStrings());
+//        Assertions.assertArrayEquals(obj.getEras(), hessian3ToHessian3(obj).getEras());
+//        Assertions.assertArrayEquals(obj.getMonths(), hessian3ToHessian3(obj).getMonths());
+//        Assertions.assertArrayEquals(obj.getShortMonths(), hessian3ToHessian3(obj).getShortMonths());
+//        Assertions.assertArrayEquals(obj.getWeekdays(), hessian3ToHessian3(obj).getWeekdays());
+//        Assertions.assertArrayEquals(obj.getShortWeekdays(), hessian3ToHessian3(obj).getShortWeekdays());
+
+        Assertions.assertArrayEquals(obj.getAmPmStrings(), hessian4ToHessian3(obj).getAmPmStrings());
+        Assertions.assertArrayEquals(obj.getEras(), hessian4ToHessian3(obj).getEras());
+        Assertions.assertArrayEquals(obj.getMonths(), hessian4ToHessian3(obj).getMonths());
+        Assertions.assertArrayEquals(obj.getShortMonths(), hessian4ToHessian3(obj).getShortMonths());
+        Assertions.assertArrayEquals(obj.getWeekdays(), hessian4ToHessian3(obj).getWeekdays());
+        Assertions.assertArrayEquals(obj.getShortWeekdays(), hessian4ToHessian3(obj).getShortWeekdays());
+
+        Assertions.assertArrayEquals(obj.getAmPmStrings(), hessian3ToHessian4(obj).getAmPmStrings());
+        Assertions.assertArrayEquals(obj.getEras(), hessian3ToHessian4(obj).getEras());
+        Assertions.assertArrayEquals(obj.getMonths(), hessian3ToHessian4(obj).getMonths());
+        Assertions.assertArrayEquals(obj.getShortMonths(), hessian3ToHessian4(obj).getShortMonths());
+        Assertions.assertArrayEquals(obj.getWeekdays(), hessian3ToHessian4(obj).getWeekdays());
+        Assertions.assertArrayEquals(obj.getShortWeekdays(), hessian3ToHessian4(obj).getShortWeekdays());
     }
 }

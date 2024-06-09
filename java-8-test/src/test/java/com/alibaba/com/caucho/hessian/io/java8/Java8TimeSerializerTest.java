@@ -17,17 +17,11 @@
 
 package com.alibaba.com.caucho.hessian.io.java8;
 
-import com.alibaba.com.caucho.hessian.io.Hessian2Input;
-import com.alibaba.com.caucho.hessian.io.Hessian2Output;
-import com.alibaba.com.caucho.hessian.io.SerializerFactory;
+import com.alibaba.com.caucho.hessian.io.base.SerializeTestBase;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -53,17 +47,7 @@ import java.util.Calendar;
 /**
  * Test Java8TimeSerializer class
  */
-public class Java8TimeSerializerTest {
-
-    private static SerializerFactory factory;
-    private static ByteArrayOutputStream os;
-
-    @BeforeAll
-    public static void setUp() {
-        String javaVersion = System.getProperty("java.specification.version");
-        factory = new SerializerFactory(Thread.currentThread().getContextClassLoader());
-        os = new ByteArrayOutputStream();
-    }
+public class Java8TimeSerializerTest extends SerializeTestBase {
 
     @Test
     public void testNull() throws IOException {
@@ -169,18 +153,13 @@ public class Java8TimeSerializerTest {
     }
 
     private void testJava8Time(Object expected) throws IOException {
-        os.reset();
-
-        Hessian2Output output = new Hessian2Output(os);
-        output.setSerializerFactory(factory);
-        output.writeObject(expected);
-        output.flush();
-
-        ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
-        Hessian2Input input = new Hessian2Input(is);
-        input.setSerializerFactory(factory);
-        Object actual = input.readObject();
-
-        Assertions.assertEquals(expected, actual);
+        Assertions.assertEquals(expected, baseHessian2Serialize(expected));
+        if (expected instanceof Chronology || expected instanceof ChronoPeriod || expected instanceof JapaneseDate
+                || expected instanceof HijrahDate || expected instanceof MinguoDate || expected instanceof ThaiBuddhistDate) {
+            return;
+        }
+        Assertions.assertEquals(expected, hessian3ToHessian3(expected));
+        Assertions.assertEquals(expected, hessian4ToHessian3(expected));
+        Assertions.assertEquals(expected, hessian3ToHessian4(expected));
     }
 }

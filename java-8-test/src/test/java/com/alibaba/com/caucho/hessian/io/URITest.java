@@ -19,6 +19,8 @@ package com.alibaba.com.caucho.hessian.io;
 import com.alibaba.com.caucho.hessian.io.base.SerializeTestBase;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledForJreRange;
+import org.junit.jupiter.api.condition.JRE;
 
 import java.io.IOException;
 import java.net.URI;
@@ -33,6 +35,18 @@ public class URITest extends SerializeTestBase {
 
         Assertions.assertEquals(originalURI.toString(), result.toString());
     }
+
+    @Test
+    @EnabledForJreRange(max = JRE.JAVA_11)
+    void testCompact() throws IOException, URISyntaxException {
+        URI originalURI = new URI("http://username:password@www.example.com:8080/path/to/resource?param1=value1&param2=value2#fragment");
+        URI result = baseHessian2Serialize(originalURI);
+        Assertions.assertEquals(originalURI.toString(), result.toString());
+        Assertions.assertEquals(originalURI.toString(), hessian3ToHessian3(originalURI).toString());
+        Assertions.assertEquals(originalURI.toString(), hessian4ToHessian3(originalURI).toString());
+        Assertions.assertEquals(originalURI.toString(), hessian3ToHessian4(originalURI).toString());
+    }
+
 
     @Test
     void testEmp() throws IOException, URISyntaxException {

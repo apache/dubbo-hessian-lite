@@ -16,13 +16,14 @@
  */
 package com.alibaba.com.caucho.hessian.io;
 
-import java.io.IOException;
-import java.util.Locale;
-
+import com.alibaba.com.caucho.hessian.io.base.SerializeTestBase;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledForJreRange;
+import org.junit.jupiter.api.condition.JRE;
 
-import com.alibaba.com.caucho.hessian.io.base.SerializeTestBase;
+import java.io.IOException;
+import java.util.Locale;
 
 public class LocaleSerializerTest extends SerializeTestBase {
 
@@ -37,7 +38,25 @@ public class LocaleSerializerTest extends SerializeTestBase {
         assertLocale(new Locale("zh-hant", "CN", "GBK"));
     }
 
+    @Test
+    @EnabledForJreRange(max = JRE.JAVA_11)
+    public void localeCompact() throws IOException {
+        assertLocaleCompact(null);
+        assertLocaleCompact(new Locale(""));
+        assertLocaleCompact(new Locale("zh"));
+        assertLocaleCompact(new Locale("zh", "CN"));
+        assertLocaleCompact(new Locale("zh-hant", "CN"));
+        assertLocaleCompact(new Locale("zh-hant", "CN", "GBK"));
+    }
+
     private void assertLocale(Locale locale) throws IOException {
         Assertions.assertEquals(locale, baseHessian2Serialize(locale));
+    }
+
+    private void assertLocaleCompact(Locale locale) throws IOException {
+        Assertions.assertEquals(locale, baseHessian2Serialize(locale));
+        Assertions.assertEquals(locale, hessian3ToHessian3(locale));
+        Assertions.assertEquals(locale, hessian4ToHessian3(locale));
+        Assertions.assertEquals(locale, hessian3ToHessian4(locale));
     }
 }

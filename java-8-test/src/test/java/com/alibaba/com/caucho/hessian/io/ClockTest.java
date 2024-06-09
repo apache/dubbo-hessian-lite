@@ -20,6 +20,8 @@ package com.alibaba.com.caucho.hessian.io;
 import com.alibaba.com.caucho.hessian.io.base.SerializeTestBase;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledForJreRange;
+import org.junit.jupiter.api.condition.JRE;
 
 import java.io.IOException;
 import java.time.Clock;
@@ -32,7 +34,16 @@ public class ClockTest extends SerializeTestBase {
 
         Clock result = baseHessian2Serialize(originalClock);
 
-        Assertions.assertEquals(originalClock.millis(), result.millis());
         Assertions.assertEquals(originalClock.getZone(), result.getZone());
+    }
+
+    @Test
+    @EnabledForJreRange(max = JRE.JAVA_11)
+    void testCompact() throws IOException {
+        Clock obj = Clock.system(ZoneId.of("Asia/Shanghai"));
+        Assertions.assertEquals(obj.getZone(), baseHessian2Serialize(obj).getZone());
+        Assertions.assertEquals(obj.getZone(), hessian3ToHessian3(obj).getZone());
+        Assertions.assertEquals(obj.getZone(), hessian4ToHessian3(obj).getZone());
+        Assertions.assertEquals(obj.getZone(), hessian3ToHessian4(obj).getZone());
     }
 }

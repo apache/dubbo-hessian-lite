@@ -19,10 +19,11 @@ package com.alibaba.com.caucho.hessian.io;
 import com.alibaba.com.caucho.hessian.io.base.SerializeTestBase;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledForJreRange;
+import org.junit.jupiter.api.condition.JRE;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.SimpleTimeZone;
 
 public class BigDecimalTest extends SerializeTestBase {
     @Test
@@ -32,5 +33,15 @@ public class BigDecimalTest extends SerializeTestBase {
         BigDecimal result = baseHessian2Serialize(originalBigDecimal);
 
         Assertions.assertEquals(originalBigDecimal, result);
+    }
+
+    @Test
+    @EnabledForJreRange(max = JRE.JAVA_11)
+    void testCompact() throws IOException {
+        BigDecimal obj = new BigDecimal("123.456");
+        Assertions.assertEquals(obj, baseHessian2Serialize(obj));
+        Assertions.assertEquals(obj, hessian3ToHessian3(obj));
+        Assertions.assertEquals(obj, hessian4ToHessian3(obj));
+        Assertions.assertEquals(obj, hessian3ToHessian4(obj));
     }
 }

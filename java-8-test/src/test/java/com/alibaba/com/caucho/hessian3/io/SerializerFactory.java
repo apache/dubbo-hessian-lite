@@ -70,7 +70,17 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
@@ -572,7 +582,8 @@ public class SerializerFactory extends AbstractSerializerFactory {
         if (cl == null
                 || cl.equals(reader.getType())
                 || cl.isAssignableFrom(reader.getType())
-                || HessianHandle.class.isAssignableFrom(reader.getType())) {
+                || HessianHandle.class.isAssignableFrom(reader.getType())
+                || com.alibaba.com.caucho.hessian.io.HessianHandle.class.isAssignableFrom(reader.getType())) {
             return reader;
         }
 

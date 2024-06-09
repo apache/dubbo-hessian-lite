@@ -19,9 +19,10 @@ package com.alibaba.com.caucho.hessian.io;
 import com.alibaba.com.caucho.hessian.io.base.SerializeTestBase;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledForJreRange;
+import org.junit.jupiter.api.condition.JRE;
 
 import java.io.IOException;
-import java.util.Comparator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
@@ -36,6 +37,20 @@ public class ConcurrentSkipListMapTest extends SerializeTestBase {
         ConcurrentSkipListMap<String, Integer> result = baseHessian2Serialize(originalMap);
 
         Assertions.assertEquals(originalMap, result);
+    }
+
+    @Test
+    @EnabledForJreRange(max = JRE.JAVA_11)
+    void testWithCompact() throws IOException {
+        ConcurrentSkipListMap<String, Integer> originalMap = new ConcurrentSkipListMap<>();
+        originalMap.put("one", 1);
+        originalMap.put("two", 2);
+        originalMap.put("three", 3);
+
+        Assertions.assertEquals(originalMap, baseHessian2Serialize(originalMap));
+        Assertions.assertEquals(originalMap, hessian3ToHessian3(originalMap));
+        Assertions.assertEquals(originalMap, hessian4ToHessian3(originalMap));
+        Assertions.assertEquals(originalMap, hessian3ToHessian4(originalMap));
     }
 
     @Test

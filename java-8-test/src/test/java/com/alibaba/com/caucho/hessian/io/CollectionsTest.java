@@ -19,6 +19,8 @@ package com.alibaba.com.caucho.hessian.io;
 import com.alibaba.com.caucho.hessian.io.base.SerializeTestBase;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledForJreRange;
+import org.junit.jupiter.api.condition.JRE;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -38,6 +40,20 @@ public class CollectionsTest extends SerializeTestBase {
     }
 
     @Test
+    @EnabledForJreRange(max = JRE.JAVA_11)
+    void testRandomAccessToUnmodifiableListCompact() throws IOException {
+        List<Integer> list = new ArrayList<>();
+        list.add(1);
+        list.add(2);
+        list.add(3);
+        List<Integer> unmodifiableList = Collections.unmodifiableList(list);
+        Assertions.assertEquals(unmodifiableList, baseHessian2Serialize(unmodifiableList));
+        Assertions.assertEquals(unmodifiableList, hessian3ToHessian3(unmodifiableList));
+        Assertions.assertEquals(unmodifiableList, hessian4ToHessian3(unmodifiableList));
+        Assertions.assertEquals(unmodifiableList, hessian3ToHessian4(unmodifiableList));
+    }
+
+    @Test
     void testLinkedToUnmodifiableList() throws IOException {
         List<Integer> list = new LinkedList<>();
         list.add(1);
@@ -45,6 +61,20 @@ public class CollectionsTest extends SerializeTestBase {
         list.add(3);
         List<Integer> unmodifiableList = Collections.unmodifiableList(list);
         Assertions.assertEquals(unmodifiableList, baseHessian2Serialize(unmodifiableList));
+    }
+
+    @Test
+    @EnabledForJreRange(max = JRE.JAVA_11)
+    void testLinkedToUnmodifiableListCompact() throws IOException {
+        List<Integer> list = new LinkedList<>();
+        list.add(1);
+        list.add(2);
+        list.add(3);
+        List<Integer> unmodifiableList = Collections.unmodifiableList(list);
+        Assertions.assertEquals(unmodifiableList, baseHessian2Serialize(unmodifiableList));
+        Assertions.assertEquals(unmodifiableList, hessian4ToHessian3(unmodifiableList));
+        Assertions.assertEquals(unmodifiableList, hessian3ToHessian3(unmodifiableList));
+        Assertions.assertEquals(unmodifiableList, hessian3ToHessian4(unmodifiableList));
     }
 
     @Test
@@ -58,6 +88,20 @@ public class CollectionsTest extends SerializeTestBase {
     }
 
     @Test
+    @EnabledForJreRange(max = JRE.JAVA_11)
+    void testRandomAccessToSynchronizedListCompact() throws IOException {
+        List<Integer> list = new ArrayList<>();
+        list.add(1);
+        list.add(2);
+        list.add(3);
+        List<Integer> unmodifiableList = Collections.synchronizedList(list);
+        Assertions.assertEquals(unmodifiableList, baseHessian2Serialize(unmodifiableList));
+        Assertions.assertEquals(unmodifiableList, hessian3ToHessian4(unmodifiableList));
+        Assertions.assertEquals(unmodifiableList, hessian3ToHessian3(unmodifiableList));
+        Assertions.assertEquals(unmodifiableList, hessian4ToHessian3(unmodifiableList));
+    }
+
+    @Test
     void testLinkedToSynchronizedList() throws IOException {
         List<Integer> list = new LinkedList<>();
         list.add(1);
@@ -67,11 +111,39 @@ public class CollectionsTest extends SerializeTestBase {
         Assertions.assertEquals(unmodifiableList, baseHessian2Serialize(unmodifiableList));
     }
 
+    @Test
+    @EnabledForJreRange(max = JRE.JAVA_11)
+    void testLinkedToSynchronizedListCompact() throws IOException {
+        List<Integer> list = new LinkedList<>();
+        list.add(1);
+        list.add(2);
+        list.add(3);
+        List<Integer> unmodifiableList = Collections.synchronizedList(list);
+        Assertions.assertEquals(unmodifiableList, baseHessian2Serialize(unmodifiableList));
+        Assertions.assertEquals(unmodifiableList, hessian3ToHessian4(unmodifiableList));
+        Assertions.assertEquals(unmodifiableList, hessian4ToHessian3(unmodifiableList));
+        Assertions.assertEquals(unmodifiableList, hessian3ToHessian3(unmodifiableList));
+    }
 
     @Test
     void testCopiesList() throws IOException {
         List<Integer> copiesList = Collections.nCopies(3, 1);
         Assertions.assertEquals(copiesList, baseHessian2Serialize(copiesList));
         Assertions.assertEquals(copiesList.subList(1, 2), baseHessian2Serialize(copiesList.subList(1, 2)));
+    }
+
+    @Test
+    @EnabledForJreRange(max = JRE.JAVA_11)
+    void testCopiesListCompact() throws IOException {
+        List<Integer> copiesList = Collections.nCopies(3, 1);
+        Assertions.assertEquals(copiesList, baseHessian2Serialize(copiesList));
+        Assertions.assertEquals(copiesList, hessian4ToHessian3(copiesList));
+        Assertions.assertEquals(copiesList, hessian3ToHessian4(copiesList));
+        Assertions.assertEquals(copiesList, hessian3ToHessian3(copiesList));
+
+        Assertions.assertEquals(copiesList.subList(1, 2), baseHessian2Serialize(copiesList.subList(1, 2)));
+        Assertions.assertEquals(copiesList.subList(1, 2), hessian3ToHessian4(copiesList.subList(1, 2)));
+        Assertions.assertEquals(copiesList.subList(1, 2), hessian3ToHessian3(copiesList.subList(1, 2)));
+        Assertions.assertEquals(copiesList.subList(1, 2), hessian4ToHessian3(copiesList.subList(1, 2)));
     }
 }

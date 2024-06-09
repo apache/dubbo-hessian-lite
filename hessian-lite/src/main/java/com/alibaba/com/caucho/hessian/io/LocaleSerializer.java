@@ -56,12 +56,6 @@ import java.util.Locale;
  * Serializing a locale.
  */
 public class LocaleSerializer extends AbstractSerializer {
-    private static LocaleSerializer SERIALIZER = new LocaleSerializer();
-
-    public static LocaleSerializer create() {
-        return SERIALIZER;
-    }
-
     @Override
     public void writeObject(Object obj, AbstractHessianOutput out)
             throws IOException {

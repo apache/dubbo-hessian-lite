@@ -22,11 +22,10 @@ import com.alibaba.com.caucho.hessian.io.beans.GrandsonUser;
 import com.alibaba.com.caucho.hessian.io.beans.SubUser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledForJreRange;
+import org.junit.jupiter.api.condition.JRE;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -46,6 +45,20 @@ public class HessianJavaSerializeTest extends SerializeTestBase {
         Assertions.assertEquals("tom", serializedUser.getUserName());
     }
 
+    @Test
+    @EnabledForJreRange(max = JRE.JAVA_11)
+    public void testGetBaseUserNameCompact() throws Exception {
+
+        BaseUser baseUser = new BaseUser();
+        baseUser.setUserId(1);
+        baseUser.setUserName("tom");
+
+        BaseUser serializedUser = baseHessian2Serialize(baseUser);
+        Assertions.assertEquals("tom", serializedUser.getUserName());
+        Assertions.assertEquals("tom", hessian4ToHessian3(baseUser).getUserName());
+        Assertions.assertEquals("tom", hessian3ToHessian3(baseUser).getUserName());
+        Assertions.assertEquals("tom", hessian3ToHessian4(baseUser).getUserName());
+    }
 
     @Test
     public void testGetSubUserName() throws Exception {
@@ -56,6 +69,20 @@ public class HessianJavaSerializeTest extends SerializeTestBase {
         SubUser serializedUser = baseHessian2Serialize(subUser);
         Assertions.assertEquals("tom", serializedUser.getUserName());
 
+    }
+
+    @Test
+    @EnabledForJreRange(max = JRE.JAVA_11)
+    public void testGetSubUserNameCompact() throws Exception {
+        SubUser subUser = new SubUser();
+        subUser.setUserId(1);
+        subUser.setUserName("tom");
+
+        SubUser serializedUser = baseHessian2Serialize(subUser);
+        Assertions.assertEquals("tom", serializedUser.getUserName());
+        Assertions.assertEquals("tom", hessian4ToHessian3(subUser).getUserName());
+        Assertions.assertEquals("tom", hessian3ToHessian3(subUser).getUserName());
+        Assertions.assertEquals("tom", hessian3ToHessian4(subUser).getUserName());
     }
 
 
@@ -76,6 +103,26 @@ public class HessianJavaSerializeTest extends SerializeTestBase {
     }
 
     @Test
+    @EnabledForJreRange(max = JRE.JAVA_11)
+    public void testSubUserWageCompact() throws Exception {
+        SubUser subUser = new SubUser();
+        subUser.setUserId(1);
+        subUser.setUserName("tom");
+        List<Integer> list = new ArrayList<>();
+        list.add(null);
+        list.add(null);
+        list.add(3);
+        subUser.setAgeList(list);
+
+        SubUser serializedUser = baseHessian2Serialize(subUser);
+        Assertions.assertEquals(subUser.getAgeList(), serializedUser.getAgeList());
+        Assertions.assertEquals(subUser.getAgeList(), hessian4ToHessian3(subUser).getAgeList());
+        Assertions.assertEquals(subUser.getAgeList(), hessian3ToHessian3(subUser).getAgeList());
+        Assertions.assertEquals(subUser.getAgeList(), hessian3ToHessian4(subUser).getAgeList());
+
+    }
+
+    @Test
     public void testGetGrandsonUserName() throws Exception {
         GrandsonUser grandsonUser = new GrandsonUser();
         grandsonUser.setUserId(1);
@@ -86,10 +133,35 @@ public class HessianJavaSerializeTest extends SerializeTestBase {
     }
 
     @Test
+    @EnabledForJreRange(max = JRE.JAVA_11)
+    public void testGetGrandsonUserNameCompact() throws Exception {
+        GrandsonUser grandsonUser = new GrandsonUser();
+        grandsonUser.setUserId(1);
+        grandsonUser.setUserName("tom");
+
+        GrandsonUser serializedUser = baseHessian2Serialize(grandsonUser);
+        Assertions.assertEquals("tom", serializedUser.getUserName());
+        Assertions.assertEquals("tom", hessian4ToHessian3(grandsonUser).getUserName());
+        Assertions.assertEquals("tom", hessian3ToHessian3(grandsonUser).getUserName());
+        Assertions.assertEquals("tom", hessian3ToHessian4(grandsonUser).getUserName());
+    }
+
+    @Test
     public void testFloat() throws Exception {
         Float fData = 99.8F;
         Double dData = 99.8D;
         Assertions.assertEquals(dData, baseHessian2Serialize(fData));
+    }
+
+    @Test
+    @EnabledForJreRange(max = JRE.JAVA_11)
+    public void testFloatCompact() throws Exception {
+        Float fData = 99.8F;
+        Double dData = 99.8D;
+        Assertions.assertEquals(dData, baseHessian2Serialize(fData));
+        Assertions.assertEquals(dData, hessian4ToHessian3(fData));
+        Assertions.assertEquals(dData, hessian3ToHessian3(fData));
+        Assertions.assertEquals(dData, hessian3ToHessian4(fData));
     }
 
 }

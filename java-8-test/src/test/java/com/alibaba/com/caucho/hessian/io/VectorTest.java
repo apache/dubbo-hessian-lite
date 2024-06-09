@@ -19,9 +19,10 @@ package com.alibaba.com.caucho.hessian.io;
 import com.alibaba.com.caucho.hessian.io.base.SerializeTestBase;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledForJreRange;
+import org.junit.jupiter.api.condition.JRE;
 
 import java.io.IOException;
-import java.util.TreeSet;
 import java.util.Vector;
 
 public class VectorTest extends SerializeTestBase {
@@ -40,5 +41,20 @@ public class VectorTest extends SerializeTestBase {
         result.add(3);
 
         Assertions.assertEquals(treeSet, result);
+    }
+
+    @Test
+    @EnabledForJreRange(max = JRE.JAVA_11)
+    void testCompact() throws IOException {
+        Vector<Integer> treeSet = new Vector<>();
+        treeSet.add(1);
+        treeSet.add(2);
+        treeSet.add(4);
+        treeSet.add(-1);
+
+        Assertions.assertEquals(treeSet, baseHessian2Serialize(treeSet));
+        Assertions.assertEquals(treeSet, hessian4ToHessian3(treeSet));
+        Assertions.assertEquals(treeSet, hessian3ToHessian3(treeSet));
+        Assertions.assertEquals(treeSet, hessian3ToHessian4(treeSet));
     }
 }

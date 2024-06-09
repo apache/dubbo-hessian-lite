@@ -19,6 +19,8 @@ package com.alibaba.com.caucho.hessian.io;
 import com.alibaba.com.caucho.hessian.io.base.SerializeTestBase;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledForJreRange;
+import org.junit.jupiter.api.condition.JRE;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,5 +42,20 @@ public class PriorityBlockingQueueTest extends SerializeTestBase {
         originalPriorityBlockingQueue.add(3);
         result.add(3);
         Assertions.assertEquals(new ArrayList<>(originalPriorityBlockingQueue), new ArrayList<>(result));
+    }
+
+    @Test
+    @EnabledForJreRange(max = JRE.JAVA_11)
+    void testCompact() throws IOException {
+        PriorityBlockingQueue<Integer> originalPriorityBlockingQueue = new PriorityBlockingQueue<>(16, Integer::compareTo);
+        originalPriorityBlockingQueue.add(1);
+        originalPriorityBlockingQueue.add(2);
+        originalPriorityBlockingQueue.add(4);
+        originalPriorityBlockingQueue.add(-1);
+
+        Assertions.assertEquals(new ArrayList<>(originalPriorityBlockingQueue), new ArrayList<>(baseHessian2Serialize(originalPriorityBlockingQueue)));
+        Assertions.assertEquals(new ArrayList<>(originalPriorityBlockingQueue), new ArrayList<>(hessian4ToHessian3(originalPriorityBlockingQueue)));
+        Assertions.assertEquals(new ArrayList<>(originalPriorityBlockingQueue), new ArrayList<>(hessian3ToHessian3(originalPriorityBlockingQueue)));
+        Assertions.assertEquals(new ArrayList<>(originalPriorityBlockingQueue), new ArrayList<>(hessian3ToHessian4(originalPriorityBlockingQueue)));
     }
 }
