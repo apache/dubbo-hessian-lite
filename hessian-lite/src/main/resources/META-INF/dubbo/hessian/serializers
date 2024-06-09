@@ -46,3 +46,4 @@ java.net.InetSocketAddress=com.alibaba.com.caucho.hessian.io.socket.InetSocketAd
 java.net.URI=com.alibaba.com.caucho.hessian.io.socket.URISerializer
 java.util.RegularEnumSet=com.alibaba.com.caucho.hessian.io.EnumSetSerializer
 java.util.JumboEnumSet=com.alibaba.com.caucho.hessian.io.EnumSetSerializer
+java.util.UUID=com.alibaba.com.caucho.hessian.io.StringValueSerializer

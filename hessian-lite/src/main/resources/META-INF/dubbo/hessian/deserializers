@@ -10,3 +10,4 @@ java.net.UnixDomainSocketAddress$Ser=com.alibaba.com.caucho.hessian.io.socket.Un
 java.net.InetSocketAddress=com.alibaba.com.caucho.hessian.io.socket.InetSocketAddressDeserializer
 java.net.URI=com.alibaba.com.caucho.hessian.io.socket.URIDeserializer
 java.time.temporal.WeekFields=com.alibaba.com.caucho.hessian.io.java8.WeekFieldsDeserializer
+java.util.UUID=com.alibaba.com.caucho.hessian.io.UUIDDeserializer
