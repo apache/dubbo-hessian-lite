@@ -17,8 +17,6 @@
 package com.alibaba.com.caucho.hessian.io;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 
 /**
  * Serializing an object for known object types.

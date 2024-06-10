@@ -48,4 +48,42 @@ public class SerializeTestBase {
         Hessian2Input input = new Hessian2Input(bin);
         return (T) input.readObject();
     }
+
+    protected <T> T hessian3ToHessian4(T data) throws IOException {
+        ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        com.alibaba.com.caucho.hessian3.io.Hessian2Output out = new com.alibaba.com.caucho.hessian3.io.Hessian2Output(bout);
+
+        out.writeObject(data);
+        out.flush();
+
+        ByteArrayInputStream bin = new ByteArrayInputStream(bout.toByteArray());
+        Hessian2Input input = new Hessian2Input(bin);
+        return (T) input.readObject();
+    }
+
+    protected <T> T hessian3ToHessian3(T data) throws IOException {
+        ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        com.alibaba.com.caucho.hessian3.io.Hessian2Output out = new com.alibaba.com.caucho.hessian3.io.Hessian2Output(bout);
+
+        out.writeObject(data);
+        out.flush();
+
+        ByteArrayInputStream bin = new ByteArrayInputStream(bout.toByteArray());
+        com.alibaba.com.caucho.hessian3.io.Hessian2Input input = new com.alibaba.com.caucho.hessian3.io.Hessian2Input(bin);
+        return (T) input.readObject();
+    }
+
+    protected <T> T hessian4ToHessian3(T data) throws IOException {
+        ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        Hessian2Output out = new Hessian2Output(bout);
+
+        out.writeObject(data);
+        out.flush();
+
+        ByteArrayInputStream bin = new ByteArrayInputStream(bout.toByteArray());
+        com.alibaba.com.caucho.hessian3.io.Hessian2Input input = new com.alibaba.com.caucho.hessian3.io.Hessian2Input(bin);
+        return (T) input.readObject();
+    }
+
+
 }

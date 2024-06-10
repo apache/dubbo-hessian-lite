@@ -1,3 +1,13 @@
 java.io.File=com.alibaba.com.caucho.hessian.io.FileDeserializer
 java.math.BigDecimal=com.alibaba.com.caucho.hessian.io.BigDecimalDeserializer
 javax.management.ObjectName=com.alibaba.com.caucho.hessian.io.ObjectNameDeserializer
+java.util.concurrent.atomic.LongAdder$SerializationProxy=com.alibaba.com.caucho.hessian.io.atomic.LongAdderDeserializer
+java.net.InetAddress=com.alibaba.com.caucho.hessian.io.socket.InetAddressDeserializer
+java.net.InetAddress$InetAddressHolder=com.alibaba.com.caucho.hessian.io.socket.InetAddressHolderDeserializer
+java.net.Inet6Address=com.alibaba.com.caucho.hessian.io.socket.Inet6AddressDeserializer
+java.net.Inet6Address$Inet6AddressHolder=com.alibaba.com.caucho.hessian.io.socket.Inet6AddressHolderDeserializer
+java.net.UnixDomainSocketAddress$Ser=com.alibaba.com.caucho.hessian.io.socket.UnixDomainSocketAddressSerDeserializer
+java.net.InetSocketAddress=com.alibaba.com.caucho.hessian.io.socket.InetSocketAddressDeserializer
+java.net.URI=com.alibaba.com.caucho.hessian.io.socket.URIDeserializer
+java.time.temporal.WeekFields=com.alibaba.com.caucho.hessian.io.java8.WeekFieldsDeserializer
+java.util.UUID=com.alibaba.com.caucho.hessian.io.UUIDDeserializer

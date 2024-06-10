@@ -17,17 +17,11 @@
 
 package com.alibaba.com.caucho.hessian.io.java8;
 
-import com.alibaba.com.caucho.hessian.io.Hessian2Input;
-import com.alibaba.com.caucho.hessian.io.Hessian2Output;
-import com.alibaba.com.caucho.hessian.io.SerializerFactory;
+import com.alibaba.com.caucho.hessian.io.base.SerializeTestBase;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -42,22 +36,18 @@ import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.chrono.ChronoPeriod;
+import java.time.chrono.Chronology;
+import java.time.chrono.HijrahDate;
+import java.time.chrono.JapaneseDate;
+import java.time.chrono.MinguoDate;
+import java.time.chrono.ThaiBuddhistDate;
 import java.util.Calendar;
 
 /**
  * Test Java8TimeSerializer class
  */
-public class Java8TimeSerializerTest {
-
-    private static SerializerFactory factory;
-    private static ByteArrayOutputStream os;
-
-    @BeforeAll
-    public static void setUp() {
-        String javaVersion = System.getProperty("java.specification.version");
-        factory = new SerializerFactory(Thread.currentThread().getContextClassLoader());
-        os = new ByteArrayOutputStream();
-    }
+public class Java8TimeSerializerTest extends SerializeTestBase {
 
     @Test
     public void testNull() throws IOException {
@@ -134,26 +124,42 @@ public class Java8TimeSerializerTest {
         testJava8Time(ZoneId.of( "America/New_York"));
     }
 
-
     @Test
     public void testCalendar() throws IOException {
         Calendar calendar = Calendar.getInstance();
         testJava8Time(calendar);
     }
 
+    @Test
+    void testChronology() throws IOException {
+        testJava8Time(Chronology.of("islamic"));
+        testJava8Time(Chronology.of("ThaiBuddhist"));
+        testJava8Time(Chronology.of("ISO"));
+        testJava8Time(Chronology.of("Hijrah"));
+        testJava8Time(Chronology.of("Japanese"));
+        testJava8Time(Chronology.of("Hijrah-umalqura"));
+        testJava8Time(Chronology.of("Minguo"));
+
+        testJava8Time(JapaneseDate.now());
+        testJava8Time(HijrahDate.now());
+        testJava8Time(MinguoDate.now());
+        testJava8Time(ThaiBuddhistDate.now());
+
+        testJava8Time(ChronoPeriod.between(LocalDate.now(), LocalDate.now()));
+        testJava8Time(ChronoPeriod.between(JapaneseDate.now(), JapaneseDate.now()));
+        testJava8Time(ChronoPeriod.between(HijrahDate.now(), HijrahDate.now()));
+        testJava8Time(ChronoPeriod.between(MinguoDate.now(), MinguoDate.now()));
+        testJava8Time(ChronoPeriod.between(ThaiBuddhistDate.now(), ThaiBuddhistDate.now()));
+    }
+
     private void testJava8Time(Object expected) throws IOException {
-        os.reset();
-
-        Hessian2Output output = new Hessian2Output(os);
-        output.setSerializerFactory(factory);
-        output.writeObject(expected);
-        output.flush();
-
-        ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
-        Hessian2Input input = new Hessian2Input(is);
-        input.setSerializerFactory(factory);
-        Object actual = input.readObject();
-
-        Assertions.assertEquals(expected, actual);
+        Assertions.assertEquals(expected, baseHessian2Serialize(expected));
+        if (expected instanceof Chronology || expected instanceof ChronoPeriod || expected instanceof JapaneseDate
+                || expected instanceof HijrahDate || expected instanceof MinguoDate || expected instanceof ThaiBuddhistDate) {
+            return;
+        }
+        Assertions.assertEquals(expected, hessian3ToHessian3(expected));
+        Assertions.assertEquals(expected, hessian4ToHessian3(expected));
+        Assertions.assertEquals(expected, hessian3ToHessian4(expected));
     }
 }
