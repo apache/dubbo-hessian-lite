@@ -26,7 +26,7 @@
 
     <groupId>org.apache.dubbo</groupId>
     <artifactId>hessian-lite-parent</artifactId>
-    <version>4.0.1</version>
+    <version>4.0.2-SNAPSHOT</version>
     <name>Hessian Lite (Parent POM)</name>
 
     <packaging>pom</packaging>
