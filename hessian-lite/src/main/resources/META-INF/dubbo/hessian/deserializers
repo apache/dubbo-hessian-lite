@@ -11,3 +11,4 @@ java.net.InetSocketAddress=com.alibaba.com.caucho.hessian.io.socket.InetSocketAd
 java.net.URI=com.alibaba.com.caucho.hessian.io.socket.URIDeserializer
 java.time.temporal.WeekFields=com.alibaba.com.caucho.hessian.io.java8.WeekFieldsDeserializer
 java.util.UUID=com.alibaba.com.caucho.hessian.io.UUIDDeserializer
+java.util.Currency=com.alibaba.com.caucho.hessian.io.CurrencyDeserializer

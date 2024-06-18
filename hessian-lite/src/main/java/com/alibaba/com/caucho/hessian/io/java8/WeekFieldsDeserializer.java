@@ -54,9 +54,10 @@ public class WeekFieldsDeserializer extends AbstractDeserializer {
             for (String fieldName : fieldNames) {
                 if ("firstDayOfWeek".equals(fieldName)) {
                     firstDayOfWeek = (DayOfWeek) in.readObject();
-                }
-                if ("minimalDays".equals(fieldName)) {
+                } else if ("minimalDays".equals(fieldName)) {
                     minimalDays = in.readInt();
+                } else {
+                    in.readObject();
                 }
             }
 
