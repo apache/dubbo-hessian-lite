@@ -14,19 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alibaba.com.caucho.hessian.io.java8;
-
-import com.alibaba.com.caucho.hessian.io.AbstractDeserializer;
-import com.alibaba.com.caucho.hessian.io.AbstractHessianInput;
-import com.alibaba.com.caucho.hessian.io.IOExceptionWrapper;
+package com.alibaba.com.caucho.hessian.io;
 
 import java.io.IOException;
-import java.time.DayOfWeek;
-import java.time.temporal.WeekFields;
+import java.util.Currency;
 
-public class WeekFieldsDeserializer extends AbstractDeserializer {
+public class CurrencyDeserializer extends AbstractDeserializer {
     public Class<?> getType() {
-        return WeekFields.class;
+        return Currency.class;
     }
 
     @Override
@@ -40,7 +35,7 @@ public class WeekFieldsDeserializer extends AbstractDeserializer {
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
-            throw new IOExceptionWrapper("java.net.Inet6Address:" + e, e);
+            throw new IOExceptionWrapper(Currency.class.getName() + ":" + e, e);
         }
     }
 
@@ -49,26 +44,23 @@ public class WeekFieldsDeserializer extends AbstractDeserializer {
                              String[] fieldNames)
             throws IOException {
         try {
-            DayOfWeek firstDayOfWeek = null;
-            int minimalDays = 0;
+            String currencyCode = null;
             for (String fieldName : fieldNames) {
-                if ("firstDayOfWeek".equals(fieldName)) {
-                    firstDayOfWeek = (DayOfWeek) in.readObject();
-                } else if ("minimalDays".equals(fieldName)) {
-                    minimalDays = in.readInt();
+                if ("currencyCode".equals(fieldName)) {
+                    currencyCode = in.readString();
                 } else {
                     in.readObject();
                 }
             }
 
-            Object obj = WeekFields.of(firstDayOfWeek, minimalDays);
+            Object obj = Currency.getInstance(currencyCode);
             in.addRef(obj);
 
             return obj;
         } catch (IOException e) {
             throw e;
         } catch (Exception e) {
-            throw new IOExceptionWrapper("java.net.Inet6Address:" + e, e);
+            throw new IOExceptionWrapper(Currency.class.getName() + ":" + e, e);
         }
     }
 }

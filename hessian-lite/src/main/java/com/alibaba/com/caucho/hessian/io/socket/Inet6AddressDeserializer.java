@@ -54,9 +54,10 @@ public class Inet6AddressDeserializer extends AbstractDeserializer {
             for (String fieldName : fieldNames) {
                 if ("holder6".equals(fieldName)) {
                     inet6Address = (Inet6Address) in.readObject();
-                }
-                if ("holder".equals(fieldName)) {
+                } else if ("holder".equals(fieldName)) {
                     inet4Address = (InetAddress) in.readObject();
+                } else {
+                    in.readObject();
                 }
             }
             if (inet4Address != null) {
