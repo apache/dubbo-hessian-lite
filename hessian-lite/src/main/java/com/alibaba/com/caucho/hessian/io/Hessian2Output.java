@@ -1086,6 +1086,8 @@ public class Hessian2Output
 
             _buffer[_offset++] = (byte) 'N';
         } else {
+            flush();
+                
             while (SIZE - _offset - 3 < length) {
                 int sublen = SIZE - _offset - 3;
 
