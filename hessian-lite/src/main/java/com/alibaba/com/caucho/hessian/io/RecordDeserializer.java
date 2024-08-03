@@ -75,9 +75,6 @@ public class RecordDeserializer extends AbstractDeserializer {
                 }
                 Object target;
                 target = in.readObject(component.type());
-                if (component.type() == float.class || component.type() == Float.class) {
-                    target = (float) ((double) target);
-                }
                 args[component.index()] = target;
                 readedIndex[component.index()] = true;
             }

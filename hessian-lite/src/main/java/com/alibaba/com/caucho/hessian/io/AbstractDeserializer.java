@@ -154,4 +154,29 @@ public class AbstractDeserializer implements Deserializer {
      */
     static final class NullDeserializer extends AbstractDeserializer {
     }
+
+
+    @Override
+    public Object readList(AbstractHessianInput in, int length, Class<?> expectType) throws IOException {
+        if (expectType == null) {
+            return readList(in, length);
+        }
+        throw new UnsupportedOperationException(String.valueOf(this));
+    }
+
+    @Override
+    public Object readLengthList(AbstractHessianInput in, int length, Class<?> expectType) throws IOException {
+        if (expectType == null) {
+            return readLengthList(in, length);
+        }
+        throw new UnsupportedOperationException(String.valueOf(this));
+    }
+
+    @Override
+    public Object readMap(AbstractHessianInput in, Class<?> expectKeyType, Class<?> expectValueType) throws IOException {
+        if (expectKeyType == null && expectValueType == null) {
+            return readMap(in);
+        }
+        throw new UnsupportedOperationException(String.valueOf(this));
+    }
 }

@@ -53,6 +53,12 @@ import sun.misc.Unsafe;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -160,6 +166,17 @@ public class FieldDeserializer2FactoryUnsafe extends FieldDeserializer2Factory {
             deser = new SqlTimestampFieldDeserializer(field);
         } else if (java.sql.Time.class.equals(type)) {
             deser = new SqlTimeFieldDeserializer(field);
+        }
+        // support generic type of map
+        else if (Map.class.equals(type)
+                && field.getGenericType() != field.getType()) {
+            deser = new ObjectMapFieldDeserializer(field);
+        } else if (List.class.equals(type)
+                && field.getGenericType() != field.getType()) {
+            deser = new ObjectListFieldDeserializer(field);
+        } else if (Set.class.equals(type)
+                && field.getGenericType() != field.getType()) {
+            deser = new ObjectSetFieldDeserializer(field);
         } else {
             deser = new ObjectFieldDeserializer(field);
         }
@@ -524,4 +541,129 @@ public class FieldDeserializer2FactoryUnsafe extends FieldDeserializer2Factory {
             }
         }
     }
+
+    static class ObjectMapFieldDeserializer implements FieldDeserializer2 {
+        private final Field _field;
+        private final long _offset;
+
+        ObjectMapFieldDeserializer(Field field) {
+            _field = field;
+            _offset = _unsafe.objectFieldOffset(_field);
+        }
+
+        @Override
+        public void deserialize(AbstractHessianInput in, Object obj)
+                throws IOException {
+            Object value = null;
+
+            try {
+
+                Type[] types = ((ParameterizedType) _field.getGenericType()).getActualTypeArguments();
+                value = in.readObject(_field.getType(),
+                        isPrimitive(types[0]) ? (Class<?>) types[0] : null,
+                        isPrimitive(types[1]) ? (Class<?>) types[1] : null
+                );
+
+                _unsafe.putObject(obj, _offset, value);
+            } catch (Exception e) {
+                logDeserializeError(_field, obj, value, e);
+            }
+        }
+    }
+
+    static class ObjectListFieldDeserializer implements FieldDeserializer2 {
+        private final Field _field;
+        private final long _offset;
+
+        ObjectListFieldDeserializer(Field field) {
+            _field = field;
+            _offset = _unsafe.objectFieldOffset(_field);
+        }
+
+        @Override
+        public void deserialize(AbstractHessianInput in, Object obj)
+                throws IOException {
+            Object value = null;
+
+            try {
+
+                Type[] types = ((ParameterizedType) _field.getGenericType()).getActualTypeArguments();
+                value = in.readObject(_field.getType(),
+                        isPrimitive(types[0]) ? (Class<?>) types[0] : null
+                );
+
+                _unsafe.putObject(obj, _offset, value);
+            } catch (Exception e) {
+                logDeserializeError(_field, obj, value, e);
+            }
+        }
+    }
+
+    static class ObjectSetFieldDeserializer implements FieldDeserializer2 {
+        private final Field _field;
+        private final long _offset;
+
+        ObjectSetFieldDeserializer(Field field) {
+            _field = field;
+            _offset = _unsafe.objectFieldOffset(_field);
+        }
+
+        @Override
+        public void deserialize(AbstractHessianInput in, Object obj)
+                throws IOException {
+            Object value = null;
+
+            try {
+
+                Type[] types = ((ParameterizedType) _field.getGenericType()).getActualTypeArguments();
+                value = in.readObject(_field.getType(),
+                        isPrimitive(types[0]) ? (Class<?>) types[0] : null
+                );
+
+                _unsafe.putObject(obj, _offset, value);
+            } catch (Exception e) {
+                logDeserializeError(_field, obj, value, e);
+            }
+        }
+    }
+
+    /**
+     * @see java.lang.Boolean#TYPE
+     * @see java.lang.Character#TYPE
+     * @see java.lang.Byte#TYPE
+     * @see java.lang.Short#TYPE
+     * @see java.lang.Integer#TYPE
+     * @see java.lang.Long#TYPE
+     * @see java.lang.Float#TYPE
+     * @see java.lang.Double#TYPE
+     * @see java.lang.Void#TYPE
+     */
+    private static boolean isPrimitive(Type type) {
+        try {
+            if (type != null) {
+                if (type instanceof Class<?>) {
+                    Class<?> clazz = (Class<?>) type;
+                    return clazz.isPrimitive()
+                            || PRIMITIVE_TYPE.containsKey(clazz.getName());
+                }
+            }
+        } catch (Exception e) {
+            // ignore exception
+        }
+        return false;
+    }
+
+    static final Map<String, Boolean> PRIMITIVE_TYPE = new HashMap<String, Boolean>() {
+        {
+            put(Boolean.class.getName(), true);
+            put(Character.class.getName(), true);
+            put(Byte.class.getName(), true);
+            put(Short.class.getName(), true);
+            put(Integer.class.getName(), true);
+            put(Long.class.getName(), true);
+            put(Float.class.getName(), true);
+            put(Double.class.getName(), true);
+            put(Void.class.getName(), true);
+        }
+    };
 }
