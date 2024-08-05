@@ -99,16 +99,7 @@ public class BasicSerializer extends AbstractSerializer
     }
 
     public Serializer getObjectSerializer() {
-        switch (_code) {
-            case BYTE:
-                return BYTE_HANDLE_SERIALIZER;
-            case SHORT:
-                return SHORT_HANDLE_SERIALIZER;
-            case FLOAT:
-                return FLOAT_HANDLE_SERIALIZER;
-            default:
-                return this;
-        }
+        return this;
     }
 
     public void writeObject(Object obj, AbstractHessianOutput out)
@@ -298,18 +289,6 @@ public class BasicSerializer extends AbstractSerializer
 
             case OBJECT:
                 ObjectHandleSerializer.SER.writeObject(obj, out);
-                break;
-
-            case BYTE_HANDLE:
-                out.writeObject(new ByteHandle((Byte) obj));
-                break;
-
-            case SHORT_HANDLE:
-                out.writeObject(new ShortHandle((Short) obj));
-                break;
-
-            case FLOAT_HANDLE:
-                out.writeObject(new FloatHandle((Float) obj));
                 break;
 
             default:
