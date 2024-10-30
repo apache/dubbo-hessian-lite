@@ -48,20 +48,77 @@
 
 package com.alibaba.com.caucho.hessian.io;
 
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
+import java.util.UUID;
 
 /**
+ * InputStream类型返序列化
  * Serializing a stream object.
  */
 public class InputStreamDeserializer extends AbstractDeserializer {
     public static final InputStreamDeserializer DESER
             = new InputStreamDeserializer();
 
+    // TODO 允许通过外部配置
+    @SuppressWarnings("FieldCanBeLocal")
+    private final int bufferSize = Hessian2Output.SIZE;
+    // TODO 允许通过外部配置
+    private final File tmpDir;
+
     public InputStreamDeserializer() {
+        tmpDir = new File(System.getProperty("java.io.tmpdir"), "dubbo-"+ System.currentTimeMillis());
+        if(!tmpDir.exists()){
+            //noinspection ResultOfMethodCallIgnored
+            tmpDir.mkdirs();
+        }
     }
 
-    public Object readObject(AbstractHessianInput in)
-            throws IOException {
-        return in.readInputStream();
+    public Object readObject(AbstractHessianInput in) throws IOException {
+
+        FileOutputStream out = null;
+        try {
+            @SuppressWarnings("resource")
+            InputStream input = in.readInputStream();
+            // 读取配置的2倍字节（16k）
+            byte[] bytes = new byte[bufferSize * 2];
+            File file = null;
+            while (true) { // 循环读取
+
+                int len = input.read(bytes, 0, bytes.length);
+
+                if (out == null) {
+
+                    // 如果InputStream的长度小于缓存，则创建字节流返回
+                    if (len <= bufferSize) {
+                        byte[] buff = new byte[len];
+                        System.arraycopy(bytes, 0, buff, 0, len);
+                        return new ByteArrayInputStream(buff);
+                    }
+
+                    // 如果InputStream的长度大于缓存，则创建临时文件返回
+                    String name = String.format("%d-%s.dubbo.tmp", System.currentTimeMillis(), UUID.randomUUID().toString().replace("-", ""));
+                    file = new File(tmpDir, name);
+                    // 在 finally中关闭流
+                    //noinspection resource
+                    out = new FileOutputStream(file);
+                }
+
+                // 读取到末尾时退出
+                if (len == -1) {
+                    break;
+                }
+                out.write(bytes, 0 ,len);
+            }
+
+            out.flush();
+            return Files.newInputStream(file.toPath());
+        } finally {
+            if (out != null){
+                out.close();
+            }
+        }
     }
+
+
 }
