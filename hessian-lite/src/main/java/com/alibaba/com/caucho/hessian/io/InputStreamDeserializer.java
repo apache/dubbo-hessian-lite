@@ -49,7 +49,6 @@
 package com.alibaba.com.caucho.hessian.io;
 
 import java.io.*;
-import java.nio.file.Files;
 import java.util.UUID;
 
 /**
@@ -112,7 +111,8 @@ public class InputStreamDeserializer extends AbstractDeserializer {
             }
 
             out.flush();
-            return Files.newInputStream(file.toPath());
+            //noinspection IOStreamConstructor
+            return new FileInputStream(file);
         } finally {
             if (out != null){
                 out.close();
