@@ -52,17 +52,19 @@ import java.io.*;
 import java.util.UUID;
 
 /**
- * InputStream类型返序列化
+ * InputStream Deserializer
  * Serializing a stream object.
+ * @author HeYuJie
+ * @date 2024/10/31
  */
 public class InputStreamDeserializer extends AbstractDeserializer {
     public static final InputStreamDeserializer DESER
             = new InputStreamDeserializer();
 
-    // TODO 允许通过外部配置
+    // TODO Allow external configuration
     @SuppressWarnings("FieldCanBeLocal")
     private final int bufferSize = Hessian2Output.SIZE;
-    // TODO 允许通过外部配置
+    // TODO Allow external configuration
     private final File tmpDir;
 
     public InputStreamDeserializer() {
@@ -79,31 +81,31 @@ public class InputStreamDeserializer extends AbstractDeserializer {
         try {
             @SuppressWarnings("resource")
             InputStream input = in.readInputStream();
-            // 读取配置的2倍字节（16k）
+            // Read twice the size of the buffer (16k)
             byte[] bytes = new byte[bufferSize * 2];
             File file = null;
-            while (true) { // 循环读取
+            while (true) { // Loop reading
 
                 int len = input.read(bytes, 0, bytes.length);
 
                 if (out == null) {
 
-                    // 如果InputStream的长度小于缓存，则创建字节流返回
+                    // If the length of InputStream is less than the buffer, creating a byte stream returns
                     if (len <= bufferSize) {
                         byte[] buff = new byte[len];
                         System.arraycopy(bytes, 0, buff, 0, len);
                         return new ByteArrayInputStream(buff);
                     }
 
-                    // 如果InputStream的长度大于缓存，则创建临时文件返回
+                    // If the length of InputStream is greater than the buffer, create a temporary file and return it
                     String name = String.format("%d-%s.dubbo.tmp", System.currentTimeMillis(), UUID.randomUUID().toString().replace("-", ""));
                     file = new File(tmpDir, name);
-                    // 在 finally中关闭流
+                    // Close the stream in finally
                     //noinspection resource
                     out = new FileOutputStream(file);
                 }
 
-                // 读取到末尾时退出
+                // Exit when reading to the end
                 if (len == -1) {
                     break;
                 }

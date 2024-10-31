@@ -28,7 +28,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 /**
- * InputStreamDeserializer 测试
+ * InputStreamDeserializer test
+ * @author HeYuJie
+ * @date 2024/10/31
  */
 public class HessianInputStreamDeserializerTest extends SerializeTestBase {
 
@@ -56,7 +58,8 @@ public class HessianInputStreamDeserializerTest extends SerializeTestBase {
     }
 
     /**
-     * 测试1024字节，返回 ByteArrayInputStream
+     * test 1024 byte
+     * deserialize return ByteArrayInputStream
      */
     @Test
     @EnabledForJreRange(max = JRE.JAVA_11)
@@ -69,13 +72,14 @@ public class HessianInputStreamDeserializerTest extends SerializeTestBase {
         byte[] resultByte = new byte[size];
         result.read(resultByte);
 
-        assertInstanceOf(ByteArrayInputStream.class, result, "类型错误");
+        assertInstanceOf(ByteArrayInputStream.class, result, "type error");
         assertEquals(bytes.length, resultByte.length);
         assertEquals(new String(bytes), new String(resultByte));
     }
 
     /**
-     * 测试8192字节，返回 ByteArrayInputStream
+     * test 8192 byte
+     * deserialize return ByteArrayInputStream
      */
     @Test
     @EnabledForJreRange(max = JRE.JAVA_11)
@@ -88,14 +92,15 @@ public class HessianInputStreamDeserializerTest extends SerializeTestBase {
         byte[] resultByte = new byte[size];
         result.read(resultByte);
 
-        assertInstanceOf(ByteArrayInputStream.class, result, "类型错误");
+        assertInstanceOf(ByteArrayInputStream.class, result, "type error");
         assertEquals(bytes.length, resultByte.length);
         assertEquals(new String(bytes), new String(resultByte));
     }
 
     /**
-     * 测试8193字节，返回 ByteArrayInputStream
-     * 比缓冲区多一个字节
+     * test 8193 byte
+     * One byte more than the buffer
+     * deserialize return FileInputStream
      */
     @Test
     @EnabledForJreRange(max = JRE.JAVA_11)
@@ -108,14 +113,15 @@ public class HessianInputStreamDeserializerTest extends SerializeTestBase {
         byte[] resultByte = new byte[size];
         result.read(resultByte);
 
-        assertInstanceOf(FileInputStream.class, result, "类型错误");
+        assertInstanceOf(FileInputStream.class, result, "type error");
         assertEquals(bytes.length, resultByte.length);
         assertEquals(new String(bytes), new String(resultByte));
     }
 
     /**
-     * 测试81920字节，返回 ByteArrayInputStream
-     * 比缓冲区多10倍字节
+     * test 81920 byte
+     * 10 times more bytes than the buffer
+     * deserialize return FileInputStream
      */
     @Test
     @EnabledForJreRange(max = JRE.JAVA_11)
@@ -128,7 +134,7 @@ public class HessianInputStreamDeserializerTest extends SerializeTestBase {
         byte[] resultByte = new byte[size];
         result.read(resultByte);
 
-        assertInstanceOf(FileInputStream.class, result, "类型错误");
+        assertInstanceOf(FileInputStream.class, result, "type error");
         assertEquals(bytes.length, resultByte.length);
         assertEquals(new String(bytes), new String(resultByte));
     }
