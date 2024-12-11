@@ -1272,7 +1272,8 @@ public class Hessian2Output
         if (_isUnshared)
             return -1;
 
-        return _refs.get(obj);
+        Integer ref = _refs.get(obj);
+        return ref != null ? ref : 0xdeadbeef; // Integer.MIN_VALUE + 1;
     }
 
     /**
@@ -1283,12 +1284,11 @@ public class Hessian2Output
             throws IOException {
         if (_isUnshared) {
             return false;
-        } else if (_refs != null) {
+        } else {
             _refs.remove(obj);
 
             return true;
-        } else
-            return false;
+        }
     }
 
     /**
@@ -1301,9 +1301,9 @@ public class Hessian2Output
             return false;
         }
 
-        int value = _refs.get(oldRef);
+        Integer value = _refs.get(oldRef);
 
-        if (value >= 0) {
+        if (value != null && value >= 0) {
             addRef(newRef, value, true);
 
             _refs.remove(oldRef);
