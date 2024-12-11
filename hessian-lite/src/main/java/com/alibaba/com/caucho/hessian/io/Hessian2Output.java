@@ -84,7 +84,7 @@ public class Hessian2Output
     // map of classes
     private final IdentityHashMap<Object, Integer> _classRefs
             = new IdentityHashMap<>(8);
-    private final byte[] _buffer = new byte[SIZE];
+    private final byte[] _buffer;
     // the output stream/
     protected OutputStream _os;
     private int _refCount = 0;
@@ -96,6 +96,7 @@ public class Hessian2Output
     private boolean _isPacket;
 
     private boolean _isUnshared;
+    private final boolean _isUseGlobalCache;
 
     /**
      * Creates a new Hessian output stream, initialized with an
@@ -104,6 +105,14 @@ public class Hessian2Output
      * @param os the underlying output stream.
      */
     public Hessian2Output() {
+        byte[] bytes = GlobalCache.getBytes();
+        if (bytes == null) {
+            bytes = new byte[SIZE];
+            _isUseGlobalCache = false;
+        } else {
+            _isUseGlobalCache = true;
+        }
+        _buffer = bytes;
     }
 
     /**
@@ -113,6 +122,7 @@ public class Hessian2Output
      * @param os the underlying output stream.
      */
     public Hessian2Output(OutputStream os) {
+        this();
         init(os);
     }
 
@@ -1553,6 +1563,10 @@ public class Hessian2Output
 
         OutputStream os = _os;
         _os = null;
+
+        if (_isUseGlobalCache) {
+            GlobalCache.putBytes(_buffer);
+        }
 
         if (os != null) {
             if (_isCloseStreamOnClose)
