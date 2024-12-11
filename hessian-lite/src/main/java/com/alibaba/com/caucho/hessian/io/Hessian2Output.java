@@ -48,12 +48,11 @@
 
 package com.alibaba.com.caucho.hessian.io;
 
-import com.alibaba.com.caucho.hessian.util.IdentityIntMap;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 
 /**
  * Output stream for Hessian 2 requests.
@@ -80,11 +79,11 @@ public class Hessian2Output
     // should match Resin buffer size for perf
     public final static int SIZE = 8 * 1024;
     // map of references
-    private final IdentityIntMap _refs
-            = new IdentityIntMap(256);
+    private final IdentityHashMap<Object, Integer> _refs
+            = new IdentityHashMap<>(8);
     // map of classes
-    private final IdentityIntMap _classRefs
-            = new IdentityIntMap(256);
+    private final IdentityHashMap<Object, Integer> _classRefs
+            = new IdentityHashMap<>(8);
     private final byte[] _buffer = new byte[SIZE];
     // the output stream/
     protected OutputStream _os;
@@ -538,7 +537,8 @@ public class Hessian2Output
     public int writeObjectBegin(String type)
             throws IOException {
         int newRef = _classRefs.size();
-        int ref = _classRefs.put(type, newRef, false);
+        Integer priv = _classRefs.putIfAbsent(type, newRef);
+        int ref = priv == null ? newRef : priv;
 
         if (newRef != ref) {
             if (SIZE < _offset + 32)
@@ -1314,9 +1314,14 @@ public class Hessian2Output
     }
 
     private int addRef(Object value, int newRef, boolean isReplace) {
-        int prevRef = _refs.put(value, newRef, isReplace);
+        if (isReplace) {
+            _refs.put(value, newRef);
 
-        return prevRef;
+            return newRef;
+        } else {
+            Integer priv = _refs.putIfAbsent(value, newRef);
+            return priv != null ? priv : newRef;
+        }
     }
 
     /**
@@ -1577,12 +1582,14 @@ public class Hessian2Output
      * Resets all counters and references
      */
     public void reset() {
-        if (_refs != null) {
+        if (!_refs.isEmpty()) {
             _refs.clear();
             _refCount = 0;
         }
 
-        _classRefs.clear();
+        if (!_classRefs.isEmpty()) {
+            _classRefs.clear();
+        }
         _typeRefs = null;
         _offset = 0;
         _isPacket = false;
