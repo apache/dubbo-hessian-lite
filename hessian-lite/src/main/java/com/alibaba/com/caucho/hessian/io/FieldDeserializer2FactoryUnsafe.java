@@ -393,7 +393,7 @@ public class FieldDeserializer2FactoryUnsafe extends FieldDeserializer2Factory {
             try {
                 value = in.readDouble();
 
-                _unsafe.putDouble(obj, _offset, value);
+                _unsafe.putFloat(obj, _offset, (float) value);
             } catch (Exception e) {
                 logDeserializeError(_field, obj, value, e);
             }
