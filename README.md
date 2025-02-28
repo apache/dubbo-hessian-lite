@@ -17,9 +17,9 @@ Now we are trying to build a hessian group https://github.com/hessian-group to m
 
 ```xml
 <dependency>
-    <groupId>com.alibaba</groupId>
+    <groupId>org.apache.dubbo</groupId>
     <artifactId>hessian-lite</artifactId>
-    <version>3.2.12</version>
+    <version>4.0.3</version>
 </dependency>
 ```
 ## Release
