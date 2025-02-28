@@ -2,9 +2,9 @@
 
 [![Build Status](https://travis-ci.org/apache/dubbo-hessian-lite.svg?branch=master)](https://travis-ci.org/apache/dubbo-hessian-lite)
 [![codecov](https://codecov.io/gh/apache/dubbo-hessian-lite/branch/master/graph/badge.svg)](https://codecov.io/gh/apache/dubbo-hessian-lite)
-[![Gitter](https://badges.gitter.im/alibaba/dubbo.svg)](https://gitter.im/alibaba/dubbo?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![Gitter](https://badges.gitter.im/apache/dubbo.svg)](https://gitter.im/apache/dubbo?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 ![license](https://img.shields.io/github/license/alibaba/dubbo.svg)
-![maven](https://img.shields.io/maven-central/v/com.alibaba/hessian-lite.svg)
+![maven](https://img.shields.io/maven-central/v/org.apache.dubbo/hessian-lite.svg)
 
 Hessian-lite is an Apache dubbo embed version of [official hessian](https://github.com/ebourg/hessian) initially.  Then this module is separated from Dubbo. All branches of [Dubbo](https://github.com/apache/dubbo) : 2.5.x, 2.6.x(since 2.6.3) and 2.7.x  are dependent on it , please see the details：
 
@@ -17,9 +17,9 @@ Now we are trying to build a hessian group https://github.com/hessian-group to m
 
 ```xml
 <dependency>
-    <groupId>com.alibaba</groupId>
+    <groupId>org.apache.dubbo</groupId>
     <artifactId>hessian-lite</artifactId>
-    <version>3.2.12</version>
+    <version>4.0.3</version>
 </dependency>
 ```
 ## Release
