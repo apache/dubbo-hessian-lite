@@ -1,0 +1,50 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.alibaba.com.caucho.hessian.io.java8;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+
+import java.io.IOException;
+import java.time.chrono.ChronoPeriod;
+import java.time.chrono.Chronology;
+import java.time.chrono.HijrahDate;
+import java.time.chrono.JapaneseDate;
+import java.time.chrono.MinguoDate;
+import java.time.chrono.ThaiBuddhistDate;
+
+/**
+ * Test Java8TimeSerializer class use bit wise encoding
+ */
+public class Java8TimeSerializerUseBitEncodingTest extends Java8TimeSerializerTest {
+
+    @BeforeEach
+    public void setUp() {
+        System.setProperty("com.caucho.hessian.io.java.time.serializer.useBitEncoding", "true");
+    }
+
+    protected void testJava8Time(Object expected) throws IOException {
+        Assertions.assertEquals(expected, baseHessian2Serialize(expected));
+        if (expected instanceof Chronology || expected instanceof ChronoPeriod || expected instanceof JapaneseDate
+                || expected instanceof HijrahDate || expected instanceof MinguoDate || expected instanceof ThaiBuddhistDate) {
+            return;
+        }
+        Assertions.assertEquals(expected, hessian3ToHessian3(expected));
+        Assertions.assertEquals(expected, hessian3ToHessian4(expected));
+    }
+}

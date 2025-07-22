@@ -20,7 +20,7 @@ package com.alibaba.com.caucho.hessian.io.java8;
 import com.alibaba.com.caucho.hessian.io.HessianHandle;
 
 import java.io.Serializable;
-import java.lang.reflect.Method;
+import java.time.Year;
 
 @SuppressWarnings("unchecked")
 public class YearHandle implements HessianHandle, Serializable {
@@ -33,9 +33,8 @@ public class YearHandle implements HessianHandle, Serializable {
 
     public YearHandle(Object o) {
         try {
-            Class c = Class.forName("java.time.Year");
-            Method m = c.getDeclaredMethod("getValue");
-            this.year = (Integer) m.invoke(o);
+            Year yearObj = (Year) o;
+            this.year = yearObj.getValue();
         } catch (Throwable t) {
             // ignore
         }
@@ -44,9 +43,7 @@ public class YearHandle implements HessianHandle, Serializable {
 
     private Object readResolve() {
         try {
-            Class c = Class.forName("java.time.Year");
-            Method m = c.getDeclaredMethod("of", int.class);
-            return m.invoke(null, year);
+            return Year.of(year);
         } catch (Throwable t) {
             // ignore
         }

@@ -152,7 +152,7 @@ public class Java8TimeSerializerTest extends SerializeTestBase {
         testJava8Time(ChronoPeriod.between(ThaiBuddhistDate.now(), ThaiBuddhistDate.now()));
     }
 
-    private void testJava8Time(Object expected) throws IOException {
+    protected void testJava8Time(Object expected) throws IOException {
         Assertions.assertEquals(expected, baseHessian2Serialize(expected));
         if (expected instanceof Chronology || expected instanceof ChronoPeriod || expected instanceof JapaneseDate
                 || expected instanceof HijrahDate || expected instanceof MinguoDate || expected instanceof ThaiBuddhistDate) {

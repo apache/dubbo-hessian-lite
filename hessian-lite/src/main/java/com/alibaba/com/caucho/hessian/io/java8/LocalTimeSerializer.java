@@ -22,9 +22,12 @@ import com.alibaba.com.caucho.hessian.io.AbstractHessianOutput;
 import com.alibaba.com.caucho.hessian.io.AbstractSerializer;
 
 import java.io.IOException;
+import java.time.LocalTime;
 
 public class LocalTimeSerializer<T> extends AbstractSerializer {
 
+    private final boolean useBitEncoding = Boolean.getBoolean("com.caucho.hessian.io.java.time.serializer.useBitEncoding");
+    
     @Override
     public void writeObject(Object obj, AbstractHessianOutput out) throws IOException {
         if (obj == null) {
@@ -32,6 +35,38 @@ public class LocalTimeSerializer<T> extends AbstractSerializer {
             return;
         }
 
-        out.writeObject(new LocalTimeHandle(obj));
+        if (!useBitEncoding) {
+            out.writeObject(new LocalTimeHandle(obj));
+        } else {
+            if (out.addRef(obj)) {
+                return;
+            }
+
+            Class<?> cl = obj.getClass();
+
+            int ref = out.writeObjectBegin(cl.getName());
+
+            LocalTime localTime = (LocalTime) obj;
+            
+            if (ref < -1) {
+                out.writeString("value");
+                out.writeLong(encodeTime(localTime));
+                out.writeMapEnd();
+            } else {
+                if (ref == -1) {
+                    out.writeInt(1);
+                    out.writeString("value");
+                    out.writeObjectBegin(cl.getName());
+                }
+                out.writeLong(encodeTime(localTime));
+            }
+        }
+    }
+
+    private static long encodeTime(LocalTime time) {
+        return ((long) time.getHour() << 47) |
+                ((long) time.getMinute() << 41) |
+                ((long) time.getSecond() << 35) |
+                time.getNano();
     }
 }

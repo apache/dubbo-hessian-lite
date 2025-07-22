@@ -12,3 +12,6 @@ java.net.URI=com.alibaba.com.caucho.hessian.io.socket.URIDeserializer
 java.time.temporal.WeekFields=com.alibaba.com.caucho.hessian.io.java8.WeekFieldsDeserializer
 java.util.UUID=com.alibaba.com.caucho.hessian.io.UUIDDeserializer
 java.util.Currency=com.alibaba.com.caucho.hessian.io.CurrencyDeserializer
+java.time.LocalDate=com.alibaba.com.caucho.hessian.io.java8.LocalDateDeserializer
+java.time.LocalDateTime=com.alibaba.com.caucho.hessian.io.java8.LocalDateTimeDeserializer
+java.time.LocalTime=com.alibaba.com.caucho.hessian.io.java8.LocalTimeDeserializer

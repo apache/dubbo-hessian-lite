@@ -20,7 +20,7 @@ package com.alibaba.com.caucho.hessian.io.java8;
 import com.alibaba.com.caucho.hessian.io.HessianHandle;
 
 import java.io.Serializable;
-import java.lang.reflect.Method;
+import java.time.MonthDay;
 
 @SuppressWarnings("unchecked")
 public class MonthDayHandle implements HessianHandle, Serializable {
@@ -34,11 +34,9 @@ public class MonthDayHandle implements HessianHandle, Serializable {
 
     public MonthDayHandle(Object o) {
         try {
-            Class c = Class.forName("java.time.MonthDay");
-            Method m = c.getDeclaredMethod("getMonthValue");
-            this.month = (Integer) m.invoke(o);
-            m = c.getDeclaredMethod("getDayOfMonth");
-            this.day = (Integer) m.invoke(o);
+            MonthDay monthDay = (MonthDay) o;
+            this.month = monthDay.getMonthValue();
+            this.day = monthDay.getDayOfMonth();
         } catch (Throwable t) {
             // ignore
         }
@@ -46,9 +44,7 @@ public class MonthDayHandle implements HessianHandle, Serializable {
 
     private Object readResolve() {
         try {
-            Class c = Class.forName("java.time.MonthDay");
-            Method m = c.getDeclaredMethod("of", int.class, int.class);
-            return m.invoke(null, month, day);
+            return MonthDay.of(month, day);
         } catch (Throwable t) {
             // ignore
         }

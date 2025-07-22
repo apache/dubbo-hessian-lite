@@ -20,7 +20,7 @@ package com.alibaba.com.caucho.hessian.io.java8;
 import com.alibaba.com.caucho.hessian.io.HessianHandle;
 
 import java.io.Serializable;
-import java.lang.reflect.Method;
+import java.time.ZoneId;
 
 @SuppressWarnings("unchecked")
 public class ZoneIdHandle implements HessianHandle, Serializable {
@@ -34,9 +34,8 @@ public class ZoneIdHandle implements HessianHandle, Serializable {
 
     public ZoneIdHandle(Object o) {
         try {
-            Class c = Class.forName("java.time.ZoneId");
-            Method m = c.getDeclaredMethod("getId");
-            this.zoneId = (String) m.invoke(o);
+            ZoneId zoneIdObj = (ZoneId) o;
+            this.zoneId = zoneIdObj.getId();
         } catch (Throwable t) {
             // ignore
         }
@@ -44,9 +43,7 @@ public class ZoneIdHandle implements HessianHandle, Serializable {
 
     private Object readResolve() {
         try {
-            Class c = Class.forName("java.time.ZoneId");
-            Method m = c.getDeclaredMethod("of", String.class);
-            return m.invoke(null, this.zoneId);
+            return ZoneId.of(this.zoneId);
         } catch (Throwable t) {
             // ignore
         }
