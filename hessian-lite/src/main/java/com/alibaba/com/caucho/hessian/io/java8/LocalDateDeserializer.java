@@ -27,14 +27,14 @@ import java.time.LocalDate;
 /**
  * @author wuwen
  */
-public class LocalDateDeserializer<T> extends AbstractDeserializer {
+public class LocalDateDeserializer extends AbstractDeserializer {
 
     @Override
     public Object readObject(AbstractHessianInput in,
                              Object[] fields)
             throws IOException {
-        int encoded = in.readInt();
-        LocalDate localDate = LocalDate.of(encoded >>> 9, (encoded >>> 5) & 0b1111, encoded & 0b11111);
+        long l = in.readLong();
+        LocalDate localDate = LocalDate.ofEpochDay(l);
         in.addRef(localDate);
         return localDate;
     }

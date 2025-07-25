@@ -25,8 +25,6 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 
 public class LocalDateTimeSerializer<T> extends AbstractSerializer {
-
-    private final boolean useBitEncoding = Boolean.getBoolean("com.caucho.hessian.io.java.time.serializer.useBitEncoding");
     
     @Override
     public void writeObject(Object obj, AbstractHessianOutput out) throws IOException {
@@ -35,9 +33,7 @@ public class LocalDateTimeSerializer<T> extends AbstractSerializer {
             return;
         }
 
-        if (!useBitEncoding) {
-            out.writeObject(new LocalDateTimeHandle(obj));
-        } else {
+        if (SerializationConfig.isCompactMode()) {
             if (out.addRef(obj)) {
                 return;
             }
@@ -50,9 +46,9 @@ public class LocalDateTimeSerializer<T> extends AbstractSerializer {
 
             if (ref < -1) {
                 out.writeString("date");
-                out.writeObject(localDateTime.toLocalDate());
+                out.writeLong(localDateTime.toLocalDate().toEpochDay());
                 out.writeString("time");
-                out.writeObject(localDateTime.toLocalTime());
+                out.writeLong(localDateTime.toLocalTime().toNanoOfDay());
                 out.writeMapEnd();
             } else {
                 if (ref == -1) {
@@ -61,9 +57,11 @@ public class LocalDateTimeSerializer<T> extends AbstractSerializer {
                     out.writeString("time");
                     out.writeObjectBegin(cl.getName());
                 }
-                out.writeObject(localDateTime.toLocalDate());
-                out.writeObject(localDateTime.toLocalTime());
+                out.writeLong(localDateTime.toLocalDate().toEpochDay());
+                out.writeLong(localDateTime.toLocalTime().toNanoOfDay());
             }   
+        } else {
+            out.writeObject(new LocalDateTimeHandle(obj));
         }
     }
 }

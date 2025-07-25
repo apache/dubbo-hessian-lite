@@ -55,14 +55,14 @@ public abstract class HessianDateBenchmark extends SerializeTestBase {
     @State(Scope.Thread)
     public static class LocalDateTimeBenchmark extends HessianDateBenchmark {
         @Param({"true", "false"})
-        public String useBitEncoding;
+        public String compactMode;
         
         protected LocalDateTime javaTimeLocalDateTime;
         
         @Setup(Level.Iteration)
         public void setUp() {
             javaTimeLocalDateTime = LocalDateTime.now();
-            System.setProperty("com.caucho.hessian.io.java.time.serializer.useBitEncoding", useBitEncoding);
+            System.setProperty("com.caucho.hessian.io.java.time.serializer.compactMode", compactMode);
         }
 
         @Benchmark
@@ -76,12 +76,12 @@ public abstract class HessianDateBenchmark extends SerializeTestBase {
         protected LocalDate javaTimeLocalDate;
 
         @Param({"true", "false"})
-        public String useBitEncoding;
+        public String compactMode;
         
         @Setup(Level.Iteration)
         public void setUp() {
             javaTimeLocalDate = LocalDate.now();
-            System.setProperty("com.caucho.hessian.io.java.time.serializer.useBitEncoding", useBitEncoding);
+            System.setProperty("com.caucho.hessian.io.java.time.serializer.compactMode", compactMode);
         }
 
         @Benchmark

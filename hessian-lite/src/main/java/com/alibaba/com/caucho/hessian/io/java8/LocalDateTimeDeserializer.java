@@ -29,7 +29,7 @@ import java.time.LocalTime;
 /**
  * @author wuwen
  */
-public class LocalDateTimeDeserializer<T> extends AbstractDeserializer {
+public class LocalDateTimeDeserializer extends AbstractDeserializer {
 
     @Override
     public Object readObject(AbstractHessianInput in,
@@ -40,9 +40,9 @@ public class LocalDateTimeDeserializer<T> extends AbstractDeserializer {
         LocalTime localTime = null;
         for (Object fieldName : fieldNames) {
             if ("date".equals(fieldName)) {
-                localDate = (LocalDate) in.readObject();
+                localDate = LocalDate.ofEpochDay(in.readLong());
             } else if ("time".equals(fieldName)) {
-                localTime = (LocalTime) in.readObject();
+                localTime = LocalTime.ofNanoOfDay(in.readLong());
             } else {
                 in.readObject();
             }

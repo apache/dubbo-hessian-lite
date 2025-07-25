@@ -25,8 +25,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 
 public class LocalDateSerializer<T> extends AbstractSerializer {
-
-    private final boolean useBitEncoding = Boolean.getBoolean("com.caucho.hessian.io.java.time.serializer.useBitEncoding");
+    
     
     @Override
     public void writeObject(Object obj, AbstractHessianOutput out) throws IOException {
@@ -35,10 +34,7 @@ public class LocalDateSerializer<T> extends AbstractSerializer {
             return;
         }
 
-        if (!useBitEncoding) {
-            out.writeObject(new LocalDateHandle(obj));
-        } else {
-            
+        if (SerializationConfig.isCompactMode()) {
             if (out.addRef(obj)) {
                 return;
             }
@@ -50,22 +46,18 @@ public class LocalDateSerializer<T> extends AbstractSerializer {
             LocalDate localDate = (LocalDate) obj;
 
             if (ref < -1) {
-                out.writeString("value");
-                out.writeInt(encodeDate(localDate.getYear(), localDate.getMonthValue(), localDate.getDayOfMonth()));
+                out.writeLong(localDate.toEpochDay());
                 out.writeMapEnd();
             } else {
                 if (ref == -1) {
-                    out.writeInt(1);
-                    out.writeString("value");
+                    out.writeInt(0);
                     out.writeObjectBegin(cl.getName());
                 }
-                out.writeInt(encodeDate(localDate.getYear(), localDate.getMonthValue(), localDate.getDayOfMonth()));
+                out.writeLong(localDate.toEpochDay());
             }
+        } else {
+            out.writeObject(new LocalDateHandle(obj));
         }
     }
-
-    private static int encodeDate(int year, int month, int day) {
-        return (year << 9) | (month << 5) | day;
-    }
-
+    
 }

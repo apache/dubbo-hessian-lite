@@ -17,25 +17,25 @@
 
 package com.alibaba.com.caucho.hessian.io.java8;
 
-
-import com.alibaba.com.caucho.hessian.io.AbstractDeserializer;
-import com.alibaba.com.caucho.hessian.io.AbstractHessianInput;
-
-import java.io.IOException;
-import java.time.LocalTime;
-
 /**
  * @author wuwen
  */
-public class LocalTimeDeserializer extends AbstractDeserializer {
+class SerializationConfig {
 
-    @Override
-    public Object readObject(AbstractHessianInput in,
-                             Object[] fields)
-            throws IOException {
-        LocalTime localTime = LocalTime.ofNanoOfDay(in.readLong());
-        in.addRef(localTime);
-        return localTime;
-    }
+    /**
+     * Whether to use compact mode for serialization, default false.
+     * use -Dcom.caucho.hessian.io.java.time.serializer.compactMode=true to enable compact mode.
+     */
+    private static final boolean COMPACT_MODE = Boolean.getBoolean("com.caucho.hessian.io.java.time.serializer.compactMode");
     
+    private SerializationConfig() {
+    }
+
+    /**
+     * Checks if compact mode is enabled for serialization.
+     * @return true if compact mode is enabled, false otherwise.
+     */
+    public static boolean isCompactMode() {
+        return COMPACT_MODE;
+    }
 }

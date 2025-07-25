@@ -19,8 +19,10 @@ package com.alibaba.com.caucho.hessian.io.java8;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.chrono.ChronoPeriod;
 import java.time.chrono.Chronology;
 import java.time.chrono.HijrahDate;
@@ -29,13 +31,18 @@ import java.time.chrono.MinguoDate;
 import java.time.chrono.ThaiBuddhistDate;
 
 /**
- * Test Java8TimeSerializer class use bit wise encoding
+ * Test Java8TimeSerializer class use compact mode
  */
 public class Java8TimeSerializerUseBitEncodingTest extends Java8TimeSerializerTest {
 
     @BeforeEach
     public void setUp() {
-        System.setProperty("com.caucho.hessian.io.java.time.serializer.useBitEncoding", "true");
+        System.setProperty("com.caucho.hessian.io.java.time.serializer.compactMode", "true");
+    }
+
+    @Test
+    public void testLocalDate() throws Exception {
+        testJava8Time(LocalDate.now());
     }
 
     protected void testJava8Time(Object expected) throws IOException {
