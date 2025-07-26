@@ -14,9 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.alibaba.com.caucho.hessian.io.java8;
-
 
 import com.alibaba.com.caucho.hessian.io.AbstractHessianOutput;
 import com.alibaba.com.caucho.hessian.io.AbstractSerializer;
@@ -25,7 +23,7 @@ import java.io.IOException;
 import java.time.LocalTime;
 
 public class LocalTimeSerializer<T> extends AbstractSerializer {
-    
+
     @Override
     public void writeObject(Object obj, AbstractHessianOutput out) throws IOException {
         if (obj == null) {
@@ -58,5 +56,5 @@ public class LocalTimeSerializer<T> extends AbstractSerializer {
             out.writeObject(new LocalTimeHandle(obj));
         }
     }
-    
+
 }
