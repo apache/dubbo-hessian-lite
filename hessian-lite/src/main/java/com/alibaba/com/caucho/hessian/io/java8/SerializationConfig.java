@@ -19,7 +19,7 @@ package com.alibaba.com.caucho.hessian.io.java8;
 /**
  * SerializationConfig
  */
-class SerializationConfig {
+public class SerializationConfig {
 
     /**
      * Whether to use compact mode for serialization, default false.
