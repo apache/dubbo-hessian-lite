@@ -17,8 +17,9 @@
 
 package com.alibaba.com.caucho.hessian.io.java8;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -33,11 +34,16 @@ import java.time.chrono.ThaiBuddhistDate;
 /**
  * Test Java8TimeSerializer class use compact mode
  */
-public class Java8TimeSerializerUseBitEncodingTest extends Java8TimeSerializerTest {
+public class Java8TimeSerializerUseCompactModeTest extends Java8TimeSerializerTest {
 
-    @BeforeEach
-    public void setUp() {
+    @BeforeAll
+    public static void setUp() {
         System.setProperty("com.caucho.hessian.io.java.time.serializer.compactMode", "true");
+    }
+
+    @AfterAll
+    public static void tearDown() {
+        System.clearProperty("com.caucho.hessian.io.java.time.serializer.compactMode");
     }
 
     @Test
