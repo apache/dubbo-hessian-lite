@@ -14,9 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.alibaba.com.caucho.hessian.io.java8;
-
 
 import com.alibaba.com.caucho.hessian.io.AbstractDeserializer;
 import com.alibaba.com.caucho.hessian.io.AbstractHessianInput;
@@ -25,7 +23,7 @@ import java.io.IOException;
 import java.time.LocalTime;
 
 /**
- * @author wuwen
+ * LocalTimeDeserializer
  */
 public class LocalTimeDeserializer extends AbstractDeserializer {
 
@@ -37,5 +35,5 @@ public class LocalTimeDeserializer extends AbstractDeserializer {
         in.addRef(localTime);
         return localTime;
     }
-    
+
 }
