@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 
 /**
- * @author wuwen
+ * LocalDateDeserializer
  */
 public class LocalDateDeserializer extends AbstractDeserializer {
 
