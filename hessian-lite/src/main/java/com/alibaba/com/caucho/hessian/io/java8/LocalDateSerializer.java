@@ -25,8 +25,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 
 public class LocalDateSerializer<T> extends AbstractSerializer {
-    
-    
+
     @Override
     public void writeObject(Object obj, AbstractHessianOutput out) throws IOException {
         if (obj == null) {
