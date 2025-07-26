@@ -38,12 +38,12 @@ public class Java8TimeSerializerUseCompactModeTest extends Java8TimeSerializerTe
 
     @BeforeAll
     public static void setUp() {
-        System.setProperty("com.caucho.hessian.io.java.time.serializer.compactMode", "true");
+        SerializationConfig.setCompactMode(true);
     }
 
     @AfterAll
     public static void tearDown() {
-        System.clearProperty("com.caucho.hessian.io.java.time.serializer.compactMode");
+        SerializationConfig.setCompactMode(false);
     }
 
     @Test
