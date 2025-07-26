@@ -18,7 +18,7 @@
 package com.alibaba.com.caucho.hessian.io.java8;
 
 /**
- * @author wuwen
+ * SerializationConfig
  */
 class SerializationConfig {
 
@@ -26,7 +26,7 @@ class SerializationConfig {
      * Whether to use compact mode for serialization, default false.
      * use -Dcom.caucho.hessian.io.java.time.serializer.compactMode=true to enable compact mode.
      */
-    private static final boolean COMPACT_MODE = Boolean.getBoolean("com.caucho.hessian.io.java.time.serializer.compactMode");
+    private static boolean compactMode = Boolean.getBoolean("com.caucho.hessian.io.java.time.serializer.compactMode");
     
     private SerializationConfig() {
     }
@@ -36,6 +36,13 @@ class SerializationConfig {
      * @return true if compact mode is enabled, false otherwise.
      */
     public static boolean isCompactMode() {
-        return COMPACT_MODE;
+        return compactMode;
+    }
+
+    /**
+     * For compatibility test.
+     */
+    protected static void setCompactMode(boolean compactMode) {
+        SerializationConfig.compactMode = compactMode;
     }
 }
