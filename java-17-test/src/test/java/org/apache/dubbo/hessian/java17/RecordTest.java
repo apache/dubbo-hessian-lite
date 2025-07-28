@@ -24,8 +24,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.IntStream;
 
 public class RecordTest extends SerializeTestBase {
@@ -271,5 +273,26 @@ public class RecordTest extends SerializeTestBase {
             Assertions.assertEquals(object, baseHessian2Serialize(object));
             Assertions.assertEquals(object.hashCode(), baseHessian2Serialize(object).hashCode());
         }
+    }
+
+
+    public record Sample(String id, X x) implements Serializable {
+        @Serial
+        private static final long serialVersionUID = 8892425129950234207L;
+    }
+
+    public enum X {
+        A, B, C;
+    }
+
+    @Test
+    public void testSerializeFather() throws IOException {
+        Sample sample1 = new Sample("1", X.A);
+        Sample sample2 = new Sample("2", X.A);
+        Sample sample3 = new Sample("3", X.A);
+        Sample sample4 = new Sample("4", X.B);
+
+        List<Sample> samples = Arrays.asList(sample1, sample2, sample3, sample4);
+        testEquals(samples);
     }
 }
