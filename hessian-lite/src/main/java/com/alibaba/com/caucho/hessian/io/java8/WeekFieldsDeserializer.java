@@ -40,7 +40,7 @@ public class WeekFieldsDeserializer extends AbstractDeserializer {
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
-            throw new IOExceptionWrapper("java.net.Inet6Address:" + e, e);
+            throw new IOExceptionWrapper("java.time.temporal.WeekFields:" + e, e);
         }
     }
 
