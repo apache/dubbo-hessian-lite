@@ -64,6 +64,7 @@ public class RecordDeserializer extends AbstractDeserializer {
                              String[] fieldNames)
             throws IOException {
         try {
+            int ref = in.addRef(null);
             Object[] args = new Object[_components.length];
             boolean readedIndex[] = new boolean[_components.length];
             for (String fieldName : fieldNames) {
@@ -84,7 +85,7 @@ public class RecordDeserializer extends AbstractDeserializer {
                 }
             }
             Object obj = _constructor.newInstance(args);
-            in.addRef(obj);
+            in.setRef(ref, obj);
 
             return obj;
         } catch (IOException e) {
