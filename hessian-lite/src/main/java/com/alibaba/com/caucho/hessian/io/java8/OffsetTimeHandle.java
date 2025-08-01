@@ -20,25 +20,25 @@ package com.alibaba.com.caucho.hessian.io.java8;
 import com.alibaba.com.caucho.hessian.io.HessianHandle;
 
 import java.io.Serializable;
-import java.lang.reflect.Method;
+import java.time.LocalTime;
+import java.time.OffsetTime;
+import java.time.ZoneOffset;
 
 @SuppressWarnings("unchecked")
 public class OffsetTimeHandle implements HessianHandle, Serializable {
     private static final long serialVersionUID = -3269846941421652860L;
 
-    private Object localTime;
-    private Object zoneOffset;
+    private LocalTime localTime;
+    private ZoneOffset zoneOffset;
 
     public OffsetTimeHandle() {
     }
 
     public OffsetTimeHandle(Object o) {
         try {
-            Class c = Class.forName("java.time.OffsetTime");
-            Method m = c.getDeclaredMethod("getOffset");
-            this.zoneOffset = m.invoke(o);
-            m = c.getDeclaredMethod("toLocalTime");
-            this.localTime = m.invoke(o);
+            OffsetTime offsetTime = (OffsetTime) o;
+            this.zoneOffset = offsetTime.getOffset();
+            this.localTime = offsetTime.toLocalTime();
         } catch (Throwable t) {
             // ignore
         }
@@ -46,10 +46,7 @@ public class OffsetTimeHandle implements HessianHandle, Serializable {
 
     private Object readResolve() {
         try {
-            Class c = Class.forName("java.time.OffsetTime");
-            Method m = c.getDeclaredMethod("of", Class.forName("java.time.LocalTime"),
-                    Class.forName("java.time.ZoneOffset"));
-            return m.invoke(null, localTime, zoneOffset);
+            return OffsetTime.of(localTime, zoneOffset);
         } catch (Throwable t) {
             // ignore
         }

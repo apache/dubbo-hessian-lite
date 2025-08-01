@@ -20,7 +20,7 @@ package com.alibaba.com.caucho.hessian.io.java8;
 import com.alibaba.com.caucho.hessian.io.HessianHandle;
 
 import java.io.Serializable;
-import java.lang.reflect.Method;
+import java.time.YearMonth;
 
 @SuppressWarnings("unchecked")
 public class YearMonthHandle implements HessianHandle, Serializable {
@@ -34,11 +34,9 @@ public class YearMonthHandle implements HessianHandle, Serializable {
 
     public YearMonthHandle(Object o) {
         try {
-            Class c = Class.forName("java.time.YearMonth");
-            Method m = c.getDeclaredMethod("getYear");
-            this.year = (Integer) m.invoke(o);
-            m = c.getDeclaredMethod("getMonthValue");
-            this.month = (Integer) m.invoke(o);
+            YearMonth yearMonth = (YearMonth) o;
+            this.year = yearMonth.getYear();
+            this.month = yearMonth.getMonthValue();
         } catch (Throwable t) {
             // ignore
         }
@@ -46,9 +44,7 @@ public class YearMonthHandle implements HessianHandle, Serializable {
 
     private Object readResolve() {
         try {
-            Class c = Class.forName("java.time.YearMonth");
-            Method m = c.getDeclaredMethod("of", int.class, int.class);
-            return m.invoke(null, year, month);
+            return YearMonth.of(year, month);
         } catch (Throwable t) {
             // ignore
         }

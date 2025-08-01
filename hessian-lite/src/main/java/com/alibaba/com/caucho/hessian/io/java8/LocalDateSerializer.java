@@ -22,6 +22,7 @@ import com.alibaba.com.caucho.hessian.io.AbstractHessianOutput;
 import com.alibaba.com.caucho.hessian.io.AbstractSerializer;
 
 import java.io.IOException;
+import java.time.LocalDate;
 
 public class LocalDateSerializer<T> extends AbstractSerializer {
 
@@ -32,6 +33,30 @@ public class LocalDateSerializer<T> extends AbstractSerializer {
             return;
         }
 
-        out.writeObject(new LocalDateHandle(obj));
+        if (SerializationConfig.isCompactMode()) {
+            if (out.addRef(obj)) {
+                return;
+            }
+
+            Class<?> cl = obj.getClass();
+            
+            int ref = out.writeObjectBegin(cl.getName());
+
+            LocalDate localDate = (LocalDate) obj;
+
+            if (ref < -1) {
+                out.writeLong(localDate.toEpochDay());
+                out.writeMapEnd();
+            } else {
+                if (ref == -1) {
+                    out.writeInt(0);
+                    out.writeObjectBegin(cl.getName());
+                }
+                out.writeLong(localDate.toEpochDay());
+            }
+        } else {
+            out.writeObject(new LocalDateHandle(obj));
+        }
     }
+    
 }

@@ -14,38 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.alibaba.com.caucho.hessian.io.java8;
 
-import com.alibaba.com.caucho.hessian.io.HessianHandle;
+import com.alibaba.com.caucho.hessian.io.AbstractDeserializer;
+import com.alibaba.com.caucho.hessian.io.AbstractHessianInput;
 
-import java.io.Serializable;
-import java.time.ZoneOffset;
+import java.io.IOException;
+import java.time.LocalDate;
 
-@SuppressWarnings("unchecked")
-public class ZoneOffsetHandle implements HessianHandle, Serializable {
-    private static final long serialVersionUID = 8841589723587858789L;
+/**
+ * LocalDateDeserializer
+ */
+public class LocalDateDeserializer extends AbstractDeserializer {
 
-    private int seconds;
-
-    public ZoneOffsetHandle() {
+    @Override
+    public Object readObject(AbstractHessianInput in,
+                             Object[] fields)
+            throws IOException {
+        long l = in.readLong();
+        LocalDate localDate = LocalDate.ofEpochDay(l);
+        in.addRef(localDate);
+        return localDate;
     }
-
-    public ZoneOffsetHandle(Object o) {
-        try {
-            ZoneOffset zoneOffset = (ZoneOffset) o;
-            this.seconds = zoneOffset.getTotalSeconds();
-        } catch (Throwable t) {
-            // ignore
-        }
-    }
-
-    private Object readResolve() {
-        try {
-            return ZoneOffset.ofTotalSeconds(seconds);
-        } catch (Throwable t) {
-            // ignore
-        }
-        return null;
-    }
+    
 }

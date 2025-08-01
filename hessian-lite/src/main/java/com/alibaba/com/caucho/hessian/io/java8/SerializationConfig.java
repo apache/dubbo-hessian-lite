@@ -14,38 +14,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.alibaba.com.caucho.hessian.io.java8;
 
-import com.alibaba.com.caucho.hessian.io.HessianHandle;
+/**
+ * SerializationConfig
+ */
+public class SerializationConfig {
 
-import java.io.Serializable;
-import java.time.ZoneOffset;
-
-@SuppressWarnings("unchecked")
-public class ZoneOffsetHandle implements HessianHandle, Serializable {
-    private static final long serialVersionUID = 8841589723587858789L;
-
-    private int seconds;
-
-    public ZoneOffsetHandle() {
+    /**
+     * Whether to use compact mode for serialization, default false.
+     * use -Dcom.caucho.hessian.io.java.time.serializer.compactMode=true to enable compact mode.
+     */
+    private static boolean compactMode = Boolean.getBoolean("com.caucho.hessian.io.java.time.serializer.compactMode");
+    
+    private SerializationConfig() {
     }
 
-    public ZoneOffsetHandle(Object o) {
-        try {
-            ZoneOffset zoneOffset = (ZoneOffset) o;
-            this.seconds = zoneOffset.getTotalSeconds();
-        } catch (Throwable t) {
-            // ignore
-        }
+    /**
+     * Checks if compact mode is enabled for serialization.
+     * @return true if compact mode is enabled, false otherwise.
+     */
+    public static boolean isCompactMode() {
+        return compactMode;
     }
 
-    private Object readResolve() {
-        try {
-            return ZoneOffset.ofTotalSeconds(seconds);
-        } catch (Throwable t) {
-            // ignore
-        }
-        return null;
+    /**
+     * For compatibility test.
+     */
+    protected static void setCompactMode(boolean compactMode) {
+        SerializationConfig.compactMode = compactMode;
     }
 }

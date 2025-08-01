@@ -20,7 +20,7 @@ package com.alibaba.com.caucho.hessian.io.java8;
 import com.alibaba.com.caucho.hessian.io.HessianHandle;
 
 import java.io.Serializable;
-import java.lang.reflect.Method;
+import java.time.Duration;
 
 
 @SuppressWarnings("unchecked")
@@ -35,11 +35,9 @@ public class DurationHandle implements HessianHandle, Serializable {
 
     public DurationHandle(Object o) {
         try {
-            Class c = Class.forName("java.time.Duration");
-            Method m = c.getDeclaredMethod("getSeconds");
-            this.seconds = (Long) m.invoke(o);
-            m = c.getDeclaredMethod("getNano");
-            this.nanos = (Integer) m.invoke(o);
+            Duration duration = (Duration) o;
+            this.seconds = duration.getSeconds();
+            this.nanos = duration.getNano();
         } catch (Throwable t) {
             // ignore
         }
@@ -47,9 +45,7 @@ public class DurationHandle implements HessianHandle, Serializable {
 
     private Object readResolve() {
         try {
-            Class c = Class.forName("java.time.Duration");
-            Method m = c.getDeclaredMethod("ofSeconds", long.class, long.class);
-            return m.invoke(null, seconds, nanos);
+            return Duration.ofSeconds(seconds, nanos);
         } catch (Throwable t) {
             // ignore
         }

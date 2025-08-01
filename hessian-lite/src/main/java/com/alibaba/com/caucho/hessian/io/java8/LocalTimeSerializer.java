@@ -14,14 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.alibaba.com.caucho.hessian.io.java8;
-
 
 import com.alibaba.com.caucho.hessian.io.AbstractHessianOutput;
 import com.alibaba.com.caucho.hessian.io.AbstractSerializer;
 
 import java.io.IOException;
+import java.time.LocalTime;
 
 public class LocalTimeSerializer<T> extends AbstractSerializer {
 
@@ -32,6 +31,30 @@ public class LocalTimeSerializer<T> extends AbstractSerializer {
             return;
         }
 
-        out.writeObject(new LocalTimeHandle(obj));
+        if (SerializationConfig.isCompactMode()) {
+            if (out.addRef(obj)) {
+                return;
+            }
+
+            Class<?> cl = obj.getClass();
+
+            int ref = out.writeObjectBegin(cl.getName());
+
+            LocalTime localTime = (LocalTime) obj;
+            
+            if (ref < -1) {
+                out.writeLong(localTime.toNanoOfDay());
+                out.writeMapEnd();
+            } else {
+                if (ref == -1) {
+                    out.writeInt(0);
+                    out.writeObjectBegin(cl.getName());
+                }
+                out.writeLong(localTime.toNanoOfDay());
+            }
+        } else {
+            out.writeObject(new LocalTimeHandle(obj));
+        }
     }
+
 }
