@@ -19,7 +19,7 @@ Now we are trying to build a hessian group https://github.com/hessian-group to m
 <dependency>
     <groupId>org.apache.dubbo</groupId>
     <artifactId>hessian-lite</artifactId>
-    <version>4.0.3</version>
+    <version>4.0.4</version>
 </dependency>
 ```
 ## Release
