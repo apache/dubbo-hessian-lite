@@ -388,12 +388,11 @@ public class FieldDeserializer2FactoryUnsafe extends FieldDeserializer2Factory {
 
         public void deserialize(AbstractHessianInput in, Object obj)
                 throws IOException {
-            double value = 0;
+            float value = 0;
 
             try {
-                value = in.readDouble();
-
-                _unsafe.putDouble(obj, _offset, value);
+                value = (float) in.readDouble();
+                _unsafe.putFloat(obj, _offset, value);
             } catch (Exception e) {
                 logDeserializeError(_field, obj, value, e);
             }
