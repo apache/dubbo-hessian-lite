@@ -89,7 +89,8 @@ public class Hessian2Input
     private static final int GAP = 16;
     private static Field _detailMessageField;
     private static boolean _isCloseStreamOnClose;
-    private final byte[] _buffer = new byte[SIZE];
+    private final byte[] _buffer;
+    private final boolean _isUseGlobalCache;
     // standard, unmodified factory for deserializing objects
     protected SerializerFactory _defaultSerializerFactory;
     // factory for deserializing objects in the input stream
@@ -125,6 +126,14 @@ public class Hessian2Input
      */
     public Hessian2Input(InputStream is) {
         init(is);
+        byte[] bytes = GlobalCache.getBytes();
+        if (bytes == null) {
+            bytes = new byte[SIZE];
+            _isUseGlobalCache = false;
+        } else {
+            _isUseGlobalCache = true;
+        }
+        _buffer = bytes;
     }
 
     private static Field getDetailMessageField() {
@@ -3748,6 +3757,10 @@ public class Hessian2Input
             throws IOException {
         InputStream is = _is;
         _is = null;
+
+        if (_isUseGlobalCache) {
+            GlobalCache.putBytes(_buffer);
+        }
 
         if (_isCloseStreamOnClose && is != null)
             is.close();
