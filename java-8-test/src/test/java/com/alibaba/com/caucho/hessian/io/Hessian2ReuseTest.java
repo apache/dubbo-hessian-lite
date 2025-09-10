@@ -116,6 +116,14 @@ public class Hessian2ReuseTest extends SerializeTestBase {
     }
 
     @Test
+    public void testBaseNumber() throws IOException {
+        BaseNumber obj = new BaseNumber();
+        obj.setNumber(3.14f);
+        BaseNumber newObj = serializeAndDeserialize(obj, BaseNumber.class);
+        Assertions.assertEquals(obj.getNumber(), newObj.getNumber());
+    }
+
+    @Test
     public void testType() throws IOException {
         serializeAndDeserialize(Type.Lower, Type.class);
         serializeAndDeserialize(Type.Normal, Type.class);
