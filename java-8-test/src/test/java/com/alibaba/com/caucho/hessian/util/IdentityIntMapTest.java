@@ -19,8 +19,6 @@ package com.alibaba.com.caucho.hessian.util;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-/**
- */
 class IdentityIntMapTest {
 
     @Test
