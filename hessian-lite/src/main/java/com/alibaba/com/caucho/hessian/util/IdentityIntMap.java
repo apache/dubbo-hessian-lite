@@ -237,16 +237,18 @@ public class IdentityIntMap {
         return System.identityHashCode(value);
     }
 
+    @Override
     public String toString() {
         StringBuffer sbuf = new StringBuffer();
 
         sbuf.append("IntMap[");
         boolean isFirst = true;
 
-        for (int i = 0; i <= _keys.length; i++) {
+        for (int i = 0; i < _keys.length; i++) {
             if (_keys[i] != null) {
-                if (!isFirst)
+                if (!isFirst) {
                     sbuf.append(", ");
+                }
 
                 isFirst = false;
                 sbuf.append(_keys[i]);
