@@ -136,30 +136,23 @@ public class ClassFactory {
                 return aClass;
             }
 
-            if (aClass.getInterfaces().length > 0) {
-                for (Class<?> anInterface : aClass.getInterfaces()) {
-                    if (!isAllow(anInterface.getName())) {
-                        log.log(Level.SEVERE, className + "'s interfaces: " + anInterface.getName() + " in blacklist or not in whitelist, deserialization with type 'HashMap' instead.");
-                        return HashMap.class;
-                    }
-                }
+            for (Class<?> anInterface : aClass.getInterfaces()) {
+                String interfaceName = anInterface.getName();
+                if (!isAllow(interfaceName)) {
+                log.log(Level.SEVERE, className + "'s interfaces: " + interfaceName
+                    + " in blacklist or not in whitelist, deserialization with type 'HashMap' instead.");
+                return HashMap.class;
+              }
             }
-
-            List<Class<?>> allSuperClasses = new LinkedList<>();
 
             Class<?> superClass = aClass.getSuperclass();
-            while (superClass != null) {
-                // add current super class
-                allSuperClasses.add(superClass);
-                superClass = superClass.getSuperclass();
-            }
-
-            for (Class<?> aSuperClass : allSuperClasses) {
-                if (!isAllow(aSuperClass.getName())) {
-                    log.log(Level.SEVERE, className + "'s superClass: " + aSuperClass.getName() + " in blacklist or not in whitelist, deserialization with type 'HashMap' instead.");
+            while (null != superClass && Object.class != superClass) {
+                String superClassName = superClass.getName();
+                if (!isAllow(superClassName)) {
+                    log.log(Level.SEVERE, className + "'s superClass: " + superClassName + " in blacklist or not in whitelist, deserialization with type 'HashMap' instead.");
                     return HashMap.class;
                 }
-
+                superClass = superClass.getSuperclass();
             }
 
             _allowClassSet.put(className, className);
