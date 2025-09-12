@@ -48,6 +48,7 @@
 
 package com.alibaba.com.caucho.hessian.io;
 
+import java.io.IOException;
 import java.util.Calendar;
 
 /**
@@ -58,11 +59,25 @@ public class CalendarSerializer extends AbstractSerializer {
 
     /**
      * java.util.Calendar serializes to com.alibaba.com.caucho.hessian.io.CalendarHandle
+     * @see com.alibaba.com.caucho.hessian.io.WriteReplaceSerializer#writeObject(Object, AbstractHessianOutput)
      */
     @Override
-    public Object writeReplace(Object obj) {
-        Calendar cal = (Calendar) obj;
+    public void writeObject(Object obj, AbstractHessianOutput out)
+        throws IOException {
+        int ref = out.getRef(obj);
 
-        return new CalendarHandle(cal.getClass(), cal.getTimeInMillis());
+        if (ref >= 0) {
+            out.writeRef(ref);
+
+            return;
+        }
+
+        Calendar cal = (Calendar) obj;
+        Object repl = new CalendarHandle(cal.getClass(), cal.getTimeInMillis());
+
+        out.writeObject(repl);
+
+        out.replaceRef(repl, obj);
     }
+
 }
