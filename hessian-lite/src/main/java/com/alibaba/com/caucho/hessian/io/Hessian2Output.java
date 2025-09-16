@@ -1289,7 +1289,7 @@ public class Hessian2Output
         if (value >= 0) {
             addRef(newRef, value, true);
 
-            // does not remove `oldRef` from `_refs` since it should be replaced at the same location.
+            // The oldRef is not removed from _refs because it is being replaced at the same index position to maintain reference integrity.
 
             return true;
         } else
