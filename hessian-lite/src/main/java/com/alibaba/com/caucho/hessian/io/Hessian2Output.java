@@ -1285,15 +1285,12 @@ public class Hessian2Output
         }
 
         int value = _refs.get(oldRef);
-
         if (value >= 0) {
             addRef(newRef, value, true);
-
-            // The oldRef is not removed from _refs because it is being replaced at the same index position to maintain reference integrity.
-
+            _refs.remove(oldRef);
             return true;
-        } else
-            return false;
+        }
+        return false;
     }
 
     private int addRef(Object value, int newRef, boolean isReplace) {
