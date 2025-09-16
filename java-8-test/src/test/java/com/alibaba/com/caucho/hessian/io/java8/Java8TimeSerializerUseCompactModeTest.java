@@ -53,7 +53,7 @@ public class Java8TimeSerializerUseCompactModeTest extends Java8TimeSerializerTe
 
     protected void testJava8Time(Object expected) throws IOException {
         Assertions.assertEquals(expected, baseHessian2Serialize(expected));
-        if (expected instanceof List && ((List) expected).get(0) instanceof Chronology) {
+        if (expected instanceof List && !((List) expected).isEmpty() && ((List) expected).get(0) instanceof Chronology) {
             return;
         }
         if (expected instanceof Chronology || expected instanceof ChronoPeriod || expected instanceof JapaneseDate
