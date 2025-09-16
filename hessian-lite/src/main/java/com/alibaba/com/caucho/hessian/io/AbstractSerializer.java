@@ -73,7 +73,8 @@ abstract public class AbstractSerializer implements Serializer {
             Object replace = writeReplace(obj);
 
             if (replace != null) {
-                // out.removeRef(obj);
+                // remove before write `replace` to ensure `ref` of `replace` is the correct location in `_refs`.
+                out.removeRef(obj);
 
                 out.writeObject(replace);
 
