@@ -320,6 +320,12 @@ public class Java8TimeSerializerTest extends SerializeTestBase {
         Assertions.assertEquals(expected, hessian3ToHessian4(expected));
     }
     
+    /**
+     * Helper class used in tests to verify reference handling during serialization.
+     * Instances of this class are added multiple times to collections to ensure
+     * that object references are correctly preserved or duplicated as expected
+     * when serializing and deserializing with Hessian.
+     */
     static class TestInner implements Serializable {
         String value;
         
