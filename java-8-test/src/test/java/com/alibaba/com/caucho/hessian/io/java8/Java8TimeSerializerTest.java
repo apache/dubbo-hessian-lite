@@ -308,7 +308,7 @@ public class Java8TimeSerializerTest extends SerializeTestBase {
     protected void testJava8Time(Object expected) throws IOException {
         Object result = baseHessian2Serialize(expected);
         Assertions.assertEquals(expected, result);
-        if (expected instanceof List && ((List) expected).get(0) instanceof Chronology) {
+        if (expected instanceof List && !((List) expected).isEmpty() && ((List) expected).get(0) instanceof Chronology) {
             return;
         }
         if (expected instanceof Chronology || expected instanceof ChronoPeriod || expected instanceof JapaneseDate
