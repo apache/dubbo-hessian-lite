@@ -49,6 +49,7 @@
 package com.alibaba.com.caucho.hessian.io;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 
 /**
@@ -56,7 +57,7 @@ import java.util.GregorianCalendar;
  */
 public class CalendarHandle implements java.io.Serializable, HessianHandle {
     private Class type;
-    private long time;
+    private Date date;
 
     public CalendarHandle() {
     }
@@ -65,7 +66,7 @@ public class CalendarHandle implements java.io.Serializable, HessianHandle {
         if (!GregorianCalendar.class.equals(type))
             this.type = type;
 
-        this.time = time;
+        this.date = new Date(time);
     }
 
     private Object readResolve() {
@@ -77,7 +78,7 @@ public class CalendarHandle implements java.io.Serializable, HessianHandle {
             else
                 cal = new GregorianCalendar();
 
-            cal.setTimeInMillis(time);
+            cal.setTimeInMillis(this.date.getTime());
 
             return cal;
         } catch (RuntimeException e) {
