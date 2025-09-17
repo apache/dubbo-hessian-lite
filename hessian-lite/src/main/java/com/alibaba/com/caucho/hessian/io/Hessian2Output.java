@@ -98,8 +98,8 @@ public class Hessian2Output
     private boolean _isUnshared;
 
     /**
-     * Creates a new Hessian output stream, initialized with an
-     * underlying output stream.
+     * Creates a new Hessian output stream instance without initializing it
+     * with an underlying output stream. The output stream must be set before use.
      */
     public Hessian2Output() {
     }
