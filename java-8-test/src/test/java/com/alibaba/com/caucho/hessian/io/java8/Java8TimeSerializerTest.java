@@ -243,7 +243,7 @@ public class Java8TimeSerializerTest extends SerializeTestBase {
     @Test
     public void testZoneId() throws Exception {
         List<Object> list = new ArrayList<>();
-        ZoneId zoneId = ZoneId.of( "America/New_York");
+        ZoneId zoneId = ZoneId.of("America/New_York");
         list.add(zoneId);
         list.add(zoneId);
         TestInner o = new TestInner();
