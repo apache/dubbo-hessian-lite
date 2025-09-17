@@ -152,7 +152,7 @@ public class MapDeserializer extends AbstractMapDeserializer {
         String[] fieldNames = (String[]) fields;
         Map<Object, Object> map = createMap();
 
-        int ref = in.addRef(map);
+        in.addRef(map);
 
         for (int i = 0; i < fieldNames.length; i++) {
             String name = fieldNames[i];
