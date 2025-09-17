@@ -16,21 +16,14 @@
  */
 package com.alibaba.com.caucho.hessian.io.chronology;
 
-import com.alibaba.com.caucho.hessian.io.AbstractHessianOutput;
 import com.alibaba.com.caucho.hessian.io.AbstractSerializer;
 
-import java.io.IOException;
 import java.time.chrono.JapaneseEra;
 
 public class JapaneseEraSerializer <T> extends AbstractSerializer {
 
     @Override
-    public void writeObject(Object obj, AbstractHessianOutput out) throws IOException {
-        if (obj == null) {
-            out.writeNull();
-            return;
-        }
-
-        out.writeObject(new JapaneseEraHandle((JapaneseEra) obj));
+    public Object writeReplace(Object obj) {
+        return new JapaneseEraHandle((JapaneseEra) obj);
     }
 }
