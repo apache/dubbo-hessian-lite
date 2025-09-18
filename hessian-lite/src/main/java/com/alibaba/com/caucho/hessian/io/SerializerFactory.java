@@ -92,40 +92,39 @@ public class SerializerFactory extends AbstractSerializerFactory {
     static {
         _staticTypeMap = new HashMap();
 
-        addBasic(void.class, "void", BasicSerializer.NULL);
+        addBasic("void", BasicSerializer.NULL);
 
-        addBasic(Boolean.class, "boolean", BasicSerializer.BOOLEAN);
-        addBasic(Byte.class, "byte", BasicSerializer.BYTE);
-        addBasic(Short.class, "short", BasicSerializer.SHORT);
-        addBasic(Integer.class, "int", BasicSerializer.INTEGER);
-        addBasic(Long.class, "long", BasicSerializer.LONG);
-        addBasic(Float.class, "float", BasicSerializer.FLOAT);
-        addBasic(Double.class, "double", BasicSerializer.DOUBLE);
-        addBasic(Character.class, "char", BasicSerializer.CHARACTER_OBJECT);
-        addBasic(String.class, "string", BasicSerializer.STRING);
-        addBasic(StringBuilder.class, "string", BasicSerializer.STRING_BUILDER);
-        addBasic(Object.class, "object", BasicSerializer.OBJECT);
-        addBasic(java.util.Date.class, "date", BasicSerializer.DATE);
+        addBasic("boolean", BasicSerializer.BOOLEAN);
+        addBasic("byte", BasicSerializer.BYTE);
+        addBasic("short", BasicSerializer.SHORT);
+        addBasic("int", BasicSerializer.INTEGER);
+        addBasic("long", BasicSerializer.LONG);
+        addBasic("float", BasicSerializer.FLOAT);
+        addBasic("double", BasicSerializer.DOUBLE);
+        addBasic("char", BasicSerializer.CHARACTER_OBJECT);
+        addBasic("string", BasicSerializer.STRING);
+        addBasic("string", BasicSerializer.STRING_BUILDER);
+        addBasic("date", BasicSerializer.DATE);
 
-        addBasic(boolean.class, "boolean", BasicSerializer.BOOLEAN);
-        addBasic(byte.class, "byte", BasicSerializer.BYTE);
-        addBasic(short.class, "short", BasicSerializer.SHORT);
-        addBasic(int.class, "int", BasicSerializer.INTEGER);
-        addBasic(long.class, "long", BasicSerializer.LONG);
-        addBasic(float.class, "float", BasicSerializer.FLOAT);
-        addBasic(double.class, "double", BasicSerializer.DOUBLE);
-        addBasic(char.class, "char", BasicSerializer.CHARACTER);
+        addBasic("boolean", BasicSerializer.BOOLEAN);
+        addBasic("byte", BasicSerializer.BYTE);
+        addBasic("short", BasicSerializer.SHORT);
+        addBasic("int", BasicSerializer.INTEGER);
+        addBasic("long", BasicSerializer.LONG);
+        addBasic("float", BasicSerializer.FLOAT);
+        addBasic("double", BasicSerializer.DOUBLE);
+        addBasic("char", BasicSerializer.CHARACTER);
 
-        addBasic(boolean[].class, "[boolean", BasicSerializer.BOOLEAN_ARRAY);
-        addBasic(byte[].class, "[byte", BasicSerializer.BYTE_ARRAY);
-        addBasic(short[].class, "[short", BasicSerializer.SHORT_ARRAY);
-        addBasic(int[].class, "[int", BasicSerializer.INTEGER_ARRAY);
-        addBasic(long[].class, "[long", BasicSerializer.LONG_ARRAY);
-        addBasic(float[].class, "[float", BasicSerializer.FLOAT_ARRAY);
-        addBasic(double[].class, "[double", BasicSerializer.DOUBLE_ARRAY);
-        addBasic(char[].class, "[char", BasicSerializer.CHARACTER_ARRAY);
-        addBasic(String[].class, "[string", BasicSerializer.STRING_ARRAY);
-        addBasic(Object[].class, "[object", BasicSerializer.OBJECT_ARRAY);
+        addBasic("[boolean", BasicSerializer.BOOLEAN_ARRAY);
+        addBasic("[byte", BasicSerializer.BYTE_ARRAY);
+        addBasic("[short", BasicSerializer.SHORT_ARRAY);
+        addBasic("[int", BasicSerializer.INTEGER_ARRAY);
+        addBasic("[long", BasicSerializer.LONG_ARRAY);
+        addBasic("[float", BasicSerializer.FLOAT_ARRAY);
+        addBasic("[double", BasicSerializer.DOUBLE_ARRAY);
+        addBasic("[char", BasicSerializer.CHARACTER_ARRAY);
+        addBasic("[string", BasicSerializer.STRING_ARRAY);
+        addBasic("[object", BasicSerializer.OBJECT_ARRAY);
 
         Deserializer objectDeserializer = new JavaDeserializer(Object.class, new FieldDeserializer2Factory());
         _staticTypeMap.put("object", objectDeserializer);
@@ -208,7 +207,7 @@ public class SerializerFactory extends AbstractSerializerFactory {
         }
     }
 
-    private static void addBasic(Class<?> cl, String typeName, int type) {
+    private static void addBasic(String typeName, int type) {
         Deserializer deserializer = new BasicDeserializer(type);
 
         _staticTypeMap.put(typeName, deserializer);
