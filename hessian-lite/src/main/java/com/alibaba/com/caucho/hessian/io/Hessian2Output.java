@@ -88,7 +88,6 @@ public class Hessian2Output
     private final byte[] _buffer = new byte[SIZE];
     // the output stream/
     protected OutputStream _os;
-    private int _refCount = 0;
     private boolean _isCloseStreamOnClose;
     // map of types
     private HashMap<String, Integer> _typeRefs;
@@ -99,10 +98,8 @@ public class Hessian2Output
     private boolean _isUnshared;
 
     /**
-     * Creates a new Hessian output stream, initialized with an
-     * underlying output stream.
-     *
-     * @param os the underlying output stream.
+     * Creates a new Hessian output stream instance without initializing it
+     * with an underlying output stream. The output stream must be set before use.
      */
     public Hessian2Output() {
     }
@@ -210,8 +207,6 @@ public class Hessian2Output
      * <code><pre>
      * C
      * </pre></code>
-     *
-     * @param method the method name to call.
      */
     @Override
     public void startCall()
@@ -402,7 +397,7 @@ public class Hessian2Output
         _buffer[_offset++] = (byte) 'F';
         _buffer[_offset++] = (byte) 'H';
 
-        addRef(new Object(), _refCount++, false);
+        addRef(new Object(), _refs.size(), false);
 
         writeString("code");
         writeString(code);
@@ -867,8 +862,6 @@ public class Hessian2Output
      * <code><pre>
      * N
      * </pre></code>
-     *
-     * @param value the string value to write.
      */
     public void writeNull()
             throws IOException {
@@ -984,8 +977,6 @@ public class Hessian2Output
      * <code><pre>
      * N
      * </pre></code>
-     *
-     * @param value the string value to write.
      */
     public void writeString(char[] buffer, int offset, int length)
             throws IOException {
@@ -1048,8 +1039,6 @@ public class Hessian2Output
      * <code><pre>
      * N
      * </pre></code>
-     *
-     * @param value the string value to write.
      */
     public void writeBytes(byte[] buffer)
             throws IOException {
@@ -1075,8 +1064,6 @@ public class Hessian2Output
      * <code><pre>
      * N
      * </pre></code>
-     *
-     * @param value the string value to write.
      */
     public void writeBytes(byte[] buffer, int offset, int length)
             throws IOException {
@@ -1248,21 +1235,17 @@ public class Hessian2Output
     public boolean addRef(Object object)
             throws IOException {
         if (_isUnshared) {
-            _refCount++;
             return false;
         }
 
-        int newRef = _refCount;
+        int newRef = _refs.size();
 
         int ref = addRef(object, newRef, false);
 
         if (ref != newRef) {
             writeRef(ref);
-
             return true;
         } else {
-            _refCount++;
-
             return false;
         }
     }
@@ -1302,15 +1285,12 @@ public class Hessian2Output
         }
 
         int value = _refs.get(oldRef);
-
         if (value >= 0) {
             addRef(newRef, value, true);
-
             _refs.remove(oldRef);
-
             return true;
-        } else
-            return false;
+        }
+        return false;
     }
 
     private int addRef(Object value, int newRef, boolean isReplace) {
@@ -1348,7 +1328,6 @@ public class Hessian2Output
             throws IOException {
         if (_refs != null) {
             _refs.clear();
-            _refCount = 0;
         }
 
         flushBuffer();
@@ -1569,7 +1548,6 @@ public class Hessian2Output
     public void resetReferences() {
         if (_refs != null) {
             _refs.clear();
-            _refCount = 0;
         }
     }
 
@@ -1579,7 +1557,6 @@ public class Hessian2Output
     public void reset() {
         if (_refs != null) {
             _refs.clear();
-            _refCount = 0;
         }
 
         _classRefs.clear();

@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -42,7 +43,10 @@ import java.time.chrono.HijrahDate;
 import java.time.chrono.JapaneseDate;
 import java.time.chrono.MinguoDate;
 import java.time.chrono.ThaiBuddhistDate;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Test Java8TimeSerializer class
@@ -56,78 +60,212 @@ public class Java8TimeSerializerTest extends SerializeTestBase {
 
     @Test
     public void testInstant() throws Exception {
-        testJava8Time(Instant.now());
+        List<Object> list = new ArrayList<>();
+        Instant instant = Instant.now();
+        list.add(instant);
+        list.add(instant);
+        TestInner o = new TestInner();
+        list.add(o);
+        list.add(o);
+        list.add(instant);
+        list.add(o);
+        testJava8Time(list);
     }
 
     @Test
     public void testDuration() throws Exception {
-        testJava8Time(Duration.ofDays(2));
+        List<Object> list = new ArrayList<>();
+        Duration duration = Duration.ofDays(2);
+        list.add(duration);
+        list.add(duration);
+        TestInner o = new TestInner();
+        list.add(o);
+        list.add(o);
+        list.add(duration);
+        list.add(o);
+        testJava8Time(list);
     }
 
     @Test
     public void testLocalDate() throws Exception {
-        testJava8Time(LocalDate.now());
+        List<Object> list = new ArrayList<>();
+        LocalDate localDate = LocalDate.now();
+        list.add(localDate);
+        list.add(localDate);
+        TestInner o = new TestInner();
+        list.add(o);
+        list.add(o);
+        list.add(localDate);
+        list.add(o);
+        testJava8Time(list);
     }
 
     @Test
     public void testLocalDateTime() throws Exception {
-        testJava8Time(LocalDateTime.now());
+        List<Object> list = new ArrayList<>();
+        LocalDateTime localDateTime = LocalDateTime.now();
+        list.add(localDateTime);
+        list.add(localDateTime);
+        TestInner o = new TestInner();
+        list.add(o);
+        list.add(o);
+        list.add(localDateTime);
+        list.add(o);
+        testJava8Time(list);
     }
 
     @Test
     public void testLocalTime() throws Exception {
-        testJava8Time(LocalTime.now());
+        List<Object> list = new ArrayList<>();
+        LocalTime localTime = LocalTime.now();
+        list.add(localTime);
+        list.add(localTime);
+        TestInner o = new TestInner();
+        list.add(o);
+        list.add(o);
+        list.add(localTime);
+        list.add(o);
+        testJava8Time(list);
     }
 
     @Test
     public void testYear() throws Exception {
-        testJava8Time(Year.now());
+        List<Object> list = new ArrayList<>();
+        Year year = Year.now();
+        list.add(year);
+        list.add(year);
+        TestInner o = new TestInner();
+        list.add(o);
+        list.add(o);
+        list.add(year);
+        list.add(o);
+        testJava8Time(list);
     }
 
     @Test
     public void testYearMonth() throws Exception {
-        testJava8Time(YearMonth.now());
+        List<Object> list = new ArrayList<>();
+        YearMonth yearMonth = YearMonth.now();
+        list.add(yearMonth);
+        list.add(yearMonth);
+        TestInner o = new TestInner();
+        list.add(o);
+        list.add(o);
+        list.add(yearMonth);
+        list.add(o);
+        testJava8Time(list);
     }
 
     @Test
     public void testMonthDay() throws Exception {
-        testJava8Time(MonthDay.now());
+        List<Object> list = new ArrayList<>();
+        MonthDay monthDay = MonthDay.now();
+        list.add(monthDay);
+        list.add(monthDay);
+        TestInner o = new TestInner();
+        list.add(o);
+        list.add(o);
+        list.add(monthDay);
+        list.add(o);
+        testJava8Time(list);
     }
 
     @Test
     public void testPeriod() throws Exception {
-        testJava8Time(Period.ofDays(3));
+        List<Object> list = new ArrayList<>();
+        Period period = Period.ofDays(3);
+        list.add(period);
+        list.add(period);
+        TestInner o = new TestInner();
+        list.add(o);
+        list.add(o);
+        list.add(period);
+        list.add(o);
+        testJava8Time(list);
     }
 
     @Test
     public void testOffsetTime() throws Exception {
-        testJava8Time(OffsetTime.now());
+        List<Object> list = new ArrayList<>();
+        OffsetTime offsetTime = OffsetTime.now();
+        list.add(offsetTime);
+        list.add(offsetTime);
+        TestInner o = new TestInner();
+        list.add(o);
+        list.add(o);
+        list.add(offsetTime);
+        list.add(o);
+        testJava8Time(list);
     }
 
     @Test
     public void testZoneOffset() throws Exception {
-        testJava8Time(ZoneOffset.ofHours( 8));
+        List<Object> list = new ArrayList<>();
+        ZoneOffset zoneOffset = ZoneOffset.ofHours(8);
+        list.add(zoneOffset);
+        list.add(zoneOffset);
+        TestInner o = new TestInner();
+        list.add(o);
+        list.add(o);
+        list.add(zoneOffset);
+        list.add(o);
+        testJava8Time(list);
     }
 
     @Test
     public void testOffsetDateTime() throws Throwable {
-        testJava8Time(OffsetDateTime.now());
+        List<Object> list = new ArrayList<>();
+        OffsetDateTime offsetDateTime = OffsetDateTime.now();
+        list.add(offsetDateTime);
+        list.add(offsetDateTime);
+        TestInner o = new TestInner();
+        list.add(o);
+        list.add(o);
+        list.add(offsetDateTime);
+        list.add(o);
+        testJava8Time(list);
     }
 
     @Test
     public void testZonedDateTime() throws Exception {
-        testJava8Time(ZonedDateTime.now());
+        List<Object> list = new ArrayList<>();
+        ZonedDateTime zonedDateTime = ZonedDateTime.now();
+        list.add(zonedDateTime);
+        list.add(zonedDateTime);
+        TestInner o = new TestInner();
+        list.add(o);
+        list.add(o);
+        list.add(zonedDateTime);
+        list.add(o);
+        testJava8Time(list);
     }
 
     @Test
     public void testZoneId() throws Exception {
-        testJava8Time(ZoneId.of( "America/New_York"));
+        List<Object> list = new ArrayList<>();
+        ZoneId zoneId = ZoneId.of("America/New_York");
+        list.add(zoneId);
+        list.add(zoneId);
+        TestInner o = new TestInner();
+        list.add(o);
+        list.add(o);
+        list.add(zoneId);
+        list.add(o);
+        testJava8Time(list);
     }
 
     @Test
     public void testCalendar() throws IOException {
+        List<Object> list = new ArrayList<>();
         Calendar calendar = Calendar.getInstance();
-        testJava8Time(calendar);
+        list.add(calendar);
+        list.add(calendar);
+        TestInner o = new TestInner();
+        list.add(o);
+        list.add(o);
+        list.add(calendar);
+        list.add(o);
+        testJava8Time(list);
     }
 
     @Test
@@ -152,8 +290,27 @@ public class Java8TimeSerializerTest extends SerializeTestBase {
         testJava8Time(ChronoPeriod.between(ThaiBuddhistDate.now(), ThaiBuddhistDate.now()));
     }
 
+
+    @Test
+    void testChronologyList() throws IOException {
+        List<Object> list = new ArrayList<>();
+        Chronology chronology = Chronology.of("islamic");
+        list.add(chronology);
+        list.add(chronology);
+        TestInner o = new TestInner();
+        list.add(o);
+        list.add(o);
+        list.add(chronology);
+        list.add(o);
+        testJava8Time(list);
+    }
+
     protected void testJava8Time(Object expected) throws IOException {
-        Assertions.assertEquals(expected, baseHessian2Serialize(expected));
+        Object result = baseHessian2Serialize(expected);
+        Assertions.assertEquals(expected, result);
+        if (expected instanceof List && !((List) expected).isEmpty() && ((List) expected).get(0) instanceof Chronology) {
+            return;
+        }
         if (expected instanceof Chronology || expected instanceof ChronoPeriod || expected instanceof JapaneseDate
                 || expected instanceof HijrahDate || expected instanceof MinguoDate || expected instanceof ThaiBuddhistDate) {
             return;
@@ -161,5 +318,31 @@ public class Java8TimeSerializerTest extends SerializeTestBase {
         Assertions.assertEquals(expected, hessian3ToHessian3(expected));
         Assertions.assertEquals(expected, hessian4ToHessian3(expected));
         Assertions.assertEquals(expected, hessian3ToHessian4(expected));
+    }
+    
+    /**
+     * Helper class used in tests to verify reference handling during serialization.
+     * Instances of this class are added multiple times to collections to ensure
+     * that object references are correctly preserved or duplicated as expected
+     * when serializing and deserializing with Hessian.
+     */
+    static class TestInner implements Serializable {
+        String value;
+        
+        @Override
+        public boolean equals(Object o) {
+            if (o == this) {
+                return true;
+            }
+            if (o instanceof TestInner) {
+                return Objects.equals(((TestInner) o).value, value);
+            }
+            return false;
+        }
+        
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(value);
+        }
     }
 }

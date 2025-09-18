@@ -29,6 +29,7 @@ import java.time.chrono.HijrahDate;
 import java.time.chrono.JapaneseDate;
 import java.time.chrono.MinguoDate;
 import java.time.chrono.ThaiBuddhistDate;
+import java.util.List;
 
 /**
  * Test Java8TimeSerializer class use compact mode
@@ -52,6 +53,9 @@ public class Java8TimeSerializerUseCompactModeTest extends Java8TimeSerializerTe
 
     protected void testJava8Time(Object expected) throws IOException {
         Assertions.assertEquals(expected, baseHessian2Serialize(expected));
+        if (expected instanceof List && !((List) expected).isEmpty() && ((List) expected).get(0) instanceof Chronology) {
+            return;
+        }
         if (expected instanceof Chronology || expected instanceof ChronoPeriod || expected instanceof JapaneseDate
                 || expected instanceof HijrahDate || expected instanceof MinguoDate || expected instanceof ThaiBuddhistDate) {
             return;
