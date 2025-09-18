@@ -78,7 +78,7 @@ public class CollectionDeserializer extends AbstractListDeserializer {
 
     @Override
     public Object readList(AbstractHessianInput in, int length, Class<?> expectType) throws IOException {
-        Collection list = createList();
+        Collection list = createList(length);
 
         in.addRef(list);
 
@@ -106,7 +106,7 @@ public class CollectionDeserializer extends AbstractListDeserializer {
 
     @Override
     public Object readLengthList(AbstractHessianInput in, int length, Class<?> expectType) throws IOException {
-        Collection list = createList();
+        Collection list = createList(length);
 
         in.addRef(list);
 
@@ -125,12 +125,12 @@ public class CollectionDeserializer extends AbstractListDeserializer {
         return list;
     }
 
-    private Collection createList()
+    private Collection createList(int expectedSize)
             throws IOException {
         Collection list = null;
 
         if (_type == null)
-            list = new ArrayList();
+            list = new ArrayList(expectedSize);
         else if (!_type.isInterface()) {
             try {
                 list = (Collection) _type.newInstance();
@@ -142,11 +142,9 @@ public class CollectionDeserializer extends AbstractListDeserializer {
         } else if (SortedSet.class.isAssignableFrom(_type))
             list = new TreeSet();
         else if (Set.class.isAssignableFrom(_type))
-            list = new HashSet();
-        else if (List.class.isAssignableFrom(_type))
-            list = new ArrayList();
+            list = new HashSet(MapUtil.capacity(expectedSize));
         else if (Collection.class.isAssignableFrom(_type))
-            list = new ArrayList();
+            list = new ArrayList(expectedSize);
         else {
             try {
                 list = (Collection) _type.newInstance();
