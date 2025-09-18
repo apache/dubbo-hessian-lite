@@ -21,9 +21,17 @@ class MapUtil {
 
   private static final int MAX_POWER_OF_TWO = 1 << (Integer.SIZE - 2);
 
+  /**
+   * @see java.util.HashMap#DEFAULT_INITIAL_CAPACITY
+   */
+  private static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
+
   protected static int capacity(int expectedSize) {
+    if (expectedSize < 0) {
+      return DEFAULT_INITIAL_CAPACITY;
+    }
+
     if (expectedSize < 3) {
-      checkNonNegative(expectedSize, "expectedSize");
       return expectedSize + 1;
     }
     if (expectedSize < MAX_POWER_OF_TWO) {
@@ -33,13 +41,6 @@ class MapUtil {
       return (int) ((float) expectedSize / 0.75F + 1.0F);
     }
     return Integer.MAX_VALUE;
-  }
-
-  private static int checkNonNegative(int value, String name) {
-    if (value < 0) {
-      throw new IllegalArgumentException(name + " cannot be negative but was: " + value);
-    }
-    return value;
   }
 
 }
