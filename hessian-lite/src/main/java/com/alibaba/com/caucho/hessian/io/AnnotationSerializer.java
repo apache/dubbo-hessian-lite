@@ -80,8 +80,7 @@ public class AnnotationSerializer extends AbstractSerializer {
     private static MethodSerializer getMethodSerializer(Class type) {
         if (int.class.equals(type)
                 || byte.class.equals(type)
-                || short.class.equals(type)
-                || int.class.equals(type)) {
+                || short.class.equals(type)) {
             return IntMethodSerializer.SER;
         } else if (long.class.equals(type)) {
             return LongMethodSerializer.SER;
@@ -275,7 +274,7 @@ public class AnnotationSerializer extends AbstractSerializer {
             int value = 0;
 
             try {
-                value = (Integer) method.invoke(obj);
+                value = Integer.parseInt(method.invoke(obj).toString());;
             } catch (InvocationTargetException e) {
                 throw error(method, e.getCause());
             } catch (IllegalAccessException e) {
@@ -313,7 +312,7 @@ public class AnnotationSerializer extends AbstractSerializer {
             double value = 0;
 
             try {
-                value = (Double) method.invoke(obj);
+                value = Double.parseDouble(method.invoke(obj).toString());
             } catch (InvocationTargetException e) {
                 throw error(method, e.getCause());
             } catch (IllegalAccessException e) {
