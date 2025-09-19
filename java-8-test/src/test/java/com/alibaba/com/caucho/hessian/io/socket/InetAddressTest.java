@@ -25,6 +25,10 @@ import org.junit.jupiter.api.condition.JRE;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Collections;
+import java.util.Optional;
 
 public class InetAddressTest extends SerializeTestBase {
     @Test
@@ -66,6 +70,32 @@ public class InetAddressTest extends SerializeTestBase {
         Assertions.assertArrayEquals(inet6Address.getAddress(), baseHessian2Serialize(inet6Address).getAddress());
 
         Assertions.assertEquals(hessian3ToHessian3(inet6Address), hessian4ToHessian3(inet6Address));
+    }
+
+    @Test
+    void testGetByAddressWithNetworkInterface() throws Exception {
+        Optional<NetworkInterface> optNif = Collections.list(NetworkInterface.getNetworkInterfaces()).stream()
+                .filter(t -> {
+                    try {
+                        return t.isUp();
+                    } catch (SocketException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .filter(nif ->
+                        Collections.list(nif.getInetAddresses()).stream().anyMatch(Inet6Address.class::isInstance))
+                .findFirst();
+
+        if (optNif.isPresent()) {
+            NetworkInterface nif = optNif.get();
+            Inet6Address inet6Address = Inet6Address.getByAddress(
+                    "baidu.com", InetAddress.getByName("::1").getAddress(), nif);
+            Inet6Address result = baseHessian2Serialize(inet6Address);
+            Assertions.assertEquals(inet6Address, result);
+            Assertions.assertEquals(inet6Address.getHostAddress(), result.getHostAddress());
+            Assertions.assertEquals(inet6Address.getHostName(), result.getHostName());
+            Assertions.assertArrayEquals(inet6Address.getAddress(), result.getAddress());
+        }
     }
 
     @Test

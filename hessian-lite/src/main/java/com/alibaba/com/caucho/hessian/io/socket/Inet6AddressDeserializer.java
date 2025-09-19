@@ -23,6 +23,7 @@ import com.alibaba.com.caucho.hessian.io.IOExceptionWrapper;
 import java.io.IOException;
 import java.net.Inet6Address;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
 
 public class Inet6AddressDeserializer extends AbstractDeserializer {
     public Class<?> getType() {
@@ -61,8 +62,14 @@ public class Inet6AddressDeserializer extends AbstractDeserializer {
                 }
             }
             if (inet4Address != null) {
-                inet6Address = Inet6Address.getByAddress(inet4Address.getHostName(), inet6Address.getAddress(),
-                        inet6Address.getScopeId() <= 0 ? -1 : inet6Address.getScopeId());
+                NetworkInterface scopedInterface = inet6Address.getScopedInterface();
+                if (scopedInterface != null) {
+                    inet6Address = Inet6Address.getByAddress(inet4Address.getHostName(), inet6Address.getAddress(),
+                            scopedInterface);
+                } else {
+                    inet6Address = Inet6Address.getByAddress(inet4Address.getHostName(), inet6Address.getAddress(),
+                            inet6Address.getScopeId() <= 0 ? -1 : inet6Address.getScopeId());
+                }
             }
 
             in.addRef(inet6Address);
