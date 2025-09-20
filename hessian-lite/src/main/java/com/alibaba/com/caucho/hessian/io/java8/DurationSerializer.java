@@ -18,20 +18,12 @@
 package com.alibaba.com.caucho.hessian.io.java8;
 
 
-import com.alibaba.com.caucho.hessian.io.AbstractHessianOutput;
 import com.alibaba.com.caucho.hessian.io.AbstractSerializer;
-
-import java.io.IOException;
 
 public class DurationSerializer<T> extends AbstractSerializer {
 
     @Override
-    public void writeObject(Object obj, AbstractHessianOutput out) throws IOException {
-        if (obj == null) {
-            out.writeNull();
-            return;
-        }
-
-        out.writeObject(new DurationHandle(obj));
+    public Object writeReplace(Object obj) {
+        return new DurationHandle(obj);
     }
 }

@@ -19,7 +19,6 @@ package com.alibaba.com.caucho.hessian.io;
 import com.alibaba.com.caucho.hessian.HessianException;
 import sun.misc.Unsafe;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.EnumSet;
 import java.util.logging.Level;
@@ -67,21 +66,17 @@ public class EnumSetSerializer extends AbstractSerializer {
     }
 
     @Override
-    public void writeObject(Object obj, AbstractHessianOutput out) throws IOException {
-        if (obj == null) {
-            out.writeNull();
-        } else {
-            EnumSet enumSet = (EnumSet) obj;
-            Class type = getElementClass(enumSet);
-            Object[] objects = enumSet.toArray();
-            out.writeObject(new EnumSetHandler(type, objects));
-        }
+    public Object writeReplace(Object obj) {
+        EnumSet enumSet = (EnumSet) obj;
+        Class type = getElementClass(enumSet);
+        Object[] objects = enumSet.toArray();
+        return new EnumSetHandler(type, objects);
     }
 
-    private Class<?> getElementClass(EnumSet enumSet) throws IOException {
+    private Class<?> getElementClass(EnumSet enumSet) {
         if (!_isEnabled) {
             if (enumSet.isEmpty()) {
-                throw new HessianFieldException("Unable to serialize empty EnumSet without unsafe access");
+                throw new HessianException(new HessianFieldException("Unable to serialize empty EnumSet without unsafe access"));
             }
             return enumSet.iterator().next().getClass();
         }

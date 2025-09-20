@@ -48,7 +48,6 @@
 
 package com.alibaba.com.caucho.hessian.io;
 
-import java.io.IOException;
 import java.net.InetAddress;
 
 /**
@@ -62,14 +61,8 @@ public class InetAddressSerializer extends AbstractSerializer {
     }
 
     @Override
-    public void writeObject(Object obj, AbstractHessianOutput out)
-            throws IOException {
-        if (obj == null)
-            out.writeNull();
-        else {
-            InetAddress addr = (InetAddress) obj;
-            out.writeObject(new InetAddressHandle(addr.getHostName(),
-                    addr.getAddress()));
-        }
+    public Object writeReplace(Object obj) {
+        InetAddress addr = (InetAddress) obj;
+        return new InetAddressHandle(addr.getHostName(), addr.getAddress());
     }
 }
