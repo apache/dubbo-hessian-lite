@@ -274,7 +274,14 @@ public class AnnotationSerializer extends AbstractSerializer {
             int value = 0;
 
             try {
-                value = Integer.parseInt(method.invoke(obj).toString());
+                Object ret = method.invoke(obj);
+                if (ret instanceof Byte) {
+                    value = (Byte) ret;
+                } else if (ret instanceof Short) {
+                    value = (Short) ret;
+                } else {
+                    value = (Integer) ret;
+                }
             } catch (InvocationTargetException e) {
                 throw error(method, e.getCause());
             } catch (IllegalAccessException e) {
@@ -312,7 +319,12 @@ public class AnnotationSerializer extends AbstractSerializer {
             double value = 0;
 
             try {
-                value = Double.parseDouble(method.invoke(obj).toString());
+                Object ret = method.invoke(obj);
+                if (ret instanceof Float) {
+                    value = (Float) ret;
+                } else {
+                    value = (Double) ret;
+                }
             } catch (InvocationTargetException e) {
                 throw error(method, e.getCause());
             } catch (IllegalAccessException e) {
