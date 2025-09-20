@@ -274,7 +274,7 @@ public class AnnotationSerializer extends AbstractSerializer {
             int value = 0;
 
             try {
-                value = Integer.parseInt(method.invoke(obj).toString());;
+                value = Integer.parseInt(method.invoke(obj).toString());
             } catch (InvocationTargetException e) {
                 throw error(method, e.getCause());
             } catch (IllegalAccessException e) {
