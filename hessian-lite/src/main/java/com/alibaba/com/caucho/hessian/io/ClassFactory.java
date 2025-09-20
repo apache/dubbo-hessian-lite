@@ -139,10 +139,9 @@ public class ClassFactory {
             for (Class<?> anInterface : aClass.getInterfaces()) {
                 String interfaceName = anInterface.getName();
                 if (!isAllow(interfaceName)) {
-                log.log(Level.SEVERE, className + "'s interfaces: " + interfaceName
-                    + " in blacklist or not in whitelist, deserialization with type 'HashMap' instead.");
-                return HashMap.class;
-              }
+                    log.log(Level.SEVERE, className + "'s interfaces: " + interfaceName + " in blacklist or not in whitelist, deserialization with type 'HashMap' instead.");
+                    return HashMap.class;
+                }
             }
 
             Class<?> superClass = aClass.getSuperclass();
