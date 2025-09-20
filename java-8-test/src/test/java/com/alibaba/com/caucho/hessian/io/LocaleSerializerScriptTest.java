@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Test for Locale script preservation during serialization/deserialization
  */
-public class LocaleScriptTest extends SerializeTestBase {
+public class LocaleSerializerScriptTest extends SerializeTestBase {
     
     @Test
     void testLocaleWithScript() throws IOException {
