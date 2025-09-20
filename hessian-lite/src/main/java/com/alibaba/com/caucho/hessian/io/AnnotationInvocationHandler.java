@@ -87,12 +87,12 @@ public class AnnotationInvocationHandler implements InvocationHandler {
 
 
         Object value = _valueMap.get(method.getName());
-
-        if (method.getReturnType().equals(byte.class) && value instanceof Integer) {
+        Class<?> returnType = method.getReturnType();
+        if (byte.class.equals(returnType) && value instanceof Integer) {
             return ((Integer) value).byteValue();
-        } else if (method.getReturnType().equals(short.class) && value instanceof Integer) {
+        } else if (short.class.equals(returnType) && value instanceof Integer) {
             return ((Integer) value).shortValue();
-        } else if (method.getReturnType().equals(float.class) && value instanceof Double) {
+        } else if (float.class.equals(returnType) && value instanceof Double) {
             return ((Double) value).floatValue();
         }
         return value;
