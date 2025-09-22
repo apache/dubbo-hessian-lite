@@ -150,7 +150,7 @@ public class MapDeserializer extends AbstractMapDeserializer {
                              Object[] fields)
             throws IOException {
         String[] fieldNames = (String[]) fields;
-        Map<Object, Object> map = createMap();
+        Map<Object, Object> map = createMap(fieldNames.length);
 
         in.addRef(map);
 
@@ -163,13 +163,11 @@ public class MapDeserializer extends AbstractMapDeserializer {
         return map;
     }
 
-    private Map createMap()
+    private Map createMap(int expectedSize)
             throws IOException {
 
-        if (_type == null)
-            return new HashMap();
-        else if (_type.equals(Map.class))
-            return new HashMap();
+        if (_type == null || _type.equals(Map.class) || _type.equals(HashMap.class))
+            return new HashMap(MapUtil.capacity(expectedSize));
         else if (_type.equals(SortedMap.class))
             return new TreeMap();
         else {

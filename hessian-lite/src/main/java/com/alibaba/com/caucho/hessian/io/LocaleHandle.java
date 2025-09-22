@@ -66,12 +66,16 @@ public class LocaleHandle implements java.io.Serializable, HessianHandle {
             return null;
         }
 
-        if (value.length() == 0) {
+        if (value.isEmpty()) {
             return new Locale("");
         }
 
         int extStart = value.indexOf("_#");
-        if (extStart != -1) value = value.substring(0, extStart);
+        String script = null;
+        if (extStart != -1) {
+            script = value.substring(extStart + 2);
+            value = value.substring(0, extStart);
+        } 
 
         String language = value, country = "", variant = "";
         int pos1 = value.indexOf('_');
@@ -86,6 +90,22 @@ public class LocaleHandle implements java.io.Serializable, HessianHandle {
                 variant = value.substring(pos2 + 1);
             }
         }
+
+        if (script != null && !script.isEmpty()) {
+            Locale.Builder builder = new Locale.Builder();
+            if (!language.isEmpty()) {
+                builder.setLanguage(language);
+            }
+            if (!country.isEmpty()) {
+                builder.setRegion(country);
+            }
+            if (!variant.isEmpty()) {
+                builder.setVariant(variant);
+            }
+            builder.setScript(script);
+            return builder.build();
+        }
+        
         return new Locale(language, country, variant);
     }
 }

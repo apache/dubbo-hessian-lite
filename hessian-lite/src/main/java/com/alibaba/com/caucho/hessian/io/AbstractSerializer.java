@@ -65,20 +65,18 @@ abstract public class AbstractSerializer implements Serializer {
     @Override
     public void writeObject(Object obj, AbstractHessianOutput out)
             throws IOException {
-        if (out.addRef(obj)) {
+        int ref = out.getRef(obj);
+        if (ref >= 0) {
+            // shared mode is true if the result of getRef is not less than zero.
+            out.writeRef(ref);
             return;
         }
 
         try {
             Object replace = writeReplace(obj);
-
             if (replace != null) {
-                // out.removeRef(obj);
-
                 out.writeObject(replace);
-
                 out.replaceRef(replace, obj);
-
                 return;
             }
         } catch (RuntimeException e) {
@@ -88,9 +86,12 @@ abstract public class AbstractSerializer implements Serializer {
             throw new HessianException(e);
         }
 
+        // add reference if writeReplace returns null and shared mode is true.
+        out.addRef(obj);
+
         Class<?> cl = getClass(obj);
 
-        int ref = out.writeObjectBegin(cl.getName());
+        ref = out.writeObjectBegin(cl.getName());
 
         if (ref < -1) {
             writeObject10(obj, out);

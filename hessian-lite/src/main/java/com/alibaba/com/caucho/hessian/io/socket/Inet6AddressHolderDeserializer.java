@@ -23,6 +23,7 @@ import com.alibaba.com.caucho.hessian.io.IOExceptionWrapper;
 import java.io.IOException;
 import java.net.Inet6Address;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
 
 public class Inet6AddressHolderDeserializer extends AbstractDeserializer {
     @Override
@@ -47,18 +48,30 @@ public class Inet6AddressHolderDeserializer extends AbstractDeserializer {
         try {
             byte[] ipaddress = new byte[16];
             int scope_id = 0;
+            String ifname = null;
             for (String fieldName : fieldNames) {
                 if ("ipaddress".equals(fieldName)) {
                     ipaddress = (byte[]) in.readObject();
                 } else if ("scope_id".equals(fieldName)) {
                     scope_id = in.readInt();
+                } else if ("scope_ifname".equals(fieldName)) {
+                    ifname = in.readString();
                 } else {
                     in.readObject();
                 }
             }
 
-
-            InetAddress obj = Inet6Address.getByAddress("", ipaddress, scope_id <= 0 ? -1 : scope_id);
+            InetAddress obj = null;
+            if (ifname != null) {
+                NetworkInterface scopeIfname = NetworkInterface.getByName(ifname);
+                if (scopeIfname != null) {
+                    obj = Inet6Address.getByAddress("", ipaddress, scopeIfname);
+                }
+            } 
+            
+            if (obj == null) {
+                obj = Inet6Address.getByAddress("", ipaddress, scope_id <= 0 ? -1 : scope_id);
+            }
 
             in.addRef(obj);
 
