@@ -129,9 +129,9 @@ public class CollectionDeserializer extends AbstractListDeserializer {
             throws IOException {
         Collection list = null;
 
-        if (_type == null)
-            list = new ArrayList(expectedSize);
-        else if (!_type.isInterface()) {
+        if (_type == null) {
+            list = expectedSize <= 0 ? new ArrayList() : new ArrayList(expectedSize);
+        } else if (!_type.isInterface()) {
             try {
                 list = (Collection) _type.newInstance();
             } catch (Exception e) {
@@ -143,9 +143,9 @@ public class CollectionDeserializer extends AbstractListDeserializer {
             list = new TreeSet();
         else if (Set.class.isAssignableFrom(_type))
             list = new HashSet(MapUtil.capacity(expectedSize));
-        else if (Collection.class.isAssignableFrom(_type))
-            list = new ArrayList(expectedSize);
-        else {
+        else if (Collection.class.isAssignableFrom(_type)) {
+            list = expectedSize <= 0 ? new ArrayList() : new ArrayList(expectedSize);
+        } else {
             try {
                 list = (Collection) _type.newInstance();
             } catch (Exception e) {
