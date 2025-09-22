@@ -16,10 +16,8 @@
  */
 package com.alibaba.com.caucho.hessian.io.java8;
 
-import com.alibaba.com.caucho.hessian.io.AbstractHessianOutput;
 import com.alibaba.com.caucho.hessian.io.AbstractSerializer;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -27,12 +25,7 @@ import java.util.LinkedList;
 public class SynchronizedRandomAccessListSerializer <T> extends AbstractSerializer {
 
     @Override
-    public void writeObject(Object obj, AbstractHessianOutput out) throws IOException {
-        if (obj == null) {
-            out.writeNull();
-            return;
-        }
-
-        out.writeObject(Collections.synchronizedList(new LinkedList<T>((Collection<T>) obj)));
+    protected Object writeReplace(Object obj) {
+        return Collections.synchronizedList(new LinkedList<T>((Collection<T>) obj));
     }
 }

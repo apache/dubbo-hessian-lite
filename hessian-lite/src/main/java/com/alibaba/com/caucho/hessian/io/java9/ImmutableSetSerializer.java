@@ -16,22 +16,16 @@
  */
 package com.alibaba.com.caucho.hessian.io.java9;
 
-import com.alibaba.com.caucho.hessian.io.AbstractHessianOutput;
 import com.alibaba.com.caucho.hessian.io.AbstractSerializer;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-public class ListNSerializer extends AbstractSerializer {
+public class ImmutableSetSerializer extends AbstractSerializer {
 
     @Override
-    public void writeObject(Object obj, AbstractHessianOutput out) throws IOException {
-        if (obj == null) {
-            out.writeNull();
-            return;
-        }
-
-        out.writeObject(new ArrayList<>((List) obj));
+    protected Object writeReplace(Object obj) {
+        return new HashSet<>((Set) obj);
     }
+
 }
