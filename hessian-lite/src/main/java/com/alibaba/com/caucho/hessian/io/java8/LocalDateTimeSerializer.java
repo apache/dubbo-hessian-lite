@@ -59,7 +59,13 @@ public class LocalDateTimeSerializer<T> extends AbstractSerializer {
                 out.writeLong(localDateTime.toLocalTime().toNanoOfDay());
             }   
         } else {
-            out.writeObject(new LocalDateTimeHandle(obj));
+            super.writeObject(obj, out);
         }
     }
+
+    @Override
+    protected Object writeReplace(Object obj) {
+        return new LocalDateTimeHandle(obj);
+    }
+
 }
