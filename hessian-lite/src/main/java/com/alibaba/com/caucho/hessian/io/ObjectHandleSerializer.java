@@ -58,21 +58,18 @@ public class ObjectHandleSerializer extends AbstractSerializer {
 
     public void writeObject(Object obj, AbstractHessianOutput out)
             throws IOException {
-        if (obj == null)
-            out.writeNull();
-        else {
-            if (out.addRef(obj))
-                return;
+        if (out.addRef(obj)) {
+            return;
+        }
 
-            int ref = out.writeObjectBegin("object");
+        int ref = out.writeObjectBegin("object");
 
-            if (ref < -1) {
-                out.writeMapEnd();
-            } else {
-                if (ref == -1) {
-                    out.writeInt(0);
-                    out.writeObjectBegin("object");
-                }
+        if (ref < -1) {
+            out.writeMapEnd();
+        } else {
+            if (ref == -1) {
+                out.writeInt(0);
+                out.writeObjectBegin("object");
             }
         }
     }

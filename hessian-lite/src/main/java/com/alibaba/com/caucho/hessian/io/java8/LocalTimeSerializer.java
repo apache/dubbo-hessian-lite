@@ -26,11 +26,6 @@ public class LocalTimeSerializer<T> extends AbstractSerializer {
 
     @Override
     public void writeObject(Object obj, AbstractHessianOutput out) throws IOException {
-        if (obj == null) {
-            out.writeNull();
-            return;
-        }
-
         if (SerializationConfig.isCompactMode()) {
             if (out.addRef(obj)) {
                 return;
