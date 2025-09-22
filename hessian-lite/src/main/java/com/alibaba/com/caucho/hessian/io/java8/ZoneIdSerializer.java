@@ -18,10 +18,8 @@
 package com.alibaba.com.caucho.hessian.io.java8;
 
 
-import com.alibaba.com.caucho.hessian.io.AbstractHessianOutput;
 import com.alibaba.com.caucho.hessian.io.AbstractSerializer;
 
-import java.io.IOException;
 
 public class ZoneIdSerializer extends AbstractSerializer {
 
@@ -32,12 +30,8 @@ public class ZoneIdSerializer extends AbstractSerializer {
     }
 
     @Override
-    public void writeObject(Object obj, AbstractHessianOutput out) throws IOException {
-        if (obj == null) {
-            out.writeNull();
-        } else {
-            out.writeObject(new ZoneIdHandle(obj));
-        }
+    protected Object writeReplace(Object obj) {
+        return new ZoneIdHandle(obj);
     }
 
 }
