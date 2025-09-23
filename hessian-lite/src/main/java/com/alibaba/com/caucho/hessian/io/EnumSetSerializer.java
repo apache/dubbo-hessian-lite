@@ -67,7 +67,7 @@ public class EnumSetSerializer extends AbstractSerializer {
     }
 
     @Override
-    public Object writeReplace(Object obj) throws Exception {
+    public Object writeReplace(Object obj) throws IOException {
         EnumSet enumSet = (EnumSet) obj;
         Class type = getElementClass(enumSet);
         Object[] objects = enumSet.toArray();
