@@ -49,6 +49,8 @@ public class WeekFieldsDeserializer extends AbstractDeserializer {
                              String[] fieldNames)
             throws IOException {
         try {
+            int ref = in.addRef(null);
+
             DayOfWeek firstDayOfWeek = null;
             int minimalDays = 0;
             for (String fieldName : fieldNames) {
@@ -62,7 +64,7 @@ public class WeekFieldsDeserializer extends AbstractDeserializer {
             }
 
             Object obj = WeekFields.of(firstDayOfWeek, minimalDays);
-            in.addRef(obj);
+            in.setRef(ref, obj);
 
             return obj;
         } catch (IOException e) {
