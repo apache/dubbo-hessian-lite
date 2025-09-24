@@ -164,4 +164,50 @@ public class HessianJavaSerializeTest extends SerializeTestBase {
         Assertions.assertEquals(dData, hessian3ToHessian4(fData));
     }
 
+    @Test
+    public void testCollection() throws Exception {
+        BaseUser baseUser = new BaseUser();
+        baseUser.setUserId(1);
+        baseUser.setUserName("tom");
+        List<BaseUser> baseUserList = new ArrayList<>();
+        baseUserList.add(baseUser);
+        baseUserList.add(baseUser);
+        List<BaseUser> result = baseHessian2Serialize(baseUserList);
+        Assertions.assertEquals(baseUserList.size(), result.size());
+        Assertions.assertSame(result.get(0), result.get(1));
+        Assertions.assertEquals("tom", result.get(0).getUserName());
+
+        SubUser subUser = new SubUser();
+        subUser.setUserId(1);
+        subUser.setUserName("tom");
+        List<SubUser> subUserList = new ArrayList<>();
+        subUserList.add(subUser);
+        subUserList.add(subUser);
+        List<SubUser> subUserResult = baseHessian2Serialize(subUserList);
+        Assertions.assertEquals(subUserList.size(), subUserResult.size());
+        Assertions.assertSame(subUserResult.get(0), subUserResult.get(1));
+        Assertions.assertEquals("tom", subUserResult.get(0).getUserName());
+
+        List<Integer> list = new ArrayList<>();
+        list.add(null);
+        list.add(null);
+        list.add(3);
+        subUser.setAgeList(list);
+        subUserResult = baseHessian2Serialize(subUserList);
+        Assertions.assertEquals(subUserList.size(), subUserResult.size());
+        Assertions.assertSame(subUserResult.get(0), subUserResult.get(1));
+        Assertions.assertEquals("tom", subUserResult.get(0).getUserName());
+
+        GrandsonUser grandsonUser = new GrandsonUser();
+        grandsonUser.setUserId(1);
+        grandsonUser.setUserName("tom");
+        List<GrandsonUser> grandsonUserList = new ArrayList<>();
+        grandsonUserList.add(grandsonUser);
+        grandsonUserList.add(grandsonUser);
+        List<GrandsonUser> grandsonUserResult = baseHessian2Serialize(grandsonUserList);
+        Assertions.assertEquals(grandsonUserList.size(), grandsonUserResult.size());
+        Assertions.assertSame(grandsonUserResult.get(0), grandsonUserResult.get(1));
+        Assertions.assertEquals("tom", grandsonUserResult.get(0).getUserName());
+    }
+
 }

@@ -23,6 +23,8 @@ import org.junit.jupiter.api.condition.EnabledForJreRange;
 import org.junit.jupiter.api.condition.JRE;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
@@ -73,5 +75,16 @@ public class ConcurrentSkipListMapTest extends SerializeTestBase {
             Assertions.assertEquals(k, resultEntry.getKey());
             Assertions.assertEquals(v, resultEntry.getValue());
         });
+    }
+
+    @Test
+    void testCollection() throws IOException {
+        List<Object> list = new ArrayList<>();
+
+        ConcurrentSkipListMap<String, Integer> originalMap = new ConcurrentSkipListMap<>();
+        originalMap.put("one", 1);
+        originalMap.put("two", 2);
+        originalMap.put("three", 3);
+        list.add(originalMap);
     }
 }

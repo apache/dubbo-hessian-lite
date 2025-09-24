@@ -18,6 +18,7 @@ package com.alibaba.com.caucho.hessian.io;
 
 import com.alibaba.com.caucho.hessian.io.base.SerializeTestBase;
 import com.alibaba.com.caucho.hessian.io.beans.SubUser;
+import java.util.ArrayList;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -104,5 +105,25 @@ public class CollectionSerializerTest extends SerializeTestBase {
 
         List deserialize = baseHessian2Serialize(vector);
         Assertions.assertTrue(deserialize.equals(vector));
+    }
+
+    @Test
+    public void testCollection() throws Exception {
+        List<Object> list = new ArrayList<>();
+
+        Set set = new HashSet();
+        set.add(1111);
+        set.add(2222);
+        testCollection(list, set);
+
+        Vector vector = new Vector();
+        vector.add(1111);
+        vector.add(2222);
+        testCollection(list, vector);
+
+        List<String> stringList = new ArrayList<>();
+        stringList.add("1111");
+        stringList.add("2222");
+        testCollection(list, stringList);
     }
 }

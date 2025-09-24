@@ -23,11 +23,21 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.UnixDomainSocketAddress;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UnixDomainSocketAddressTest extends SerializeTestBase {
     @Test
     void test() throws IOException {
         UnixDomainSocketAddress unixDomainSocketAddress = UnixDomainSocketAddress.of("/etc/test");
         Assertions.assertEquals(unixDomainSocketAddress, baseHessian2Serialize(unixDomainSocketAddress));
+    }
+
+    @Test
+    void testCollection() throws IOException {
+        List<Object> list = new ArrayList<>();
+
+        UnixDomainSocketAddress unixDomainSocketAddress = UnixDomainSocketAddress.of("/etc/test");
+        testCollection(list, unixDomainSocketAddress);
     }
 }

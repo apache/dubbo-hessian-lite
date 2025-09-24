@@ -24,6 +24,8 @@ import org.junit.jupiter.api.condition.JRE;
 
 import java.io.IOException;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class NumberFormatTest extends SerializeTestBase {
@@ -77,5 +79,24 @@ public class NumberFormatTest extends SerializeTestBase {
         Assertions.assertEquals(obj.getRoundingMode(), hessian3ToHessian4(obj).getRoundingMode());
         // TODO Support currency
 //        Assertions.assertEquals(obj.getCurrency(), hessian3ToHessian4(obj).getCurrency());
+    }
+
+    @Test
+    void testCollection() throws IOException {
+        NumberFormat originalNumberFormat = NumberFormat.getInstance(Locale.US);
+
+        List<NumberFormat> list = new ArrayList<>();
+        list.add(originalNumberFormat);
+        list.add(originalNumberFormat);
+
+        List<NumberFormat> result = baseHessian2Serialize(list);
+
+        Assertions.assertEquals(list.size(), result.size());
+        Assertions.assertSame(result.get(0), result.get(1));
+        Assertions.assertEquals(originalNumberFormat.getMaximumFractionDigits(), result.get(0).getMaximumFractionDigits());
+        Assertions.assertEquals(originalNumberFormat.getMaximumIntegerDigits(), result.get(0).getMaximumIntegerDigits());
+        Assertions.assertEquals(originalNumberFormat.getMinimumFractionDigits(), result.get(0).getMinimumFractionDigits());
+        Assertions.assertEquals(originalNumberFormat.getMinimumIntegerDigits(), result.get(0).getMinimumIntegerDigits());
+        Assertions.assertEquals(originalNumberFormat.getRoundingMode(), result.get(0).getRoundingMode());
     }
 }

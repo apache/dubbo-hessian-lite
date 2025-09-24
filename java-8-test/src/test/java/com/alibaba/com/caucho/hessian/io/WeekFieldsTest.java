@@ -38,16 +38,9 @@ public class WeekFieldsTest extends SerializeTestBase {
 
     @Test
     void testCollection() throws IOException {
+        List<Object> list = new ArrayList<>();
+
         WeekFields originalWeekFields = WeekFields.of(Locale.FRANCE);
-
-        List<WeekFields> list = new ArrayList<>();
-        list.add(originalWeekFields);
-        list.add(originalWeekFields);
-
-        List<WeekFields> result = baseHessian2Serialize(list);
-
-        Assertions.assertEquals(list.size(), result.size());
-        Assertions.assertSame(result.get(0), result.get(1));
-        Assertions.assertEquals(originalWeekFields, result.get(0));
+        testCollection(list, originalWeekFields);
     }
 }

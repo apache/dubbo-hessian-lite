@@ -26,6 +26,8 @@ import org.junit.jupiter.api.condition.JRE;
 import java.io.IOException;
 import java.time.Clock;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ClockTest extends SerializeTestBase {
     @Test
@@ -45,5 +47,13 @@ public class ClockTest extends SerializeTestBase {
         Assertions.assertEquals(obj.getZone(), hessian3ToHessian3(obj).getZone());
         Assertions.assertEquals(obj.getZone(), hessian4ToHessian3(obj).getZone());
         Assertions.assertEquals(obj.getZone(), hessian3ToHessian4(obj).getZone());
+    }
+
+    @Test
+    void testCollection() throws IOException {
+        List<Object> list = new ArrayList<>();
+
+        Clock originalClock = Clock.system(ZoneId.of("Asia/Shanghai"));
+        testCollection(list, originalClock);
     }
 }

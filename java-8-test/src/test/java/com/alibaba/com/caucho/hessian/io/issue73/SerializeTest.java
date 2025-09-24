@@ -17,6 +17,7 @@
 package com.alibaba.com.caucho.hessian.io.issue73;
 
 import com.alibaba.com.caucho.hessian.io.base.SerializeTestBase;
+import java.util.ArrayList;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -57,4 +58,32 @@ public class SerializeTest extends SerializeTestBase {
         Assertions.assertEquals(result, hessian3ToHessian4(result));
 
     }
+
+    @Test
+    void testCollection() throws IOException {
+        List<Object> list = new ArrayList<>();
+
+        ComplainDto complainDto = new ComplainDto();
+        complainDto.setAppealReason("1");
+        complainDto.setAppealState(2);
+        complainDto.setAppealType((byte) 3);
+        complainDto.setClass1Name("4");
+        complainDto.setClass2Name("5");
+        complainDto.setClass3Name("6");
+        complainDto.setComplainDate("7");
+        complainDto.setComplainOi(Arrays.asList("8"));
+        complainDto.setComplainOrderId("9");
+        complainDto.setComplainResult("10");
+        complainDto.setComplainStatus((byte) 11);
+        complainDto.setComplainStatusName("12");
+        complainDto.setCustomerName("13");
+        complainDto.setRemark("14");
+        complainDto.setShowType(Boolean.TRUE);
+        complainDto.setSurplusDate("15");
+        complainDto.setTotal(BigDecimal.valueOf(16L));
+        complainDto.setTotalType((byte) 17);
+        complainDto.setUserAccessory(Arrays.asList("18"));
+        testCollection(list, complainDto);
+    }
+
 }

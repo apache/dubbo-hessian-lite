@@ -25,6 +25,8 @@ import org.junit.jupiter.api.condition.JRE;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class URITest extends SerializeTestBase {
     @Test
@@ -55,5 +57,13 @@ public class URITest extends SerializeTestBase {
         URI result = baseHessian2Serialize(originalURI);
 
         Assertions.assertEquals(originalURI.toString(), result.toString());
+    }
+
+    @Test
+    void testCollection() throws IOException, URISyntaxException {
+        List<Object> list = new ArrayList<>();
+
+        URI originalURI = new URI("http://username:password@www.example.com:8080/path/to/resource?param1=value1&param2=value2#fragment");
+        testCollection(list, originalURI);
     }
 }

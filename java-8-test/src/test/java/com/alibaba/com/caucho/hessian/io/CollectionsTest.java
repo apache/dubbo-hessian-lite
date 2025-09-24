@@ -146,4 +146,31 @@ public class CollectionsTest extends SerializeTestBase {
         Assertions.assertEquals(copiesList.subList(1, 2), hessian3ToHessian3(copiesList.subList(1, 2)));
         Assertions.assertEquals(copiesList.subList(1, 2), hessian4ToHessian3(copiesList.subList(1, 2)));
     }
+
+    @Test
+    void testCollection() throws IOException {
+        List<Object> list = new ArrayList<>();
+
+        List<Integer> arrayList = new ArrayList<>();
+        arrayList.add(1);
+        arrayList.add(2);
+        arrayList.add(3);
+        List<Integer> unmodifiableList = Collections.unmodifiableList(arrayList);
+        testCollection(list, unmodifiableList);
+
+        List<Integer> linkedList = new LinkedList<>();
+        linkedList.add(1);
+        linkedList.add(2);
+        linkedList.add(3);
+        unmodifiableList = Collections.unmodifiableList(linkedList);
+        testCollection(list, unmodifiableList);
+
+        List<Integer> synchronizedList = Collections.synchronizedList(arrayList);
+        testCollection(list, synchronizedList);
+        synchronizedList = Collections.synchronizedList(linkedList);
+        testCollection(list, synchronizedList);
+
+        List<Integer> copiesList = Collections.nCopies(3, 1);
+        testCollection(list, copiesList);
+    }
 }

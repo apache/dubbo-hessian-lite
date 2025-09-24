@@ -23,6 +23,8 @@ import org.junit.jupiter.api.condition.EnabledForJreRange;
 import org.junit.jupiter.api.condition.JRE;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 public class PropertiesTest extends SerializeTestBase {
@@ -47,5 +49,15 @@ public class PropertiesTest extends SerializeTestBase {
         Assertions.assertEquals(obj, hessian3ToHessian3(obj));
         Assertions.assertEquals(obj, hessian4ToHessian3(obj));
         Assertions.assertEquals(obj, hessian3ToHessian4(obj));
+    }
+
+    @Test
+    void testCollection() throws IOException {
+        List<Object> list = new ArrayList<>();
+
+        Properties originalProperties = new Properties();
+        originalProperties.setProperty("key1", "value1");
+        originalProperties.setProperty("key2", "value2");
+        testCollection(list, originalProperties);
     }
 }

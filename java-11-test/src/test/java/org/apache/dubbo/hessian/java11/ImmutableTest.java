@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -98,4 +99,55 @@ public class ImmutableTest extends SerializeTestBase {
             return Objects.hash(a, b, c);
         }
     }
+
+    @Test
+    public void testCollection() throws IOException {
+        List<Object> list = new ArrayList<>();
+
+        assertImmutableList(list, List.of());
+        assertImmutableList(list, List.of(1));
+        assertImmutableList(list, List.of(1, 2));
+        assertImmutableList(list, List.of(1, 2, 3));
+
+        assertImmutableMap(list, Map.of());
+        assertImmutableMap(list, Map.of(1, 2));
+        assertImmutableMap(list, Map.of(1, 2, 3, 4));
+        assertImmutableMap(list, Map.of(1, 2, 3, 4, 5, 6));
+
+        assertImmutableSet(list, Set.of());
+        assertImmutableSet(list, Set.of(1));
+        assertImmutableSet(list, Set.of(1, 2));
+        assertImmutableSet(list, Set.of(1, 2, 3));
+    }
+
+    private void assertImmutableList(List<Object> list, List<?> immutableList) throws IOException {
+        list.clear();
+        list.add(immutableList);
+        list.add(immutableList);
+        List<Object> result = baseHessian2Serialize(list);
+        Assertions.assertEquals(list.size(), result.size());
+        Assertions.assertSame(result.get(0), result.get(1));
+        Assertions.assertEquals(immutableList, result.get(0));
+    }
+
+    private void assertImmutableMap(List<Object> list, Map<Object, Object> map) throws IOException {
+        list.clear();
+        list.add(map);
+        list.add(map);
+        List<Object> result = baseHessian2Serialize(list);
+        Assertions.assertEquals(list.size(), result.size());
+        Assertions.assertSame(result.get(0), result.get(1));
+        Assertions.assertEquals(map, result.get(0));
+    }
+
+    private void assertImmutableSet(List<Object> list, Set<Object> set) throws IOException {
+        list.clear();
+        list.add(set);
+        list.add(set);
+        List<Object> result = baseHessian2Serialize(list);
+        Assertions.assertEquals(list.size(), result.size());
+        Assertions.assertSame(result.iterator().next(), result.iterator().next());
+        Assertions.assertEquals(set, result.get(0));
+    }
+
 }

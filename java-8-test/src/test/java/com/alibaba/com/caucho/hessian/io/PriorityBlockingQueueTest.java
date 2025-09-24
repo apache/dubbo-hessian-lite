@@ -24,6 +24,7 @@ import org.junit.jupiter.api.condition.JRE;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
 
 public class PriorityBlockingQueueTest extends SerializeTestBase {
@@ -57,5 +58,24 @@ public class PriorityBlockingQueueTest extends SerializeTestBase {
         Assertions.assertEquals(new ArrayList<>(originalPriorityBlockingQueue), new ArrayList<>(hessian4ToHessian3(originalPriorityBlockingQueue)));
         Assertions.assertEquals(new ArrayList<>(originalPriorityBlockingQueue), new ArrayList<>(hessian3ToHessian3(originalPriorityBlockingQueue)));
         Assertions.assertEquals(new ArrayList<>(originalPriorityBlockingQueue), new ArrayList<>(hessian3ToHessian4(originalPriorityBlockingQueue)));
+    }
+
+    @Test
+    void testCollection() throws IOException {
+        PriorityBlockingQueue<Integer> originalPriorityBlockingQueue = new PriorityBlockingQueue<>(16, Integer::compareTo);
+        originalPriorityBlockingQueue.add(1);
+        originalPriorityBlockingQueue.add(2);
+        originalPriorityBlockingQueue.add(4);
+        originalPriorityBlockingQueue.add(-1);
+
+        List<PriorityBlockingQueue<Integer>> list = new ArrayList<>();
+        list.add(originalPriorityBlockingQueue);
+        list.add(originalPriorityBlockingQueue);
+
+        List<PriorityBlockingQueue<Integer>> result = baseHessian2Serialize(list);
+
+        Assertions.assertEquals(list.size(), result.size());
+        Assertions.assertSame(result.get(0), result.get(1));
+        Assertions.assertEquals(new ArrayList<>(originalPriorityBlockingQueue), new ArrayList<>(result.get(0)));
     }
 }

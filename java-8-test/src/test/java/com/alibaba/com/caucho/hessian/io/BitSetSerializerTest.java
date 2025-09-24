@@ -21,7 +21,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.List;
 
 public class BitSetSerializerTest extends SerializeTestBase {
 
@@ -36,6 +38,17 @@ public class BitSetSerializerTest extends SerializeTestBase {
         assertBitSet(new BitSet());
         assertBitSet(new BitSet(1));
         assertBitSet(BitSet.valueOf(words));
+    }
+
+    @Test
+    public void testCollection() throws IOException {
+        List<Object> list = new ArrayList<>();
+
+        BitSet bitSet = new BitSet();
+        bitSet.set(1);
+        bitSet.set(3);
+        bitSet.set(5);
+        testCollection(list, bitSet);
     }
 
     private void assertBitSet(BitSet bitSet) throws IOException {

@@ -24,6 +24,8 @@ import org.junit.jupiter.api.condition.JRE;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BigDecimalTest extends SerializeTestBase {
     @Test
@@ -43,5 +45,13 @@ public class BigDecimalTest extends SerializeTestBase {
         Assertions.assertEquals(obj, hessian3ToHessian3(obj));
         Assertions.assertEquals(obj, hessian4ToHessian3(obj));
         Assertions.assertEquals(obj, hessian3ToHessian4(obj));
+    }
+
+    @Test
+    void testCollection() throws IOException {
+        List<Object> list = new ArrayList<>();
+
+        BigDecimal originalBigDecimal = new BigDecimal("123.456");
+        testCollection(list, originalBigDecimal);
     }
 }

@@ -21,6 +21,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.LongAdder;
 
 public class LongAdderTest extends SerializeTestBase {
@@ -30,5 +32,21 @@ public class LongAdderTest extends SerializeTestBase {
         longAdder.add(1);
 
         Assertions.assertEquals(longAdder.longValue(), baseHessian2Serialize(longAdder).longValue());
+    }
+
+    @Test
+    void testCollection() throws IOException {
+        LongAdder longAdder = new LongAdder();
+        longAdder.add(1);
+
+        List<LongAdder> list = new ArrayList<>();
+        list.add(longAdder);
+        list.add(longAdder);
+
+        List<LongAdder> result = baseHessian2Serialize(list);
+
+        Assertions.assertEquals(list.size(), result.size());
+        Assertions.assertSame(result.get(0), result.get(1));
+        Assertions.assertEquals(longAdder.longValue(), result.get(0).longValue());
     }
 }

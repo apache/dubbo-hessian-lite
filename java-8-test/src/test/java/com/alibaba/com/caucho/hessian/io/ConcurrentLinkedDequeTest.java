@@ -24,6 +24,7 @@ import org.junit.jupiter.api.condition.JRE;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class ConcurrentLinkedDequeTest extends SerializeTestBase {
@@ -57,5 +58,23 @@ public class ConcurrentLinkedDequeTest extends SerializeTestBase {
         Assertions.assertEquals(new ArrayList<>(originalDeque), new ArrayList<>(hessian4ToHessian3(originalDeque)));
         Assertions.assertEquals(new ArrayList<>(originalDeque), new ArrayList<>(hessian3ToHessian3(originalDeque)));
         Assertions.assertEquals(new ArrayList<>(originalDeque), new ArrayList<>(hessian3ToHessian4(originalDeque)));
+    }
+
+    @Test
+    void testCollection() throws IOException {
+        ConcurrentLinkedDeque<String> originalDeque = new ConcurrentLinkedDeque<>();
+        originalDeque.add("one");
+        originalDeque.add("two");
+        originalDeque.add("three");
+
+        List<ConcurrentLinkedDeque<String>> list = new ArrayList<>();
+        list.add(originalDeque);
+        list.add(originalDeque);
+
+        List<ConcurrentLinkedDeque<String>> result = baseHessian2Serialize(list);
+
+        Assertions.assertEquals(list.size(), result.size());
+        Assertions.assertSame(result.get(0), result.get(1));
+        Assertions.assertEquals(new ArrayList<>(originalDeque), new ArrayList<>(result.get(0)));
     }
 }
