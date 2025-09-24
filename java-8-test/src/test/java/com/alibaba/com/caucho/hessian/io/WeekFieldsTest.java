@@ -22,6 +22,8 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.time.temporal.WeekFields;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class WeekFieldsTest extends SerializeTestBase {
@@ -32,5 +34,13 @@ public class WeekFieldsTest extends SerializeTestBase {
         WeekFields result = baseHessian2Serialize(originalWeekFields);
 
         Assertions.assertEquals(originalWeekFields, result);
+    }
+
+    @Test
+    void testCollection() throws IOException {
+        List<Object> list = new ArrayList<>();
+
+        WeekFields originalWeekFields = WeekFields.of(Locale.FRANCE);
+        testCollection(list, originalWeekFields);
     }
 }

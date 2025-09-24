@@ -14,23 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alibaba.com.caucho.hessian.io.chronology;
+package com.alibaba.com.caucho.hessian.io.java9;
 
-import com.alibaba.com.caucho.hessian.io.AbstractHessianOutput;
 import com.alibaba.com.caucho.hessian.io.AbstractSerializer;
 
-import java.io.IOException;
-import java.time.chrono.JapaneseDate;
+import java.util.HashMap;
+import java.util.Map;
 
-public class JapaneseDateSeriailzer <T> extends AbstractSerializer {
+public class ImmutableMapSerializer extends AbstractSerializer {
 
     @Override
-    public void writeObject(Object obj, AbstractHessianOutput out) throws IOException {
-        if (obj == null) {
-            out.writeNull();
-            return;
-        }
-
-        out.writeObject(new JapaneseDateHandle((JapaneseDate) obj));
+    protected Object writeReplace(Object obj) {
+        return new HashMap<>((Map) obj);
     }
+
 }

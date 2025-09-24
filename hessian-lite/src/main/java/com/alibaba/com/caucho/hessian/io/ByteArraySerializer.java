@@ -70,9 +70,6 @@ public class ByteArraySerializer extends AbstractSerializer
             throws IOException {
         byte[] data = (byte[]) obj;
 
-        if (data != null)
-            out.writeBytes(data, 0, data.length);
-        else
-            out.writeNull();
+        out.writeBytes(data, 0, data.length);
     }
 }

@@ -23,7 +23,9 @@ import org.junit.jupiter.api.condition.EnabledForJreRange;
 import org.junit.jupiter.api.condition.JRE;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Currency;
+import java.util.List;
 
 public class CurrencyTest extends SerializeTestBase {
 
@@ -47,5 +49,13 @@ public class CurrencyTest extends SerializeTestBase {
         Assertions.assertEquals(currency, hessian3ToHessian3(currency));
         Assertions.assertEquals(currency, hessian3ToHessian4(currency));
         Assertions.assertEquals(currency, hessian4ToHessian3(currency));
+    }
+
+    @Test
+    void testCollection() throws IOException {
+        List<Object> list = new ArrayList<>();
+
+        Currency currency = Currency.getInstance("USD");
+        testCollection(list, currency);
     }
 }

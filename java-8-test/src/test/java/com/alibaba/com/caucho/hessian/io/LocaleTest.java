@@ -23,6 +23,8 @@ import org.junit.jupiter.api.condition.EnabledForJreRange;
 import org.junit.jupiter.api.condition.JRE;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class LocaleTest extends SerializeTestBase {
@@ -43,5 +45,13 @@ public class LocaleTest extends SerializeTestBase {
         Assertions.assertEquals(obj, hessian3ToHessian3(obj));
         Assertions.assertEquals(obj, hessian4ToHessian3(obj));
         Assertions.assertEquals(obj, hessian3ToHessian4(obj));
+    }
+
+    @Test
+    void testCollection() throws IOException {
+        List<Object> list = new ArrayList<>();
+
+        Locale locale = Locale.US;
+        testCollection(list, locale);
     }
 }

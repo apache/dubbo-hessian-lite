@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -294,5 +295,76 @@ public class RecordTest extends SerializeTestBase {
 
         List<Sample> samples = Arrays.asList(sample1, sample2, sample3, sample4);
         testEquals(samples);
+    }
+
+    @Test
+    public void testCollection() throws IOException {
+        List<Object> list = new ArrayList<>();
+
+        var record = new RecordRectangle("one", 2, 3L, 4.0);
+        testCollection(list, record);
+
+        var emptyRecord = new EmptyRecord();
+        testCollection(list, emptyRecord);
+
+        var recordPoint = new RecordPoint(1, 1);
+        testCollection(list, recordPoint);
+
+        // 参考上面的所有方法都执行testCollection
+        var recordWithConstructor = new RecordWithConstructor("ten");
+        testCollection(list, recordWithConstructor);
+
+        var recordOfRecord = new RecordOfRecord(new RecordRectangle("one", 2, 3L, 4.0));
+        testCollection(list, recordOfRecord);
+
+        var arr = new RecordPoint[100];
+        IntStream.range(0, 100).forEach(i -> arr[i] = new RecordPoint(i, i + 1));
+        testCollection(list, arr);
+
+        var recordWithArray = new RecordWithArray(new RecordRectangle[]{new RecordRectangle("one", 2, 3L, 4.0)});
+        testCollection(list, recordWithArray);
+
+        var recordWithNull = new RecordWithNull(null, null, null);
+        testCollection(list, recordWithNull);
+
+        var recordWithDefaultValues = new RecordWithDefaultValues(
+            (byte) 0, (short) 0, 0, 0l, 0.0f, 0.0d, '\u0000', false);
+        testCollection(list, recordWithDefaultValues);
+
+        var r = new R(1L, 1, "foo");
+        testCollection(list, r);
+
+        var r1 = new R1(1, 1L, "foo");
+        testCollection(list, r1);
+
+        var r2 = new R2("foo", 1, 1L);
+        testCollection(list, r2);
+
+        var r3 = new R3("foo");
+        testCollection(list, r3);
+
+        var r4 = new R4("foo", 1, 1L, null);
+        testCollection(list, r4);
+
+        var r5 = new R5("foo", 1, 1L,
+                false, (byte) 0, (short) 0, '\u0000', 0, 0L, 0.0f, 0.0d,
+                null, null, null, null, null, null, null, null);
+        testCollection(list, r5);
+
+        var recordWithSuperType = new RecordWithSuperType(1L);
+        testCollection(list, recordWithSuperType);
+
+        PackagePrivateRecord packagePrivateRecord = new PackagePrivateRecord(1, "s1");
+        testCollection(list, packagePrivateRecord);
+
+        PrivateRecord privateRecord = new PrivateRecord("s2", 2);
+        testCollection(list, privateRecord);
+
+        Sample sample1 = new Sample("1", X.A);
+        Sample sample2 = new Sample("2", X.A);
+        Sample sample3 = new Sample("3", X.A);
+        Sample sample4 = new Sample("4", X.B);
+        List<Sample> samples = Arrays.asList(sample1, sample2, sample3, sample4);
+        testCollection(list, samples);
     }
 }

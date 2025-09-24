@@ -24,6 +24,7 @@ import org.junit.jupiter.api.condition.JRE;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.SynchronousQueue;
 
 public class SynchronousQueueTest extends SerializeTestBase {
@@ -54,5 +55,23 @@ public class SynchronousQueueTest extends SerializeTestBase {
         Assertions.assertEquals(new ArrayList<>(obj), new ArrayList<>(hessian3ToHessian3(obj)));
         Assertions.assertEquals(new ArrayList<>(obj), new ArrayList<>(hessian4ToHessian3(obj)));
         Assertions.assertEquals(new ArrayList<>(obj), new ArrayList<>(hessian3ToHessian4(obj)));
+    }
+
+    @Test
+    void testCollection() throws IOException {
+        SynchronousQueue<Integer> originalSynchronousQueue = new SynchronousQueue<>();
+        originalSynchronousQueue.offer(1);
+        originalSynchronousQueue.offer(2);
+        originalSynchronousQueue.offer(3);
+
+        List<SynchronousQueue<Integer>> list = new ArrayList<>();
+        list.add(originalSynchronousQueue);
+        list.add(originalSynchronousQueue);
+
+        List<SynchronousQueue<Integer>> result = baseHessian2Serialize(list);
+
+        Assertions.assertEquals(list.size(), result.size());
+        Assertions.assertSame(result.get(0), result.get(1));
+        Assertions.assertEquals(new ArrayList<>(originalSynchronousQueue), new ArrayList<>(result.get(0)));
     }
 }

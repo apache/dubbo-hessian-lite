@@ -24,6 +24,8 @@ import org.junit.jupiter.api.condition.JRE;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FileTest extends SerializeTestBase {
     @Test
@@ -43,5 +45,13 @@ public class FileTest extends SerializeTestBase {
         Assertions.assertEquals(obj, hessian3ToHessian3(obj));
         Assertions.assertEquals(obj, hessian4ToHessian3(obj));
         Assertions.assertEquals(obj, hessian3ToHessian4(obj));
+    }
+
+    @Test
+    void testCollection() throws IOException {
+        List<Object> list = new ArrayList<>();
+
+        File originalFile = new File("test.txt");
+        testCollection(list, originalFile);
     }
 }

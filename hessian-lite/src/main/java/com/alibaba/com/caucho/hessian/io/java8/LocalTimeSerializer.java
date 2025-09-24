@@ -26,11 +26,6 @@ public class LocalTimeSerializer<T> extends AbstractSerializer {
 
     @Override
     public void writeObject(Object obj, AbstractHessianOutput out) throws IOException {
-        if (obj == null) {
-            out.writeNull();
-            return;
-        }
-
         if (SerializationConfig.isCompactMode()) {
             if (out.addRef(obj)) {
                 return;
@@ -53,8 +48,13 @@ public class LocalTimeSerializer<T> extends AbstractSerializer {
                 out.writeLong(localTime.toNanoOfDay());
             }
         } else {
-            out.writeObject(new LocalTimeHandle(obj));
+            super.writeObject(obj, out);
         }
+    }
+
+    @Override
+    protected Object writeReplace(Object obj) {
+        return new LocalTimeHandle(obj);
     }
 
 }

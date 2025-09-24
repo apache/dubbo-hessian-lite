@@ -23,6 +23,8 @@ import org.junit.jupiter.api.condition.EnabledForJreRange;
 import org.junit.jupiter.api.condition.JRE;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class StringBufferTest extends SerializeTestBase {
     @Test
@@ -42,5 +44,20 @@ public class StringBufferTest extends SerializeTestBase {
         Assertions.assertEquals(obj.toString(), hessian3ToHessian3(obj).toString());
         Assertions.assertEquals(obj.toString(), hessian4ToHessian3(obj).toString());
         Assertions.assertEquals(obj.toString(), hessian3ToHessian4(obj).toString());
+    }
+
+    @Test
+    void testCollection() throws IOException {
+        StringBuffer originalStringBuffer = new StringBuffer("Hello, World!");
+
+        List<StringBuffer> list = new ArrayList<>();
+        list.add(originalStringBuffer);
+        list.add(originalStringBuffer);
+
+        List<StringBuffer> result = baseHessian2Serialize(list);
+
+        Assertions.assertEquals(list.size(), result.size());
+        Assertions.assertSame(result.get(0), result.get(1));
+        Assertions.assertEquals(originalStringBuffer.toString(), result.get(0).toString());
     }
 }

@@ -88,10 +88,13 @@ public class AnnotationDeserializer extends AbstractMapDeserializer {
 
             in.readMapEnd();
 
-            return Proxy.newProxyInstance(_annType.getClassLoader(),
-                    new Class[]{_annType},
-                    new AnnotationInvocationHandler(_annType, valueMap));
+            Object annotation = Proxy.newProxyInstance(_annType.getClassLoader(),
+                new Class[]{_annType},
+                new AnnotationInvocationHandler(_annType, valueMap));
 
+            in.setRef(ref, annotation);
+
+            return annotation;
         } catch (IOException e) {
             throw e;
         } catch (Exception e) {
@@ -105,9 +108,9 @@ public class AnnotationDeserializer extends AbstractMapDeserializer {
         String[] fieldNames = (String[]) fields;
 
         try {
-            in.addRef(null);
+            int ref = in.addRef(null);
 
-            HashMap<String, Object> valueMap = new HashMap<String, Object>(8);
+            HashMap<String, Object> valueMap = new HashMap<>(MapUtil.capacity(fieldNames.length));
 
             for (int i = 0; i < fieldNames.length; i++) {
                 String name = fieldNames[i];
@@ -115,10 +118,13 @@ public class AnnotationDeserializer extends AbstractMapDeserializer {
                 valueMap.put(name, in.readObject());
             }
 
-            return Proxy.newProxyInstance(_annType.getClassLoader(),
-                    new Class[]{_annType},
-                    new AnnotationInvocationHandler(_annType, valueMap));
+            Object annotation = Proxy.newProxyInstance(_annType.getClassLoader(),
+                new Class[]{_annType},
+                new AnnotationInvocationHandler(_annType, valueMap));
 
+            in.setRef(ref, annotation);
+
+            return annotation;
         } catch (IOException e) {
             throw e;
         } catch (Exception e) {

@@ -23,6 +23,8 @@ import org.junit.jupiter.api.condition.EnabledForJreRange;
 import org.junit.jupiter.api.condition.JRE;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -76,5 +78,16 @@ public class TreeMapTest extends SerializeTestBase {
             Assertions.assertEquals(k, resultEntry.getKey());
             Assertions.assertEquals(v, resultEntry.getValue());
         });
+    }
+
+    @Test
+    void testCollection() throws IOException {
+        List<Object> list = new ArrayList<>();
+
+        TreeMap<String, Integer> originalTreeMap = new TreeMap<>();
+        originalTreeMap.put("one", 1);
+        originalTreeMap.put("two", 2);
+        originalTreeMap.put("three", 3);
+        testCollection(list, originalTreeMap);
     }
 }

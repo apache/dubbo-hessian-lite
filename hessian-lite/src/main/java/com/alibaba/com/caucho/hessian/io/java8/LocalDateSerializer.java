@@ -28,18 +28,13 @@ public class LocalDateSerializer<T> extends AbstractSerializer {
 
     @Override
     public void writeObject(Object obj, AbstractHessianOutput out) throws IOException {
-        if (obj == null) {
-            out.writeNull();
-            return;
-        }
-
         if (SerializationConfig.isCompactMode()) {
             if (out.addRef(obj)) {
                 return;
             }
 
             Class<?> cl = obj.getClass();
-            
+
             int ref = out.writeObjectBegin(cl.getName());
 
             LocalDate localDate = (LocalDate) obj;
@@ -55,8 +50,13 @@ public class LocalDateSerializer<T> extends AbstractSerializer {
                 out.writeLong(localDate.toEpochDay());
             }
         } else {
-            out.writeObject(new LocalDateHandle(obj));
+            super.writeObject(obj, out);
         }
+    }
+
+    @Override
+    protected Object writeReplace(Object obj) {
+        return new LocalDateHandle(obj);
     }
     
 }

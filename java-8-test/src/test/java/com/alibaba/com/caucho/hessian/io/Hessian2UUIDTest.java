@@ -97,4 +97,19 @@ public class Hessian2UUIDTest extends SerializeTestBase {
 		assertEquals(actual, hessian3ToHessian4(actual));
 	}
 
+	@Test
+	public void testCollection() throws IOException {
+		UUID uuid = UUID.randomUUID();
+
+		List<UUID> list = new ArrayList<>();
+		list.add(uuid);
+		list.add(uuid);
+
+		List<UUID> result = baseHessian2Serialize(list);
+
+		assertEquals(list.size(), result.size());
+		assertEquals(uuid, result.get(0));
+		assertEquals(uuid, result.get(1));
+		assertEquals(result.get(0), result.get(1));
+	}
 }

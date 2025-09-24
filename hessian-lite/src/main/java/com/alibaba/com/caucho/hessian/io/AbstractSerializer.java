@@ -106,7 +106,7 @@ abstract public class AbstractSerializer implements Serializer {
         }
     }
 
-    protected Object writeReplace(Object obj) {
+    protected Object writeReplace(Object obj) throws IOException {
         return null;
     }
 

@@ -62,10 +62,6 @@ public class InputStreamSerializer extends AbstractSerializer {
             throws IOException {
         InputStream is = (InputStream) obj;
 
-        if (is == null)
-            out.writeNull();
-        else {
-            out.writeByteStream(is);
-        }
+        out.writeByteStream(is);
     }
 }

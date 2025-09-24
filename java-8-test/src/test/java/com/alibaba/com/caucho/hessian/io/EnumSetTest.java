@@ -23,7 +23,9 @@ import org.junit.jupiter.api.condition.EnabledForJreRange;
 import org.junit.jupiter.api.condition.JRE;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
 
 enum TestEnumSet {
     ONE, TWO, THREE
@@ -79,5 +81,13 @@ public class EnumSetTest extends SerializeTestBase {
         Assertions.assertEquals(largeEnumSet, hessian3ToHessian3(largeEnumSet));
         Assertions.assertEquals(largeEnumSet, hessian3ToHessian4(largeEnumSet));
         Assertions.assertEquals(largeEnumSet, hessian4ToHessian3(largeEnumSet));
+    }
+
+    @Test
+    void testCollection() throws IOException {
+        List<Object> list = new ArrayList<>();
+
+        EnumSet<TestEnumSet> originalEnumSet = EnumSet.of(TestEnumSet.ONE, TestEnumSet.TWO);
+        testCollection(list, originalEnumSet);
     }
 }

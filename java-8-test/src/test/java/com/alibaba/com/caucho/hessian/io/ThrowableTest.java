@@ -23,6 +23,8 @@ import org.junit.jupiter.api.condition.EnabledForJreRange;
 import org.junit.jupiter.api.condition.JRE;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ThrowableTest extends SerializeTestBase {
     @Test
@@ -54,5 +56,22 @@ public class ThrowableTest extends SerializeTestBase {
         Assertions.assertArrayEquals(throwable.getStackTrace(), hessian3ToHessian4(throwable).getStackTrace());
         Assertions.assertEquals(throwable.getMessage(), hessian3ToHessian4(throwable).getMessage());
         Assertions.assertEquals(throwable.getLocalizedMessage(), hessian3ToHessian4(throwable).getLocalizedMessage());
+    }
+
+    @Test
+    void testCollection() throws IOException {
+        Throwable throwable = new Throwable("test");
+
+        List<Throwable> list = new ArrayList<>();
+        list.add(throwable);
+        list.add(throwable);
+
+        List<Throwable> result = baseHessian2Serialize(list);
+
+        Assertions.assertEquals(list.size(), result.size());
+        Assertions.assertSame(result.get(0), result.get(1));
+        Assertions.assertArrayEquals(throwable.getStackTrace(), result.get(0).getStackTrace());
+        Assertions.assertEquals(throwable.getMessage(), result.get(0).getMessage());
+        Assertions.assertEquals(throwable.getLocalizedMessage(), result.get(0).getLocalizedMessage());
     }
 }

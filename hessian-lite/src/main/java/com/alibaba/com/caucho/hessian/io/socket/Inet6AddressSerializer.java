@@ -28,6 +28,9 @@ public class Inet6AddressSerializer extends AbstractSerializer {
     @Override
     public void writeObject(Object obj, AbstractHessianOutput out)
             throws IOException {
+        if (out.addRef(obj)) {
+            return;
+        }
 
         String replacedClName = "java.net.Inet6Address";
 

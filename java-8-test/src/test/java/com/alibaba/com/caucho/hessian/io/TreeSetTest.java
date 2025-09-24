@@ -23,6 +23,8 @@ import org.junit.jupiter.api.condition.EnabledForJreRange;
 import org.junit.jupiter.api.condition.JRE;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.TreeSet;
 
 public class TreeSetTest extends SerializeTestBase {
@@ -57,5 +59,17 @@ public class TreeSetTest extends SerializeTestBase {
         Assertions.assertEquals(treeSet, hessian4ToHessian3(treeSet));
         Assertions.assertEquals(treeSet, hessian3ToHessian3(treeSet));
         Assertions.assertEquals(treeSet, hessian3ToHessian4(treeSet));
+    }
+
+    @Test
+    void testCollection() throws IOException {
+        List<Object> list = new ArrayList<>();
+
+        TreeSet<Integer> treeSet = new TreeSet<>(Integer::compareTo);
+        treeSet.add(1);
+        treeSet.add(2);
+        treeSet.add(4);
+        treeSet.add(-1);
+        testCollection(list, treeSet);
     }
 }

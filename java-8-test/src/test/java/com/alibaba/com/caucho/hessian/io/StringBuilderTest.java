@@ -23,6 +23,8 @@ import org.junit.jupiter.api.condition.EnabledForJreRange;
 import org.junit.jupiter.api.condition.JRE;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class StringBuilderTest extends SerializeTestBase {
     @Test
@@ -42,5 +44,20 @@ public class StringBuilderTest extends SerializeTestBase {
         Assertions.assertEquals(obj.toString(), hessian3ToHessian3(obj).toString());
         Assertions.assertEquals(obj.toString(), hessian4ToHessian3(obj).toString());
         Assertions.assertEquals(obj.toString(), hessian3ToHessian4(obj).toString());
+    }
+
+    @Test
+    void testCollection() throws IOException {
+        StringBuilder originalStringBuilder = new StringBuilder("test");
+
+        List<StringBuilder> list = new ArrayList<>();
+        list.add(originalStringBuilder);
+        list.add(originalStringBuilder);
+
+        List<StringBuilder> result = baseHessian2Serialize(list);
+
+        Assertions.assertEquals(list.size(), result.size());
+        Assertions.assertSame(result.get(0), result.get(1));
+        Assertions.assertEquals(originalStringBuilder.toString(), result.get(0).toString());
     }
 }

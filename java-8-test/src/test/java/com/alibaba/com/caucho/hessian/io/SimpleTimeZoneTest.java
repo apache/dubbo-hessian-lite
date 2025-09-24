@@ -21,6 +21,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.SimpleTimeZone;
 
 public class SimpleTimeZoneTest extends SerializeTestBase {
@@ -31,5 +33,13 @@ public class SimpleTimeZoneTest extends SerializeTestBase {
         SimpleTimeZone result = baseHessian2Serialize(originalTimeZone);
 
         Assertions.assertEquals(originalTimeZone, result);
+    }
+
+    @Test
+    void testCollection() throws IOException {
+        List<Object> list = new ArrayList<>();
+
+        SimpleTimeZone originalTimeZone = new SimpleTimeZone(3600000, "ID");
+        testCollection(list, originalTimeZone);
     }
 }

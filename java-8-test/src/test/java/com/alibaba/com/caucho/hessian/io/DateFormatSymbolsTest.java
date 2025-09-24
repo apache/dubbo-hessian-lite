@@ -24,6 +24,8 @@ import org.junit.jupiter.api.condition.JRE;
 
 import java.io.IOException;
 import java.text.DateFormatSymbols;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class DateFormatSymbolsTest extends SerializeTestBase {
@@ -72,5 +74,25 @@ public class DateFormatSymbolsTest extends SerializeTestBase {
         Assertions.assertArrayEquals(obj.getShortMonths(), hessian3ToHessian4(obj).getShortMonths());
         Assertions.assertArrayEquals(obj.getWeekdays(), hessian3ToHessian4(obj).getWeekdays());
         Assertions.assertArrayEquals(obj.getShortWeekdays(), hessian3ToHessian4(obj).getShortWeekdays());
+    }
+
+    @Test
+    void testCollection() throws IOException {
+        DateFormatSymbols originalDateFormatSymbols = new DateFormatSymbols(Locale.US);
+
+        List<DateFormatSymbols> list = new ArrayList<>();
+        list.add(originalDateFormatSymbols);
+        list.add(originalDateFormatSymbols);
+
+        List<DateFormatSymbols> result = baseHessian2Serialize(list);
+
+        Assertions.assertEquals(list.size(), result.size());
+        Assertions.assertSame(result.get(0), result.get(1));
+        Assertions.assertArrayEquals(originalDateFormatSymbols.getAmPmStrings(), result.get(0).getAmPmStrings());
+        Assertions.assertArrayEquals(originalDateFormatSymbols.getEras(), result.get(0).getEras());
+        Assertions.assertArrayEquals(originalDateFormatSymbols.getMonths(), result.get(0).getMonths());
+        Assertions.assertArrayEquals(originalDateFormatSymbols.getShortMonths(), result.get(0).getShortMonths());
+        Assertions.assertArrayEquals(originalDateFormatSymbols.getWeekdays(), result.get(0).getWeekdays());
+        Assertions.assertArrayEquals(originalDateFormatSymbols.getShortWeekdays(), result.get(0).getShortWeekdays());
     }
 }

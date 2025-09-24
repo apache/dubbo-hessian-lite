@@ -24,6 +24,7 @@ import org.junit.jupiter.api.condition.JRE;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.LinkedTransferQueue;
 
 public class LinkedTransferQueueTest extends SerializeTestBase {
@@ -54,5 +55,23 @@ public class LinkedTransferQueueTest extends SerializeTestBase {
         Assertions.assertEquals(new ArrayList<>(obj), new ArrayList<>(hessian3ToHessian3(obj)));
         Assertions.assertEquals(new ArrayList<>(obj), new ArrayList<>(hessian4ToHessian3(obj)));
         Assertions.assertEquals(new ArrayList<>(obj), new ArrayList<>(hessian3ToHessian4(obj)));
+    }
+
+    @Test
+    void testCollection() throws IOException {
+        LinkedTransferQueue<Integer> originalLinkedTransferQueue = new LinkedTransferQueue<>();
+        originalLinkedTransferQueue.offer(1);
+        originalLinkedTransferQueue.offer(2);
+        originalLinkedTransferQueue.offer(3);
+
+        List<LinkedTransferQueue<Integer>> list = new ArrayList<>();
+        list.add(originalLinkedTransferQueue);
+        list.add(originalLinkedTransferQueue);
+
+        List<LinkedTransferQueue<Integer>> result = baseHessian2Serialize(list);
+
+        Assertions.assertEquals(list.size(), result.size());
+        Assertions.assertSame(result.get(0), result.get(1));
+        Assertions.assertEquals(new ArrayList<>(originalLinkedTransferQueue), new ArrayList<>(result.get(0)));
     }
 }

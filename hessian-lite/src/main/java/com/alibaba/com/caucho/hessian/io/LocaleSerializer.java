@@ -49,7 +49,6 @@
 package com.alibaba.com.caucho.hessian.io;
 
 
-import java.io.IOException;
 import java.util.Locale;
 
 /**
@@ -57,14 +56,8 @@ import java.util.Locale;
  */
 public class LocaleSerializer extends AbstractSerializer {
     @Override
-    public void writeObject(Object obj, AbstractHessianOutput out)
-            throws IOException {
-        if (obj == null)
-            out.writeNull();
-        else {
-            Locale locale = (Locale) obj;
-
-            out.writeObject(new LocaleHandle(locale.toString()));
-        }
+    public Object writeReplace(Object obj) {
+        Locale locale = (Locale) obj;
+        return new LocaleHandle(locale.toString());
     }
 }

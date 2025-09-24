@@ -49,7 +49,6 @@
 package com.alibaba.com.caucho.hessian.io;
 
 
-import java.io.IOException;
 import java.util.BitSet;
 
 /**
@@ -63,14 +62,7 @@ public class BitSetSerializer extends AbstractSerializer {
     }
 
     @Override
-    public void writeObject(Object obj, AbstractHessianOutput out)
-            throws IOException {
-        if (obj == null)
-            out.writeNull();
-        else {
-            BitSet bitSet = (BitSet) obj;
-
-            out.writeObject(new BitSetHandle(bitSet.toLongArray()));
-        }
+    public Object writeReplace(Object obj){
+        return new BitSetHandle(((BitSet) obj).toLongArray());
     }
 }

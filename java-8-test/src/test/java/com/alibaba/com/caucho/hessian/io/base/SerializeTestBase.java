@@ -22,6 +22,8 @@ import com.alibaba.com.caucho.hessian.io.Hessian2Output;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.List;
+import org.junit.jupiter.api.Assertions;
 
 /**
  * hessian base serialize utils
@@ -85,5 +87,21 @@ public class SerializeTestBase {
         return (T) input.readObject();
     }
 
-
+    protected <T> void testCollection(List<Object> list, T t) throws IOException {
+        try {
+            list.clear();
+            list.add(t);
+            list.add(t);
+            List<Object> result = baseHessian2Serialize(list);
+            Assertions.assertEquals(list.size(), result.size());
+            Assertions.assertSame(result.get(0), result.get(1));
+            if (t instanceof Object[]) {
+                Assertions.assertArrayEquals((Object[]) t, (Object[]) result.get(0));
+            } else {
+                Assertions.assertEquals(t, result.get(0));
+            }
+        } finally {
+            list.clear();
+        }
+    }
 }
