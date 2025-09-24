@@ -110,7 +110,7 @@ public class AnnotationDeserializer extends AbstractMapDeserializer {
         try {
             int ref = in.addRef(null);
 
-            HashMap<String, Object> valueMap = new HashMap<String, Object>(8);
+            HashMap<String, Object> valueMap = new HashMap<>(MapUtil.capacity(fieldNames.length));
 
             for (int i = 0; i < fieldNames.length; i++) {
                 String name = fieldNames[i];
