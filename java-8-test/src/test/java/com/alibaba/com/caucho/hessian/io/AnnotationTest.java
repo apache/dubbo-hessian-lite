@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AnnotationTest extends SerializeTestBase {
     @Test
@@ -34,6 +36,21 @@ public class AnnotationTest extends SerializeTestBase {
         TestAnnotation testAnnotation = baseHessian2Serialize(annotation);
 
         Assertions.assertEquals(annotation, testAnnotation);
+    }
+
+    @Test
+    void testAnnotationCollection() throws IOException {
+        TestAnnotation annotation = AnnotatedClass.class.getAnnotation(TestAnnotation.class);
+
+        List<TestAnnotation> list = new ArrayList<>();
+        list.add(annotation);
+        list.add(annotation);
+
+        List<TestAnnotation> result = baseHessian2Serialize(list);
+
+        Assertions.assertEquals(list.size(), result.size());
+        Assertions.assertSame(result.get(0), result.get(1));
+        Assertions.assertEquals(annotation, result.get(0));
     }
 
     @TestAnnotation(byteValue = 1, intValue = 2, shortValue = 3, floatValue = 4.0f, doubleValue = 5.0, value = "test")
