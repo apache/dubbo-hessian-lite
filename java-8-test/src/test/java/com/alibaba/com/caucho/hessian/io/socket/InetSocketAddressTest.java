@@ -23,10 +23,11 @@ import org.junit.jupiter.api.condition.EnabledForJreRange;
 import org.junit.jupiter.api.condition.JRE;
 
 import java.io.IOException;
-import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.List;
 
 public class InetSocketAddressTest extends SerializeTestBase {
     @Test
@@ -88,5 +89,12 @@ public class InetSocketAddressTest extends SerializeTestBase {
     void testJdk17() throws Exception {
         InetSocketAddress inetSocketAddress = new InetSocketAddress("localhost", 8080);
         Assertions.assertEquals(inetSocketAddress, baseHessian2Serialize(inetSocketAddress));
+    }
+    
+    @Test
+    void testCollectionRef() throws IOException {
+        InetSocketAddress inetSocketAddress = new InetSocketAddress("localhost", 8080);
+        List<Object> list = new ArrayList<>();
+        testCollection(list, inetSocketAddress);
     }
 }
