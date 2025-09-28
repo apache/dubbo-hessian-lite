@@ -49,6 +49,9 @@ public class InetSocketAddressDeserializer extends AbstractDeserializer {
                              String[] fieldNames)
             throws IOException {
         try {
+
+            int ref = in.addRef(null);
+
             String hostName = null;
             InetAddress address = null;
             int port = 0;
@@ -73,8 +76,7 @@ public class InetSocketAddressDeserializer extends AbstractDeserializer {
                 obj = new InetSocketAddress(port);
             }
 
-            in.addRef(obj);
-
+            in.setRef(ref, obj);
             return obj;
         } catch (IOException e) {
             throw e;
