@@ -48,20 +48,78 @@
 
 package com.alibaba.com.caucho.hessian.io;
 
-import java.io.IOException;
+import java.io.*;
+import java.util.UUID;
 
 /**
+ * InputStream Deserializer
  * Serializing a stream object.
+ * @author HeYuJie
+ * @date 2024/10/31
  */
 public class InputStreamDeserializer extends AbstractDeserializer {
     public static final InputStreamDeserializer DESER
             = new InputStreamDeserializer();
 
+    // TODO Allow external configuration
+    @SuppressWarnings("FieldCanBeLocal")
+    private final int bufferSize = Hessian2Output.SIZE;
+    // TODO Allow external configuration
+    private final File tmpDir;
+
     public InputStreamDeserializer() {
+        tmpDir = new File(System.getProperty("java.io.tmpdir"), "dubbo-"+ System.currentTimeMillis());
+        if(!tmpDir.exists()){
+            //noinspection ResultOfMethodCallIgnored
+            tmpDir.mkdirs();
+        }
     }
 
-    public Object readObject(AbstractHessianInput in)
-            throws IOException {
-        return in.readInputStream();
+    public Object readObject(AbstractHessianInput in) throws IOException {
+
+        FileOutputStream out = null;
+        try {
+            @SuppressWarnings("resource")
+            InputStream input = in.readInputStream();
+            // Read twice the size of the buffer (16k)
+            byte[] bytes = new byte[bufferSize * 2];
+            File file = null;
+            while (true) { // Loop reading
+
+                int len = input.read(bytes, 0, bytes.length);
+
+                if (out == null) {
+
+                    // If the length of InputStream is less than the buffer, creating a byte stream returns
+                    if (len <= bufferSize) {
+                        byte[] buff = new byte[len];
+                        System.arraycopy(bytes, 0, buff, 0, len);
+                        return new ByteArrayInputStream(buff);
+                    }
+
+                    // If the length of InputStream is greater than the buffer, create a temporary file and return it
+                    String name = String.format("%d-%s.dubbo.tmp", System.currentTimeMillis(), UUID.randomUUID().toString().replace("-", ""));
+                    file = new File(tmpDir, name);
+                    // Close the stream in finally
+                    //noinspection resource
+                    out = new FileOutputStream(file);
+                }
+
+                // Exit when reading to the end
+                if (len == -1) {
+                    break;
+                }
+                out.write(bytes, 0 ,len);
+            }
+
+            out.flush();
+            //noinspection IOStreamConstructor
+            return new FileInputStream(file);
+        } finally {
+            if (out != null){
+                out.close();
+            }
+        }
     }
+
 }
