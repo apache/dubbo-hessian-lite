@@ -19,6 +19,9 @@ package com.alibaba.com.caucho.hessian.io;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
 
 public class SerializerFactoryTest {
@@ -135,5 +138,59 @@ public class SerializerFactoryTest {
         //again check NotExistClass, there should be no warning like Hessian/Burlap:.....
         Deserializer d3 = serializerFactory.getDeserializer("com.test.NotExistClass");
         Assertions.assertNull(d3, "NotExistClass Deserializer!");
+    }
+
+    /**
+     * Simulates a class-isolated environment where the business classloader cannot see
+     * hessian internal classes. Verifies that loadSerializedClass falls back to
+     * SerializerFactory's own classloader for hessian internal classes.
+     */
+    @Test
+    public void loadSerializedClassFallbackInIsolatedClassLoader() throws Exception {
+        ClassLoader isolatedLoader = new ClassLoader(ClassLoader.getSystemClassLoader()) {
+            @Override
+            public Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+                if (name.startsWith("com.alibaba.com.caucho.hessian.io.")) {
+                    throw new ClassNotFoundException("Simulated isolation: " + name);
+                }
+                return super.loadClass(name, resolve);
+            }
+        };
+
+        SerializerFactory factory = new SerializerFactory(isolatedLoader);
+        Class<?> clazz = factory.loadSerializedClass("com.alibaba.com.caucho.hessian.io.LocaleHandle");
+        Assertions.assertEquals(LocaleHandle.class, clazz);
+    }
+
+    /**
+     * End-to-end test: serialize a Locale, then deserialize it using a SerializerFactory
+     * whose classloader cannot see hessian internal classes (simulating Pandora/OSGi).
+     */
+    @Test
+    public void localeDeserializeWithIsolatedClassLoader() throws Exception {
+        Locale locale = new Locale("zh", "CN");
+
+        ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        Hessian2Output out = new Hessian2Output(bout);
+        out.writeObject(locale);
+        out.flush();
+        byte[] data = bout.toByteArray();
+
+        ClassLoader isolatedLoader = new ClassLoader(ClassLoader.getSystemClassLoader()) {
+            @Override
+            public Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+                if (name.startsWith("com.alibaba.com.caucho.hessian.io.")) {
+                    throw new ClassNotFoundException("Simulated isolation: " + name);
+                }
+                return super.loadClass(name, resolve);
+            }
+        };
+
+        SerializerFactory factory = new SerializerFactory(isolatedLoader);
+        ByteArrayInputStream bin = new ByteArrayInputStream(data);
+        Hessian2Input input = new Hessian2Input(bin);
+        input.setSerializerFactory(factory);
+        Object result = input.readObject();
+        Assertions.assertEquals(locale, result);
     }
 }
