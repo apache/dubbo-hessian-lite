@@ -29,6 +29,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.IntStream;
 
 public class RecordTest extends SerializeTestBase {
@@ -366,5 +367,98 @@ public class RecordTest extends SerializeTestBase {
         Sample sample4 = new Sample("4", X.B);
         List<Sample> samples = Arrays.asList(sample1, sample2, sample3, sample4);
         testCollection(list, samples);
+    }
+
+    public record Address(String city) implements Serializable {
+    }
+
+    public record Student(String id, String name, Address address) implements Serializable {
+    }
+
+    public record StuRep(List<Student> students) implements Serializable {
+    }
+
+    /**
+     * Test where two distinct records share the same nested record instance.
+     * Hessian2 must preserve the shared reference instead of throwing
+     * IndexOutOfBoundsException while resolving the back reference.
+     * Regression test for issue #80.
+     */
+    @Test
+    public void testSharedRecordReference() throws IOException {
+        Address address = new Address("BeiJing");
+        Student student1 = new Student("1001", "ZhangSan", address);
+        Student student2 = new Student("1002", "LiSi", address);
+        StuRep stuRep = new StuRep(List.of(student1, student2));
+
+        StuRep result = baseHessian2Serialize(stuRep);
+
+        Assertions.assertEquals(stuRep, result);
+        Assertions.assertSame(result.students().get(0).address(), result.students().get(1).address());
+    }
+
+    public enum Gender {
+        MALE, FEMALE
+    }
+
+    public record TestObj(List<InnerObj> list) implements Serializable {
+        public static class InnerObj implements Serializable {
+            private String str;
+            private Gender gender;
+
+            public InnerObj() {
+            }
+
+            public String getStr() {
+                return str;
+            }
+
+            public Gender getGender() {
+                return gender;
+            }
+
+            public InnerObj setStr(String str) {
+                this.str = str;
+                return this;
+            }
+
+            public InnerObj setGender(Gender gender) {
+                this.gender = gender;
+                return this;
+            }
+
+            @Override
+            public boolean equals(Object o) {
+                if (this == o) {
+                    return true;
+                }
+                if (!(o instanceof InnerObj)) {
+                    return false;
+                }
+                InnerObj other = (InnerObj) o;
+                return Objects.equals(str, other.str) && gender == other.gender;
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(str, gender);
+            }
+        }
+    }
+
+    /**
+     * Test where a record holds a list of objects that share the same enum
+     * instance. The shared enum reference must be resolved correctly instead
+     * of corrupting the elements following the first one.
+     * Regression test for issue #81.
+     */
+    @Test
+    public void testSharedEnumInListOfPojo() throws IOException {
+        List<TestObj.InnerObj> list = new ArrayList<>();
+        list.add(new TestObj.InnerObj().setStr("1").setGender(Gender.MALE));
+        list.add(new TestObj.InnerObj().setStr("2").setGender(Gender.MALE));
+        TestObj obj = new TestObj(list);
+
+        Assertions.assertEquals(obj, baseHessian2Serialize(obj));
     }
 }
