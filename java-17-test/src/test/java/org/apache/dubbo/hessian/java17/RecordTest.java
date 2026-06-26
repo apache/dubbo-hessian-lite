@@ -18,11 +18,6 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 package org.apache.dubbo.hessian.java17;
 
-import org.apache.dubbo.hessian.java17.base.SerializeTestBase;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import java.io.IOException;
 import java.io.Serial;
 import java.io.Serializable;
@@ -31,6 +26,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
+
+import org.apache.dubbo.hessian.java17.base.SerializeTestBase;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class RecordTest extends SerializeTestBase {
 
