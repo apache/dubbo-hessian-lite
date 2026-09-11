@@ -49,6 +49,7 @@
 package com.alibaba.com.caucho.hessian.io;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Serializing an object for known object types.
@@ -68,6 +69,33 @@ public class ObjectDeserializer extends AbstractDeserializer {
     public Object readObject(AbstractHessianInput in)
             throws IOException {
         return in.readObject();
+    }
+
+    /**
+     * Reads an untyped map when the expected Java type is an interface.
+     */
+    @Override
+    public Object readMap(AbstractHessianInput in)
+            throws IOException {
+        return readMap(in, null, null);
+    }
+
+    @Override
+    public Object readMap(AbstractHessianInput in, Class<?> expectKeyType, Class<?> expectValueType)
+            throws IOException {
+        SerializerFactory factory = ((Hessian2Input) in).findSerializerFactory();
+        Deserializer mapDeserializer = factory.getDeserializer(Map.class);
+        if (mapDeserializer == this) {
+            throw error(getClass().getName() + " cannot delegate Map deserialization to itself");
+        }
+
+        Object value = mapDeserializer.readMap(in, expectKeyType, expectValueType);
+
+        if (value != null && !_cl.isInstance(value)) {
+            throw error(value.getClass().getName() + " cannot be assigned to " + _cl.getName());
+        }
+
+        return value;
     }
 
     @Override
