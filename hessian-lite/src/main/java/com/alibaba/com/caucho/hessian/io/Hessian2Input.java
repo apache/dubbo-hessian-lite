@@ -2921,18 +2921,33 @@ public class Hessian2Input
         String type = readString();
         int len = readInt();
 
+        if (len < 0)
+            throw error("bad field count " + len + " in object definition '"
+                    + type + "'");
+
         SerializerFactory factory = findSerializerFactory();
 
         Deserializer reader = factory.getObjectDeserializer(type, null);
 
-        Object[] fields = reader.createFields(len);
-        String[] fieldNames = new String[len];
+        // each field name takes at least one byte, so reading the names
+        // first bounds the arrays by the input actually supplied
+        ArrayList<String> nameList = new ArrayList<String>();
 
         for (int i = 0; i < len; i++) {
-            String name = readString();
+            if (read() < 0)
+                throw error("truncated object definition '" + type + "': "
+                        + i + " of " + len + " field names read");
 
-            fields[i] = reader.createField(name);
-            fieldNames[i] = name;
+            unread();
+
+            nameList.add(readString());
+        }
+
+        Object[] fields = reader.createFields(nameList.size());
+        String[] fieldNames = nameList.toArray(new String[0]);
+
+        for (int i = 0; i < fieldNames.length; i++) {
+            fields[i] = reader.createField(fieldNames[i]);
         }
 
         ObjectDefinition def
