@@ -73,7 +73,7 @@ public class CollectionDeserializer extends AbstractListDeserializer {
 
     public Object readList(AbstractHessianInput in, int length)
             throws IOException {
-        return readList(in, length, _type);
+        return readList(in, length, null);
     }
 
     @Override
