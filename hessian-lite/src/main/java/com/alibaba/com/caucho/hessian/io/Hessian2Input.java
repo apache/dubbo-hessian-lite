@@ -2223,6 +2223,16 @@ public class Hessian2Input
         if (cl == null || cl == Object.class)
             return readObject();
 
+        try {
+            if (cl != HashMap.class && !cl.isPrimitive() && !cl.isArray()
+                    && findSerializerFactory().getClassFactory().load(cl.getName()) == HashMap.class) {
+                readObject();
+                return null;
+            }
+        } catch (ClassNotFoundException e) {
+            throw new HessianProtocolException("Unable to resolve expected class " + cl.getName(), e);
+        }
+
         int tag = _offset < _length ? (_buffer[_offset++] & 0xff) : read();
 
         switch (tag) {
