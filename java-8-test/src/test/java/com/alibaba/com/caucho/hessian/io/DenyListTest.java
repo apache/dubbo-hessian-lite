@@ -20,11 +20,33 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Array;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
 public class DenyListTest {
+
+    @Test
+    public void deniedNestedFieldIsNotInstantiated() throws IOException {
+        AllowedContainer source = new AllowedContainer();
+        source.child = new DeniedChild();
+        source.child.value = "secret";
+
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        Hessian2Output output = new Hessian2Output(bytes);
+        output.writeObject(source);
+        output.flush();
+
+        HessianFactory factory = new HessianFactory();
+        factory.deny(DeniedChild.class.getName());
+        Hessian2Input input = factory.createHessian2Input(new ByteArrayInputStream(bytes.toByteArray()));
+        AllowedContainer result = (AllowedContainer) input.readObject();
+
+        Assertions.assertNull(result.child);
+    }
 
     @Test
     public void testDeny() throws ClassNotFoundException {
