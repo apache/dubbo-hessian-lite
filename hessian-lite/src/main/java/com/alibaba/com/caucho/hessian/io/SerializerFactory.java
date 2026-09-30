@@ -288,9 +288,23 @@ public class SerializerFactory extends AbstractSerializerFactory {
             return serializer;
     }
 
+    private static final String HESSIAN_PACKAGE_PREFIX = "com.alibaba.com.caucho.hessian.io.";
+
     public Class<?> loadSerializedClass(String className)
             throws ClassNotFoundException {
-        return getClassFactory().load(className);
+        try {
+            return getClassFactory().load(className);
+        } catch (ClassNotFoundException e) {
+            // In class-isolated containers (e.g. Pandora/OSGi), the configured classloader
+            // may be the business classloader, which cannot see hessian-lite internal classes
+            // such as LocaleHandle, CalendarHandle, etc. These Handle classes are bundled in
+            // the same jar as SerializerFactory and are always loadable by its own classloader.
+            // see: https://github.com/apache/dubbo-hessian-lite/issues/104
+            if (className.startsWith(HESSIAN_PACKAGE_PREFIX)) {
+                return Class.forName(className, false, SerializerFactory.class.getClassLoader());
+            }
+            throw e;
+        }
     }
 
     public ClassFactory getClassFactory() {
